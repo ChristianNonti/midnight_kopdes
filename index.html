@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Midnight KOPDES</title>
+<title>Midnight KOPDES — Mobile</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -44,6 +44,7 @@ body::after{
 .papan h1{font-family:'Oswald',Impact,sans-serif;font-weight:700;font-size:clamp(20px,4.4vw,32px);
   margin:0;color:#fff6e8;line-height:1;text-shadow:0 2px 0 #5d150c,0 0 18px rgba(255,220,180,.35)}
 .papan .sub{font-size:10.5px;color:#f6d3c8;letter-spacing:.14em;margin-top:3px}
+.judul{display:flex;align-items:center;gap:10px}
 .kanan{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .jam{font-family:'Oswald',sans-serif;font-weight:500;font-size:clamp(19px,3.8vw,28px);
   background:#0b0f0c;color:#ff6a4a;border:2px solid #000;padding:2px 11px;letter-spacing:.08em;
@@ -143,6 +144,98 @@ th,td{text-align:left;padding:4px 6px;border-bottom:1px solid #22403a;vertical-a
 th{font-family:'Oswald',sans-serif;font-weight:500;letter-spacing:.08em;font-size:11px;color:var(--kuning)}
 tr.tandai td{background:#1b2d26}
 
+/* ===================== VERSI MOBILE: MUAT 1 LAYAR ===================== */
+body{-webkit-tap-highlight-color:transparent}
+button{touch-action:manipulation}
+
+@media (max-width:700px){
+  html,body{height:100%;overflow:hidden}
+  body{overflow-x:hidden}
+  .wrap{
+    max-width:none;
+    height:100vh;height:100dvh;
+    padding:6px 6px 6px;
+    display:flex;flex-direction:column;gap:6px;
+    overflow:hidden;
+  }
+
+  /* header padat: judul+jam 1 baris, 3 tombol mini 1 baris */
+  .papan{flex:0 0 auto;padding:6px 8px;gap:4px}
+  .judul{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%}
+  .papan h1{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:none}
+  .jam{font-size:14px;padding:2px 7px;flex:0 0 auto}
+  .kanan{width:100%;display:flex;gap:4px}
+  .mini{flex:1 1 0;min-height:26px;padding:3px 2px;font-size:9px;text-align:center;box-shadow:0 2px 0 #000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+  /* status: 1 baris padat */
+  .status{flex:0 0 auto;grid-template-columns:repeat(6,1fr)}
+  .status div{padding:3px 2px;text-align:center}
+  .status .lbl{font-size:6.3px;letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .status .val{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+  /* panggung mengisi sisa layar, tidak scroll; hanya nota yg scroll internal */
+  .panggung{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;gap:6px;margin-top:0}
+
+  .etalase{flex:0 0 auto;align-self:center;width:auto;height:32vh;min-height:170px;max-height:250px;aspect-ratio:320/340;border-width:1px}
+  .scene svg{max-height:100%;filter:brightness(1.55) contrast(1.08) saturate(1.1)}
+  .stiker{font-size:7.5px;padding:1px 5px;top:5px;left:5px}
+  .kusen{inset:4px}
+  .sabar{left:8px;right:8px;bottom:5px}
+  .sabar .cap{font-size:7.5px;margin-bottom:2px}
+  .bar{height:6px}
+
+  .meja{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;gap:5px}
+
+  .nota{flex:1 1 auto;min-height:0;height:auto;padding:6px 8px;overflow-y:auto}
+  .nota h2{font-size:12px;padding-bottom:3px;margin-bottom:1px}
+  .nota .waktu{font-size:9px;margin-bottom:4px}
+  .baris{font-size:11.5px;margin-bottom:5px;line-height:1.35}
+  .baris b{font-size:9px}
+  .ucap{padding-left:7px;margin:1px 0 6px}
+
+  .aksi{flex:0 0 auto;grid-template-columns:repeat(3,1fr);gap:4px}
+  .aksi button{min-height:32px;font-size:8.6px;line-height:1.18;padding:3px 4px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:0;box-shadow:0 2px 0 #000}
+  .aksi button kbd{display:none}
+  .aksi button .biaya{float:none;font-size:7.3px;margin-top:1px}
+
+  .putusan{flex:0 0 auto;grid-template-columns:1fr 1fr;gap:4px}
+  .putusan button{min-height:32px;font-size:10.5px;padding:5px 8px;box-shadow:0 2px 0 #000}
+  .putusan button .biaya{display:none}
+  .lanjut{min-height:36px;font-size:12.5px}
+  button kbd{display:none}
+
+  /* layar modal tetap boleh scroll sendiri, ini overlay terpisah dari .wrap */
+  .layar{padding:8px}
+  .kartu{padding:14px;max-height:94vh}
+  .layar h2{font-size:clamp(19px,7vw,25px)}
+  table{font-size:10.5px}
+  th,td{padding:3px 4px}
+}
+@media (max-width:360px){
+  .papan h1{font-size:13px}
+  .status{grid-template-columns:repeat(3,1fr)}
+  .aksi{grid-template-columns:repeat(2,1fr)}
+}
+@supports (height:100dvh){
+  @media (max-width:700px){ .wrap{height:100dvh} }
+}
+
+/* kunci ke mode potret: kalau HP diputar landscape, tampilkan pesan */
+.putar-hp{display:none}
+@media (max-width:900px) and (orientation:landscape){
+  .wrap{display:none}
+  .putar-hp{
+    display:flex;position:fixed;inset:0;z-index:200;background:var(--malam);
+    flex-direction:column;align-items:center;justify-content:center;text-align:center;
+    padding:24px;gap:14px
+  }
+  .putar-hp .ikon{font-size:44px;animation:putar-anim 1.8s ease-in-out infinite}
+  .putar-hp h2{font-family:'Oswald',sans-serif;font-weight:500;letter-spacing:.06em;
+    font-size:18px;color:var(--kuning);margin:0}
+  .putar-hp p{color:var(--redup);font-size:13px;max-width:320px;margin:0}
+  @keyframes putar-anim{0%,100%{transform:rotate(0deg)}50%{transform:rotate(-90deg)}}
+}
+
 .getar{animation:getar .35s}
 @keyframes getar{0%,100%{transform:none}20%{transform:translate(-5px,3px)}45%{transform:translate(4px,-3px)}70%{transform:translate(-3px,-2px)}}
 .padam{animation:padam .9s}
@@ -152,18 +245,22 @@ tr.tandai td{background:#1b2d26}
 </style>
 </head>
 <body>
+<div class="putar-hp">
+  <div class="ikon">📱</div>
+  <h2>Putar HP ke mode potret</h2>
+  <p>Midnight KOPDES dirancang untuk layar tegak (potret). Putar HP kamu kembali ke posisi normal untuk melanjutkan shift.</p>
+</div>
 <div class="wrap" id="wrap">
 
   <header class="papan">
-    <div>
+    <div class="judul">
       <h1>KOPDES MEKAR JAYA</h1>
-      <div class="sub">Unit Warung Serba Ada · Dusun Karangwuni</div>
+      <div class="jam" id="jam">21.00</div>
     </div>
     <div class="kanan">
       <button class="mini" id="b-buku">Buku anggota</button>
       <button class="mini" id="b-catatan">Catatan shift</button>
       <button class="mini" id="b-suara">Suara: mati</button>
-      <div class="jam" id="jam">21.00</div>
     </div>
   </header>
 
@@ -960,20 +1057,13 @@ function layarJudul(){
   const malam=muatMalam();
   bukaLayar('<h2>Midnight KOPDES</h2>'+
    '<p class="kecil">Warung koperasi desa · shift 21.00–03.00</p>'+
-   '<p>Kamu penjaga malam di unit warung KOPDES Mekar Jaya. Pekerjaannya sederhana: layani siapa pun yang datang, kumpulkan setoran, jangan tutup sebelum jam tiga.</p>'+
-   '<p>Masalahnya, sejak pohon asam di pertigaan ditebang, tidak semua yang mengetuk kaca itu warga.</p>'+
+   '<p>Kamu jaga warung KOPDES malam ini. Layani warga, kumpulkan setoran, jangan tutup sebelum jam tiga — tapi sejak pohon asam di pertigaan ditebang, tidak semua yang mengetuk kaca itu warga.</p>'+
    '<h3>Cara bermain</h3><ul>'+
-   '<li>Tiap pelanggan bisa diperiksa lewat tujuh cara, ditambah satu telepon ke pos ronda yang hanya bisa dipakai sekali semalam tapi jawabannya pasti.</li>'+
-   '<li>Semua pemeriksaan makan waktu. Senter, garam, dan cermin stoknya terbatas, dan jam tidak berhenti.</li>'+
-   '<li>Warga asli punya kesabaran. Diinterogasi terlalu lama, mereka pergi sendiri dan penjualannya hilang. Yang bukan warga tidak pernah kehabisan sabar — itu sendiri sebuah petunjuk.</li>'+
-   '<li>Layani warga asli untuk mengisi kas. <span class="tanda">Melayani yang bukan warga mengurangi keselamatan.</span> Mengusir warga asli merusak nama baik. Tiga kali salah di salah satunya, shift berakhir.</li>'+
-   '<li>Kalimat <span class="tanda">berwarna merah</span> di nota adalah kejanggalan yang berhasil kamu tangkap — dan hanya muncul kalau kamu memeriksa saluran yang tepat.</li>'+
+   '<li>Periksa tiap pelanggan lewat 7 cara + 1 telepon pos ronda (sekali pakai, jawabannya pasti). Semua makan waktu, stok senter/garam/cermin terbatas.</li>'+
+   '<li>Warga asli bisa kehabisan sabar kalau kelamaan diinterogasi lalu pergi sendiri. Yang bukan warga tidak pernah kehabisan sabar — itu sendiri petunjuk.</li>'+
+   '<li><span class="tanda">Layani yang bukan warga = keselamatan berkurang.</span> Tolak warga asli = nama baik berkurang. 3x salah di salah satunya, shift berakhir.</li>'+
+   '<li>Curiga? Cocokkan di <b>Buku anggota</b> dan cek <b>Catatan shift</b> — dua hal yang paling sering kelupaan.</li>'+
    '</ul>'+
-   '<h3>Dua alat yang mudah dilupakan</h3><ul>'+
-   '<li><b>Buku anggota</b> berisi nama, umur, RT, dan ciri fisik warga terdaftar. Cocokkan dengan KTP yang disodorkan. RT di dusun ini hanya sampai nomor lima.</li>'+
-   '<li><b>Catatan shift</b> mencatat siapa saja yang sudah datang malam ini. Berguna sekali ketika seseorang datang untuk kedua kalinya dengan wajah yang sama.</li>'+
-   '</ul>'+
-   '<p class="kecil">Tombol angka 1–8 untuk memeriksa, L untuk melayani, T untuk menolak, Enter untuk lanjut.</p>'+
    '<button class="mulai" id="tbl-mulai">Buka rolling door · mulai malam ke-'+malam+'</button>'+
    (malam>1?'<p class="kecil" style="text-align:center;margin-top:8px"><a href="#" id="reset" style="color:#89a79a">Mulai lagi dari malam pertama</a></p>':''));
   el("tbl-mulai").onclick=()=>{ if(!Au.ctx&&Au.on) suaraNyala(); tutupLayar(); mulaiMalam(malam); };
