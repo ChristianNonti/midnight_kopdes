@@ -791,7 +791,7 @@ function suaraNyala(){
 
     // LFO sangat pelan menggoyang cutoff filter -> kesan "sesuatu sedang bernapas" di kegelapan
     const lfo=Au.ctx.createOscillator(); lfo.type="sine"; lfo.frequency.value=.07;
-    const lfoGain=Au.ctx.createGain(); lfoGain.gain.value=150;
+    const lfoGain=Au.ctx.createGain(); lfoGain.gain.value=260;
     lfo.connect(lfoGain); lfoGain.connect(Au.filter.frequency); lfo.start(); Au.lfo=lfo;
 
     jadwalkanBisikan();
@@ -813,7 +813,7 @@ function bunyi(jenis){
   const t=Au.ctx.currentTime, g=Au.ctx.createGain(), o=Au.ctx.createOscillator();
   o.connect(g); g.connect(Au.ctx.destination);
   if(jenis==="bel"){ o.type="sine"; o.frequency.setValueAtTime(1180,t); o.frequency.exponentialRampToValueAtTime(760,t+.18);
-    g.gain.setValueAtTime(.09,t); g.gain.exponentialRampToValueAtTime(.001,t+.55); o.start(t); o.stop(t+.6); }
+    g.gain.setValueAtTime(.17,t); g.gain.exponentialRampToValueAtTime(.001,t+.55); o.start(t); o.stop(t+.6); }
   else if(jenis==="baik"){ o.type="triangle"; o.frequency.setValueAtTime(520,t); o.frequency.linearRampToValueAtTime(700,t+.14);
     g.gain.setValueAtTime(.075,t); g.gain.exponentialRampToValueAtTime(.001,t+.3); o.start(t); o.stop(t+.32); }
   else if(jenis==="buruk"){
