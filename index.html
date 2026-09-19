@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Midnight KOPDES — Mobile</title>
+<title>Midnight KOPDES — Story Edition</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -136,15 +136,63 @@ button:disabled{opacity:.32;cursor:not-allowed}
 .layar ul{margin:0 0 10px;padding-left:19px}
 .layar li{margin-bottom:5px}
 .tanda{color:#ff7a5e}
-.mulai{background:var(--kuning);color:#2b1f04;font-size:17px;padding:11px;width:100%;text-align:center;margin-top:14px}
+.mulai{background:var(--kuning);color:#2b1f04;font-size:17px;padding:11px;width:100%;text-align:center;margin-top:14px;border:none;cursor:pointer;font-family:'Oswald',sans-serif;font-weight:700}
 .tutup{background:#14251f;width:100%;text-align:center;margin-top:8px;font-size:14px}
+
+/* ===== layar pembuka: efek hidup ===== */
+.layar{position:fixed;inset:0;overflow:hidden}
+.layar::before{
+  content:"";position:absolute;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(55% 38% at 18% 82%, rgba(30,107,79,.22), transparent 62%),
+    radial-gradient(48% 32% at 86% 12%, rgba(192,52,31,.14), transparent 65%);
+  animation:kabutGerak 16s ease-in-out infinite alternate;
+}
+@keyframes kabutGerak{0%{transform:translate(-2%,1%) scale(1)}100%{transform:translate(3%,-2%) scale(1.08)}}
+.kartu{position:relative;z-index:1;transition:filter .09s linear}
+.kartu.kedip{filter:brightness(.8) saturate(.85)}
+
+.judul-flicker{animation:judulFlicker 4.2s infinite}
+@keyframes judulFlicker{
+  0%,2%,5%,7%,42%,44%,100%{opacity:1;text-shadow:0 0 2px rgba(255,220,180,.25),0 0 16px rgba(255,120,80,.45)}
+  3%,6%,43%{opacity:.5;text-shadow:none}
+}
+
+#intro-p{min-height:3.4em}
+#intro-p.mengetik::after{content:"▍";margin-left:1px;animation:kursorKedip .85s steps(1) infinite;color:var(--kuning)}
+@keyframes kursorKedip{50%{opacity:0}}
+
+.cara-list li{opacity:0;transform:translateX(-10px);animation:itemMuncul .5s ease forwards}
+.cara-list li:nth-child(1){animation-delay:.3s}
+.cara-list li:nth-child(2){animation-delay:.5s}
+.cara-list li:nth-child(3){animation-delay:.7s}
+.cara-list li:nth-child(4){animation-delay:.9s}
+@keyframes itemMuncul{to{opacity:1;transform:none}}
+
+.mulai-glow{animation:tombolNafas 2.4s ease-in-out infinite;animation-delay:1.2s;opacity:0;animation-fill-mode:forwards}
+@keyframes tombolNafas{
+  0%{opacity:0;box-shadow:0 3px 0 #000,0 0 0 rgba(230,183,74,0)}
+  8%{opacity:1}
+  50%{box-shadow:0 3px 0 #000,0 0 20px rgba(230,183,74,.6)}
+  100%{opacity:1;box-shadow:0 3px 0 #000,0 0 0 rgba(230,183,74,0)}
+}
+.mulai-glow:active{animation:none;transform:translateY(3px);box-shadow:0 0 0 #000!important}
+@media (prefers-reduced-motion:reduce){
+  .judul-flicker,.kartu.kedip,.layar::before,.cara-list li,.mulai-glow{animation:none!important;opacity:1!important;transform:none!important;filter:none!important}
+}
 .kecil{font-size:12px;color:var(--redup)}
 table{width:100%;border-collapse:collapse;font-size:12.5px;margin-bottom:8px}
 th,td{text-align:left;padding:4px 6px;border-bottom:1px solid #22403a;vertical-align:top}
 th{font-family:'Oswald',sans-serif;font-weight:500;letter-spacing:.08em;font-size:11px;color:var(--kuning)}
 tr.tandai td{background:#1b2d26}
 
-/* ===================== VERSI MOBILE: MUAT 1 LAYAR ===================== */
+/* Narasi Prolog & Ending */
+.cerita-box{background:#0a1210;border:1px solid #2e4d43;padding:12px;margin:10px 0;font-size:13.5px;line-height:1.6;color:#d5e5dc;border-left:4px solid var(--kuning)}
+.ending-badge{display:inline-block;padding:3px 8px;font-family:'Oswald',sans-serif;font-size:12px;font-weight:bold;margin-bottom:8px}
+.ending-happy{background:#1e6b4f;color:#fff}
+.ending-bad{background:#8e1b12;color:#fff}
+
+/* ===================== VERSI MOBILE ===================== */
 body{-webkit-tap-highlight-color:transparent}
 button{touch-action:manipulation}
 
@@ -159,7 +207,6 @@ button{touch-action:manipulation}
     overflow:hidden;
   }
 
-  /* header padat: judul+jam 1 baris, 3 tombol mini 1 baris */
   .papan{flex:0 0 auto;padding:6px 8px;gap:4px}
   .judul{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%}
   .papan h1{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:none}
@@ -167,13 +214,11 @@ button{touch-action:manipulation}
   .kanan{width:100%;display:flex;gap:4px}
   .mini{flex:1 1 0;min-height:26px;padding:3px 2px;font-size:9px;text-align:center;box-shadow:0 2px 0 #000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-  /* status: 1 baris padat */
   .status{flex:0 0 auto;grid-template-columns:repeat(6,1fr)}
   .status div{padding:3px 2px;text-align:center}
   .status .lbl{font-size:6.3px;letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .status .val{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-  /* panggung mengisi sisa layar, tidak scroll; hanya nota yg scroll internal */
   .panggung{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;gap:6px;margin-top:0}
 
   .etalase{flex:0 0 auto;align-self:center;width:auto;height:32vh;min-height:170px;max-height:250px;aspect-ratio:320/340;border-width:1px}
@@ -204,7 +249,6 @@ button{touch-action:manipulation}
   .lanjut{min-height:36px;font-size:12.5px}
   button kbd{display:none}
 
-  /* layar modal tetap boleh scroll sendiri, ini overlay terpisah dari .wrap */
   .layar{padding:8px}
   .kartu{padding:14px;max-height:94vh}
   .layar h2{font-size:clamp(19px,7vw,25px)}
@@ -220,7 +264,6 @@ button{touch-action:manipulation}
   @media (max-width:700px){ .wrap{height:100dvh} }
 }
 
-/* kunci ke mode potret: kalau HP diputar landscape, tampilkan pesan */
 .putar-hp{display:none}
 @media (max-width:900px) and (orientation:landscape){
   .wrap{display:none}
@@ -265,7 +308,7 @@ button{touch-action:manipulation}
   </header>
 
   <div class="status">
-    <div><div class="lbl">Malam ke</div><div class="val" id="s-malam">1</div></div>
+    <div><div class="lbl">Malam ke</div><div class="val" id="s-malam">1/5</div></div>
     <div><div class="lbl">Kas laci</div><div class="val" id="s-kas">Rp 0</div></div>
     <div><div class="lbl">Setoran wajib</div><div class="val" id="s-target">Rp 0</div></div>
     <div><div class="lbl">Keselamatan</div><div class="val pip" id="s-nyawa">◆◆◆</div></div>
@@ -274,7 +317,7 @@ button{touch-action:manipulation}
   </div>
 
   <main class="panggung">
-    <section class="etalase" id="etalase" aria-label="Pintu kaca warung">
+    <section class="etalase" id="etalase" aria-label="Pintu kaca minimarket">
       <span class="stiker">BUKA SAMPAI 03.00</span>
       <div class="scene" id="scene"></div>
       <div class="hujan" id="hujan"></div>
@@ -303,7 +346,7 @@ button{touch-action:manipulation}
 <script>
 "use strict";
 
-/* ===================== BUKU ANGGOTA ===================== */
+/* ===================== BUKU ANGGOTA (EXPANDED) ===================== */
 const BUKU = [
  {n:"Sarno Widodo",u:54,rt:"02",k:"Hansip. Bekas sundutan obat nyamuk di lengan kiri."},
  {n:"Yanti Kusuma",u:31,rt:"04",k:"Punya bayi 8 bulan. Suami kerja di Kalimantan."},
@@ -314,19 +357,30 @@ const BUKU = [
  {n:"Tarjo Prasetyo",u:39,rt:"05",k:"Tukang bakso keliling. Gerobak biru."},
  {n:"Fajar Prasetyo",u:9,rt:"05",k:"Anak Pak Tarjo. Belum punya KTP."},
  {n:"Dewi Anggraini",u:23,rt:"—",k:"Pendatang, kos di rumah Bu Tin. Surat keterangan dari Pak Mardi."},
- {n:"Mardi Susanto",u:51,rt:"02",k:"Ketua RT sekaligus pengurus KOPDES. Masih hidup dan sehat."},
+ {n:"Mardi Susanto",u:51,rt:"02",k:"Ketua RT 02 sekaligus pengurus KOPDES. Punya bekas luka garukan di leher."},
  {n:"Bagas Nugroho",u:8,rt:"05",k:"Anak Pak Kirno. Rambutnya ikal, bukan plontos."},
- {n:"Kirno Hadi",u:44,rt:"05",k:"Petani. Bapak dari Bagas."},
+ {n:"Kirno Hadi",u:44,rt:"05",k:"Petani. Bapak dari Bagas. Bau pupuk kandang."},
  {n:"Retno Palupi",u:26,rt:"04",k:"Menantu Bu Tin. Jarang keluar malam."},
  {n:"Marno Sudibyo",u:47,rt:"01",k:"Wafat pekan lalu. Nama belum dicoret dari buku."},
  {n:"Sugeng Riyadi",u:41,rt:"03",k:"Tukang bangunan. Badan kurus, bukan berotot."},
  {n:"Tumirah",u:71,rt:"05",k:"Nenek penjual jamu. Tidak punya cucu."},
  {n:"Suryadi",u:44,rt:"05",k:"Peternak. Perhatian: di dusun ini RT hanya sampai 05."},
  {n:"Karyo Pamungkas",u:38,rt:"02",k:"Tukang las. Bengkelnya di pertigaan."},
- {n:"Tin Marlina",u:58,rt:"04",k:"Pemilik rumah kos. Ibu mertua Retno."}
+ {n:"Tin Marlina",u:58,rt:"04",k:"Pemilik rumah kos. Ibu mertua Retno. Suka pakai selendang batik."},
+ {n:"Eko Purwanto",u:36,rt:"01",k:"Tukang kayu. Jari telunjuk kanan pernah terpotong separuh."},
+ {n:"Nur Hayati",u:29,rt:"03",k:"Guru SD Karangwuni. Selalu memakai kacamata frame hitam."},
+ {n:"Hendra Pratama",u:42,rt:"04",k:"Sopir truk pasir. Tato jangkar pudar di lengan kanan."},
+ {n:"Mbah Minto",u:82,rt:"01",k:"Mbah sepuh. Telinga kiri agak tuli, bicara selalu keras."},
+ {n:"Slamet Riyadi",u:49,rt:"05",k:"Peternak kambing. Bau jamu herbal dan pakan ternak."},
+ {n:"Dwi Handoko",u:20,rt:"02",k:"Anggota Karang Taruna. Tangan kanan ada bekas knalpot."},
+ {n:"Sri Mulyani",u:45,rt:"03",k:"Penjual nasi goreng malam. Tangan kanan sering luka bakar wajan."},
+ {n:"Budi Santoso",u:33,rt:"01",k:"Pegawai kelurahan. Pakai jam tangan emas palsu."},
+ {n:"Rina Astuti",u:25,rt:"02",k:"Kasir minimarket kecamatan. Tahi lalat di bawah hidung."},
+ {n:"Agus Setiawan",u:28,rt:"04",k:"Mekanik bengkel. Kuku jari selalu berbekas oli hitam."},
+ {n:"Lilik Suprihatin",u:50,rt:"05",k:"Pensiunan PNS. Selalu membawa tas pinggang kulit."}
 ];
 
-/* ===================== TOKOH ===================== */
+/* ===================== TOKOH WARGA (EXPANDED) ===================== */
 const SALURAN=["amati","ktp","belanja","tanya","senter","garam","cermin"];
 
 const WARGA=[
@@ -420,18 +474,59 @@ const WARGA=[
      senter:"Bayangan kecilnya menempel di lantai, ikut menguap lebar.",
      garam:"Malah menjilat jarinya. Asin, Om. Nggak enak.",
      cermin:"Terpantul, sambil menggaruk kepala dan melihat rak es krim."}},
- {id:"bowo",nama:"Bowo Hartanto",peran:"Perantau tersesat",bayar:35000,sabar:25,
-  look:{kulit:"#a87d52",baju:"#4a4a52",kepala:"cepak",tinggi:1.01,wajah:"normal"},
-  ucap:"Mas, saya kesasar. Ini jalan ke Karangwuni bawah, kan? Sekalian beli rokok.",
-  c:{amati:"Ransel besar, celana kotor kena lumpur, wajah kusut kelelahan perjalanan.",
-     ktp:"Bowo Hartanto, 29 th, KTP Bekasi. Boarding pass kereta terselip di dompet.",
-     belanja:"Rokok putih, air mineral besar, roti tawar.",
-     tanya:"Wah, saya nggak tahu RT sini siapa. Sepuluh tahun saya di Bekasi, Mas.",
-     senter:"Bayangannya panjang, ranselnya bikin punggungnya kelihatan bungkuk.",
-     garam:"Mengangkat alis. Ritual apa nih, Mas? Serem amat warungnya.",
-     cermin:"Terpantul jelas. Dia balik menatap cermin dan merapikan rambut."}}
+ {id:"mardi",nama:"Mardi Susanto",peran:"Ketua RT 02 & Pengurus",bayar:55000,sabar:28,
+  look:{kulit:"#9e724a",baju:"#2d4030",kepala:"peci",tinggi:1.02,wajah:"tua"},
+  ucap:"Lho, Mas. Piye shift malammu? Lancar to? Aku mampir sisan tuku obat nyamuk.",
+  c:{amati:"Jaket dinas RT, kacamata gantung di leher. Ada bekas luka garukan kuno di leher.",
+     ktp:"Mardi Susanto, 51 th, RT 02. KTP Pengurus KOPDES resmi dengan stempel wet.",
+     belanja:"Obat nyamuk bakar, baterai ABC 2 biji, rokok surya.",
+     tanya:"Lha aku ketua RT 02 dhewe kok ditakoni RT-ne sopo. Wes ngopi durung kowe?",
+     senter:"Bayangannya tegap, sorot senter memantul di kaca kacamatanya.",
+     garam:"Tergelak. Yo ojo disirami uyah, Mas. Aku dudu demit hiii...",
+     cermin:"Terpantul utuh. Terlihat kunci pos ronda tergantung di pinggangnya."}},
+ {id:"tin",nama:"Tin Marlina",peran:"Pemilik Kos RT 04",bayar:42000,sabar:25,
+  look:{kulit:"#b88a62",baju:"#6e334d",kepala:"sanggul_mewah",tinggi:.92,wajah:"tua"},
+  ucap:"Kopi luwak saset roso gulas masih ada, Mas? Anak-anak kos pada begadang.",
+  c:{amati:"Selendang batik cokelat melilit pundak, perhiasan emas di jemari.",
+     ktp:"Tin Marlina, 58 th, RT 04. Wajah foto anggun dan pas dengan aslinya.",
+     belanja:"Kopi saset 5, sabun cuci piring, baterai senter.",
+     tanya:"RT-ku ya Pak Mardi. Omahku jejeran kok.",
+     senter:"Bayangan tubuhnya agak gemuk memantul jelas di lantai.",
+     garam:"Menepuk pundakmu. Halah, guyon wae kowe iki Mas.",
+     cermin:"Pantulan cermin jelas, emas di tangannya memantulkan cahaya."}},
+ {id:"eko",nama:"Eko Purwanto",peran:"Tukang Kayu",bayar:36000,sabar:20,
+  look:{kulit:"#a37042",baju:"#4d3e2e",kepala:"cepak",tinggi:1.01,wajah:"normal"},
+  ucap:"Mas, amplas halus sama paku payung ada? Kerjaan perkakas belum kelar.",
+  c:{amati:"Bau serbuk kayu jati kering. Jari telunjuk kanannya buntung separuh.",
+     ktp:"Eko Purwanto, 36 th, RT 01. Foto pas resmi dengan kemeja rapi.",
+     belanja:"Paku payung 1 pak, lem G, kopi hitam.",
+     tanya:"Pak Mardi RT 02, tapi nak aku RT 01 Pak Joyo dharat.",
+     senter:"Senter menyorot jari telunjuk kanannya yang buntung, bayangan wajar.",
+     garam:"Mengebas celana yang kena serbuk garam.",
+     cermin:"Pantulan cermin pas. Terlihat noda serbuk kayu di dahinya."}},
+ {id:"nur",nama:"Nur Hayati",peran:"Guru SD",bayar:31000,sabar:22,
+  look:{kulit:"#cc9f78",baju:"#2d506e",kepala:"kerudung",tinggi:.95,wajah:"muda"},
+  ucap:"Malam Mas, spidol papan tulis warna hitam ready? Buat mengajar besok.",
+  c:{amati:"Kacamata bingkai hitam tebal. Membawa tas laptop jinjing.",
+     ktp:"Nur Hayati, 29 th, RT 03. Foto jilbab biru rapi.",
+     belanja:"Spidol boardmarker, tipe-x, air mineral.",
+     tanya:"RT 03 Pak Mardi kan pengurus desa juga. Sering ke sekolah.",
+     senter:"Bayangannya memanjang rapi membawa tas.",
+     garam:"Tersenyum bingung. Garam buat apa Mas?",
+     cermin:"Pantulan cermin sempurna. Mengatur posisi kacamatanya."}},
+ {id:"hendra",nama:"Hendra Pratama",peran:"Sopir Truk",bayar:48000,sabar:18,
+  look:{kulit:"#8c5c36",baju:"#333230",kepala:"topi",tinggi:1.08,wajah:"kasar"},
+  ucap:"Bos, rokok filter dua bungkus sama kopi dingin. Masih ada jalan jauh.",
+  c:{amati:"Tato bentuk jangkar pudar di lengan kanan. Bau minyak solar.",
+     ktp:"Hendra Pratama, 42 th, RT 04. Ada SIM B2 Umum di dompetnya.",
+     belanja:"Rokok filter 2, kopi dingin, korek api.",
+     tanya:"Pak Mardi. Sering ketemu waktu syukuran RT.",
+     senter:"Bayangannya kekar dan besar menutupi sebagian rak.",
+     garam:"Mendengus. Aneh-aneh wae kowe Mas.",
+     cermin:"Pantulan jelas, tato jangkarnya terlihat di cermin."}}
 ];
 
+/* ===================== TOKOH ENTITAS / BUKAN WARGA (EXPANDED) ===================== */
 const BUKAN=[
  {id:"tuyul",nama:"Bagas Nugroho",peran:"Mengaku anak Pak Kirno",bayar:0,sabar:55,
   look:{kulit:"#b5a07c",baju:"#5c4a2e",kepala:"botak",tinggi:.64,wajah:"anak"},
@@ -446,7 +541,7 @@ const BUKAN=[
   x:{amati:"Kepalanya plontos mengilap seperti dipoles, tapi kerut di sudut matanya seperti kakek-kakek.",
      ktp:"Bagas Nugroho, 8 th. Masalahnya foto di KK itu anak berambut ikal, dan yang di depanmu plontos.",
      belanja:"Bayarnya koin receh selaci penuh, semuanya basah berlumpur dan bau got.",
-     tanya:"Pak RT? Yang nyimpen uang di bawah kasur itu ya, Om? Yang laci warungnya nggak dikunci?",
+     tanya:"Pak RT? Yang nyimpen uang di bawah kasur itu ya, Om? Yang laci kasirnya nggak dikunci?",
      senter:"Tidak ada bayangan sama sekali. Yang ikut bergerak di lantai cuma bayangan kaleng biskuit.",
      garam:"Kakinya melepuh. Dia memekik dengan suara serak orang dewasa lalu mundur ke balik rak.",
      cermin:"Di cermin, di tempat dia berdiri, cuma ada karung goni yang bergerak-gerak sendiri."}},
@@ -518,40 +613,74 @@ const BUKAN=[
      senter:"Bayangannya bukan bayangan nenek, melainkan sosok tinggi dengan tangan menjuntai sampai lantai.",
      garam:"Dia menjerit dengan suara bayi menangis, lalu merangkak mundur ke arah kebun bambu.",
      cermin:"Di pantulannya ada anak kecil menempel di punggungnya, matanya terbuka menatapmu."}},
- {id:"ngepet",nama:"Suryadi",peran:"Mengaku peternak RT 06",bayar:0,sabar:55,
-  look:{kulit:"#8b6039",baju:"#22201e",kepala:"cepak",tinggi:1,wajah:"kasar"},
-  ucap:"Lilin, Mas. Yang paling besar. Sisa berapa saja saya ambil semua.",
-  c:{amati:"Jaket hitam basah, napas tersengal seperti habis lari, mata melirik ke sekitar.",
-     ktp:"Suryadi, 44 th, RT 05. Alamat sesuai, foto agak lama tapi cocok.",
-     belanja:"Lilin 3 batang, korek, kopi sachet.",
-     tanya:"Pak Mardi. Saya ikut arisan RT gabungan tiap tanggal 15.",
-     senter:"Bayangannya wajar, jaketnya menetes membentuk genangan.",
-     garam:"Melompat mundur. Wah, licin nanti, Mas.",
-     cermin:"Terpantul utuh, langsung menyeka wajahnya yang basah."},
-  x:{amati:"Keringatnya berbau kandang. Di sela jaket, bulu kasar tumbuh memanjang di tengkuknya.",
-     ktp:"Suryadi, 44 th, RT 06. Masalahnya, di dusun ini RT cuma sampai nomor lima.",
-     belanja:"Belasan lilin. Sambil menunggu, matanya tidak lepas dari laci uangmu, bukan dari rak.",
-     tanya:"Pak Mardi? Yang lacinya saya gasak minggu lalu itu, ya. Ternyata isinya cuma receh.",
-     senter:"Yang terbayang di lantai bukan sosok manusia, melainkan babi besar yang berdiri di dua kaki.",
-     garam:"Dia memekik seperti babi disembelih, menyeruduk rak mi instan, lalu kabur ke kegelapan.",
-     cermin:"Cermin memantulkan moncong panjang dan taring, sementara di depanmu wajahnya tetap manusia."}},
- {id:"banaspati",nama:"Karyo Pamungkas",peran:"Mengaku tukang las",bayar:0,sabar:55,
-  look:{kulit:"#7a4a30",baju:"#5a2a18",kepala:"gondrong",tinggi:1.05,wajah:"kasar"},
-  ucap:"Panas, Mas. Ada minuman dingin? Yang paling dingin.",
-  c:{amati:"Wearpack kotor bekas gerinda, alis terbakar sebagian, bau besi panas.",
-     ktp:"Karyo Pamungkas, 38 th, RT 02. Ada kartu BPJS ketenagakerjaan terselip.",
-     belanja:"Es teh botolan 3, minyak tanah botol kecil, plester luka.",
-     tanya:"Pak Mardi. Pagar rumahnya saya yang las, sampai sekarang belum dibayar.",
-     senter:"Bayangannya bergerak wajar, ada percikan serbuk besi di lantai.",
-     garam:"Menyeka tengkuk. Saya kan bukan setan, Mas. Capek doang.",
-     cermin:"Terpantul jelas, wajahnya belang kena debu gerinda."},
-  x:{amati:"Kulitnya menghitam dan retak seperti bara yang mulai padam. Uap naik dari bahunya.",
-     ktp:"Kartunya menghangat di tanganmu. Bagian fotonya menggelembung seperti plastik mau meleleh.",
-     belanja:"Lima botol minyak tanah. Minuman dingin dalam genggamannya mendidih pelan.",
-     tanya:"Pak Mardi sedang tidur. Rumahnya hangat sekali malam ini. Sebentar lagi lebih hangat.",
-     senter:"Senternya mati begitu diarahkan ke dia. Lampu warung ikut berkedip putus-putus.",
-     garam:"Garam yang jatuh ke dekat kakinya langsung meletup jadi butiran hitam.",
-     cermin:"Di cermin tidak ada orang. Cuma bola api melayang setinggi dada, berputar pelan."}},
+ {id:"sundel",nama:"Tin Marlina",peran:"Mengaku Bu Tin Kos",bayar:0,sabar:55,minMalam:2,
+  look:{kulit:"#d2c7b8",baju:"#5a233b",kepala:"sanggul_mewah",tinggi:.93,wajah:"pucat"},
+  ucap:"Mas... beli minyak wangi kantil sama pembalut. Punggungku rasanya bolong...",
+  c:{amati:"Selendang batik melilit pundak, perhiasan emas di jari.",
+     ktp:"Tin Marlina, 58 th, RT 04. Laminasi rapi.",
+     belanja:"Kopi saset, sabun, baterai.",
+     tanya:"Pak Mardi tetangga dekat saya.",
+     senter:"Bayangan wajar di lantai.",
+     garam:"Mengebas selendang batik.",
+     cermin:"Terpantul rapi di cermin."},
+  x:{amati:"Bau bangkai amis bercampur melati menusuk hidung. Di balik selendang batik ada cairan hitam menetes.",
+     ktp:"Tin Marlina, 58 th. Alamat ditulis RT 09, padahal desa Karangwuni cuma sampai RT 05.",
+     belanja:"Belanjaannya kunyit basah dan pembalut sekardus. Tangannya dingin kaku.",
+     tanya:"Pak Mardi? Ahahaha... dia sedang tidur nyenyak di bawah tanah gurih...",
+     senter:"Sorot senter menembus punggungnya. Ada lubang menganga berulat di punggung bajunya.",
+     garam:"Garam meletup kencang waktu menyentuh roknya. Dia menjerit melengking melintasi jendela.",
+     cermin:"Di cermin terpantul sosok wanita berlubang besar di punggung berdarah segar menatapmu."}},
+ {id:"kuyang",nama:"Nur Hayati",peran:"Mengaku Guru SD Nur",bayar:0,sabar:55,minMalam:2,
+  look:{kulit:"#e0d3c1",baju:"#1e3b52",kepala:"kuyang",tinggi:.95,wajah:"pucat"},
+  ucap:"Mas... ada minyak goreng curah? Leherku rasanya gatal banget...",
+  c:{amati:"Kacamata bingkai hitam tebal, tas laptop jinjing.",
+     ktp:"Nur Hayati, 29 th, RT 03. Foto jilbab biru.",
+     belanja:"Spidol, tipe-x, air mineral.",
+     tanya:"RT 03 Pak Mardi sering berkunjung.",
+     senter:"Bayangan memanjang membawa tas.",
+     garam:"Tersenyum bingung.",
+     cermin:"Pantulan cermin sempurna."},
+  x:{amati:"Ada garis merah melingkar utuh di lehernya, seolah kepalanya pernah terpotong dan ditempelkan kembali.",
+     ktp:"Nur Hayati, 29 th. Foto KTP tidak punya kepala—cuma gambar leher membusuk.",
+     belanja:"Minyak goreng curah 2 liter dan darah ayam jika ada. Napasnya berbau hanyir organ dalam.",
+     tanya:"Anak-anak muridku di SD... organ tubuh mereka manis-manis sekali malam ini...",
+     senter:"Kepalanya tampak melayang 5 cm di atas kerah baju waktu disorot cahaya!",
+     garam:"Garam membuat lehernya mengeluarkam asap hijau. Kepalanya terangkat sedikit melayang ketakutan!",
+     cermin:"Di cermin, cuma ada kepala melayang dengan usus dan jantung berdarah menggantung di bawahnya!"}},
+ {id:"lampor",nama:"Hendra Pratama",peran:"Mengaku Sopir Truk Hendra",bayar:0,sabar:55,minMalam:3,
+  look:{kulit:"#5c4333",baju:"#1f1d1b",kepala:"topi",tinggi:1.08,wajah:"kasar"},
+  ucap:"Buka pintu... keranda lewat... kepingin beli tali pocong...",
+  c:{amati:"Tato jangkar pudar di lengan kanan. Bau minyak solar.",
+     ktp:"Hendra Pratama, 42 th, RT 04. SIM B2.",
+     belanja:"Rokok filter, kopi dingin.",
+     tanya:"Pak Mardi langganan syukuran.",
+     senter:"Bayangan kekar besar.",
+     garam:"Mendengus kesal.",
+     cermin:"Pantulan jelas tato jangkar."},
+  x:{amati:"Dari luar terdengar suara besi berkerincing dentang-dentang seperti keranda digotong. Matanya menyala merah.",
+     ktp:"Kartu KTP-nya dari besi berkarat tebal bersimbah darah kering.",
+     belanja:"Minta beli kain kafan dan kawat besi. Tangannya kaku seperti kayu kering.",
+     tanya:"Satu dusun ini akan kami bawa naik keranda terbang sebelum fajar menyingsing...",
+     senter:"Bukan bayangan manusia di lantai, melainkan bayangan keranda terbang beratap hitam.",
+     garam:"Garam yang mengenai bajunya memercikkan api membakar kainnya jadi abu berasap.",
+     cermin:"Cermin retak saat menangkap pantulannya! Terlihat keranda besi melayang melintasi lorong toko."}},
+ {id:"peniru_mardi",nama:"Mardi Susanto",peran:"Mengaku Pak RT Mardi",bayar:0,sabar:55,minMalam:3,peniruDari:"mardi",
+  look:{kulit:"#9e724a",baju:"#2d4030",kepala:"peci",tinggi:1.02,wajah:"tua"},
+  ucap:"Lho, Mas. Piye shift malammu? Lancar to? Aku mampir sisan tuku obat nyamuk.",
+  c:{amati:"Jaket dinas RT, kacamata gantung di leher. Bekas luka garukan kuno di leher.",
+     ktp:"Mardi Susanto, 51 th, RT 02. KTP Pengurus KOPDES resmi.",
+     belanja:"Obat nyamuk bakar, baterai ABC.",
+     tanya:"Lha aku ketua RT 02 dhewe kok ditakoni.",
+     senter:"Bayangannya tegap.",
+     garam:"Tergelak santai.",
+     cermin:"Terpantul utuh."},
+  x:{amati:"Bekas luka garukan di lehernya hilang total! Kulit lehernya mulus licin seperti plastik.",
+     ktp:"Data KTP persis sama, tapi stempel resmi koperasi tercetak terbalik di sebelah kanan.",
+     belanja:"Membeli obat nyamuk dan racun tikus 5 botol sekaligus.",
+     tanya:"Aku Pak Mardi asli... tapi kalau kamu nelepon pos ronda sekarang, siapa yang angkat ya?",
+     senter:"Bayangan di lantai bergerak berlawanan arah dengan gerakan badannya.",
+     garam:"Wajahnya mendadak datar tanpa ekspresi sama sekali saat terkena garam. Suaranya berubah jadi gema monoton.",
+     cermin:"Pantulan cermin menampilkan sosok tanpa mata dan tanpa mulut sama sekali!"}},
  {id:"peniru",nama:"Sarno Widodo",peran:"Hansip ronda",bayar:0,sabar:55,minMalam:2,peniruDari:"sarno",
   look:{kulit:"#a9784f",baju:"#3d5a3a",kepala:"peci",tinggi:1,wajah:"tua"},
   ucap:"Assalamualaikum. Isih bukak to, Mas? Kopine sik ono ora?",
@@ -588,7 +717,48 @@ const AMBIEN=[
  "Lampu TL paling ujung berkedip dalam pola yang sama persis: tiga kali, jeda, tiga kali."
 ];
 
-/* ===================== STATE ===================== */
+/* ===================== NARRATIVE CERITA (PROLOG & ENDINGS) ===================== */
+const PROLOG_TEKS = [
+  "Dusun Karangwuni dulu tenang. Tapi tiga hari lalu, pohon asam berusia dua abad di pertigaan desa ditebang atas perintah pemborong jalan.",
+  "Sejak malam itu, sesepuh desa bilang 'pintu penghubung' ke kebun bambu kuno telah terbuka. Bau bangkai dan tanah basah menyelimuti gang-gang desa setiap pukul 21.00.",
+  "Kamu menerima pekerjaan penjaga shift malam KOPDES Mekar Jaya karena terdesak kebutuhan ekonomi. Pak RT Mardi memberimu kunci minimarket dan buku anggota desa.",
+  "'Ingat, Le...' pesan Pak RT Mardi sore tadi. 'Karangwuni sekarang sedang aneh. Kalau ada yang mau belanja lewat jam sembilan malam, periksa baik-baik. Jangan sampai yang bukan warga kamu izinkan masuk ke dalam laci dan toko ini...'"
+];
+
+const ENDING_STORY = {
+  "happy_true": {
+    judul: "Happy End: Pahlawan Karangwuni (True Ending)",
+    badge: "ending-happy",
+    teks: "Fajar menyingsing di Ujung Dusun Karangwuni pada hari ke-6. Kamu telah bertahan melewati 5 malam paling mencekam dalam sejarah desa.<br><br>Kejelianmu membedakan warga asli dan para Peniru berhasil menyelamatkan Dusun Karangwuni dari ancaman invasi makhluk kegelapan. Warga desa yang tersadar berkumpul di depan toko KOPDES, memujimu sebagai pahlawan penjaga desa.<br><br>Pak RT Mardi menyerahkan amplop bonus tebal beserta piagam penghargaan KOPDES. Kebun bambu kini telah dipagari sesaji khusus oleh para sesepuh, dan teror hantu peniru akhirnya berhenti total."
+  },
+  "happy_normal": {
+    judul: "Happy End: Fajar Karangwuni",
+    badge: "ending-happy",
+    teks: "Jam 03.00 di malam ke-5 berdentang. Kamu berhasil memenuhi seluruh target setoran koperasi dan mempertahankan tokomu dari kerugian.<br><br>Walaupun beberapa warga sempat mengeluhkan pemeriksaan ketatmu, Dusun Karangwuni selamat melewati minggu paling kramat. Kamu menerima gaji penuh dan tetap bekerja sebagai penjaga kepercayaan warga Mekar Jaya."
+  },
+  "bad_hantu": {
+    judul: "Bad End: Terjebak Dalam Gelap",
+    badge: "ending-bad",
+    teks: "Tiga kali kamu mempersilakan sesuatu yang bukan manusia masuk ke dalam tokomu. Yang ketiga tidak pernah kembali keluar...<br><br>Lampu TL toko padam satu per satu dari ujung rak. Dalam kegelapan pekat, bayangan melayang merayap turun dari langit-langit toko. Suara bisikan serak memanggil namamu...<br><br>Keesokan harinya, minimarket KOPDES buka seperti biasa. Ada penjaga baru berdiri kaku di balik meja kasir. Wajah dan senyumnya persis seperti wajahmu, tapi matanya tak lagi berkedip."
+  },
+  "bad_dipecat": {
+    judul: "Bad End: Dibuang Warga Dusun",
+    badge: "ending-bad",
+    teks: "Tiga warga asli Karangwuni kamu usir dan tuduh sebagai monster hantu. Di desa sekecil ini, kabar burung menyebar lebih cepat daripada angin malam.<br><br>Sebelum fajar tiba, Pak RT Mardi bersama belasan warga yang marah mendatangi minimarket. Kamu dicabut dari jabatan penjaga shift malam, dituduh gila dan mengalami gangguan jiwa. Kamu diusir dari desa Karangwuni malam itu juga."
+  },
+  "bad_bangkrut": {
+    judul: "Bad End: Koperasi Bangkrut & Teror",
+    badge: "ending-bad",
+    teks: "Kamu gagal memenuhi target setoran kas wajib di malam puncak. Pengurus KOPDES memutuskan untuk menutup minimarket Mekar Jaya secara permanen karena kerugian finansial.<br><br>Tanpa cahaya lampu minimarket KOPDES yang menyala di pertigaan jalan, Dusun Karangwuni tenggelam dalam kegelapan total. Satu per satu warga desa menghilang misterius di malam hari..."
+  },
+  "bad_doppelganger": {
+    judul: "Bad End: Dusun Para Peniru",
+    badge: "ending-bad",
+    teks: "Terlalu banyak Doppelganger (peniru) yang berhasil kamu layani dan beri jalan masuk ke dalam pemukiman warga.<br><br>Di malam ke-5, ketika kamu berjalan pulang, kamu menyadari bahwa seluruh warga Karangwuni—termasuk Pak RT Mardi—kini memiliki tatapan mata kosong dan senyum kaku terbalik. Desa Karangwuni sepenuhnya telah digantikan oleh para Peniru."
+  }
+};
+
+/* ===================== STATE GAME ===================== */
 const AWAL=21*60, AKHIR=27*60;
 let G=null;
 const el=id=>document.getElementById(id);
@@ -601,47 +771,87 @@ const muatMalam=()=>{try{return Math.max(1,parseInt(localStorage.getItem("kopdes
 const simpanMalam=n=>{try{localStorage.setItem("kopdes_malam",String(n))}catch(e){}};
 
 /* ===================== SUARA ===================== */
-const Au={ctx:null,on:false,hum:null,gain:null};
+const Au={ctx:null,on:false,hum:null,hum2:null,lfo:null,filter:null,gain:null,stingTimer:null};
 function suaraNyala(){
   if(Au.ctx) return;
   try{
     const C=window.AudioContext||window.webkitAudioContext; if(!C) return;
     Au.ctx=new C();
-    Au.gain=Au.ctx.createGain(); Au.gain.gain.value=.05; Au.gain.connect(Au.ctx.destination);
-    const o=Au.ctx.createOscillator(); o.type="sawtooth"; o.frequency.value=100;
-    const f=Au.ctx.createBiquadFilter(); f.type="lowpass"; f.frequency.value=360;
-    o.connect(f); f.connect(Au.gain); o.start(); Au.hum=o;
+    Au.gain=Au.ctx.createGain(); Au.gain.gain.value=.022; Au.gain.connect(Au.ctx.destination);
+
+    // drone dasar: dua osilator sedikit di-detune → saling "berdenyut" tak nyaman didengar
+    Au.filter=Au.ctx.createBiquadFilter(); Au.filter.type="lowpass"; Au.filter.frequency.value=320;
+    Au.filter.connect(Au.gain);
+
+    const o=Au.ctx.createOscillator(); o.type="sawtooth"; o.frequency.value=55;
+    o.connect(Au.filter); o.start(); Au.hum=o;
+
+    const o2=Au.ctx.createOscillator(); o2.type="sawtooth"; o2.frequency.value=58.4; // detune -> beating sumbang
+    o2.connect(Au.filter); o2.start(); Au.hum2=o2;
+
+    // LFO sangat pelan menggoyang cutoff filter -> kesan "sesuatu sedang bernapas" di kegelapan
+    const lfo=Au.ctx.createOscillator(); lfo.type="sine"; lfo.frequency.value=.07;
+    const lfoGain=Au.ctx.createGain(); lfoGain.gain.value=150;
+    lfo.connect(lfoGain); lfoGain.connect(Au.filter.frequency); lfo.start(); Au.lfo=lfo;
+
+    jadwalkanBisikan();
   }catch(e){}
 }
+
+// bisikan/derik acak yang muncul sendiri di latar, tanpa dipicu aksi pemain
+function jadwalkanBisikan(){
+  clearTimeout(Au.stingTimer);
+  const jeda=7000+Math.random()*15000;
+  Au.stingTimer=setTimeout(()=>{
+    if(Au.on&&Au.ctx) bunyi("bisik");
+    jadwalkanBisikan();
+  },jeda);
+}
+
 function bunyi(jenis){
   if(!Au.on||!Au.ctx) return;
   const t=Au.ctx.currentTime, g=Au.ctx.createGain(), o=Au.ctx.createOscillator();
   o.connect(g); g.connect(Au.ctx.destination);
   if(jenis==="bel"){ o.type="sine"; o.frequency.setValueAtTime(1180,t); o.frequency.exponentialRampToValueAtTime(760,t+.18);
-    g.gain.setValueAtTime(.16,t); g.gain.exponentialRampToValueAtTime(.001,t+.55); o.start(t); o.stop(t+.6); }
+    g.gain.setValueAtTime(.09,t); g.gain.exponentialRampToValueAtTime(.001,t+.55); o.start(t); o.stop(t+.6); }
   else if(jenis==="baik"){ o.type="triangle"; o.frequency.setValueAtTime(520,t); o.frequency.linearRampToValueAtTime(700,t+.14);
-    g.gain.setValueAtTime(.13,t); g.gain.exponentialRampToValueAtTime(.001,t+.3); o.start(t); o.stop(t+.32); }
-  else if(jenis==="buruk"){ o.type="square"; o.frequency.setValueAtTime(90,t); o.frequency.exponentialRampToValueAtTime(34,t+.9);
-    g.gain.setValueAtTime(.2,t); g.gain.exponentialRampToValueAtTime(.001,t+1.1); o.start(t); o.stop(t+1.2); }
+    g.gain.setValueAtTime(.075,t); g.gain.exponentialRampToValueAtTime(.001,t+.3); o.start(t); o.stop(t+.32); }
+  else if(jenis==="buruk"){
+    // dua nada sumbang berdekatan turun tajam bersamaan -> kesan sesuatu yang salah & mengerikan
+    o.type="sawtooth"; o.frequency.setValueAtTime(146,t); o.frequency.exponentialRampToValueAtTime(26,t+1.15);
+    g.gain.setValueAtTime(.13,t); g.gain.exponentialRampToValueAtTime(.001,t+1.35); o.start(t); o.stop(t+1.4);
+    const o3=Au.ctx.createOscillator(), g3=Au.ctx.createGain();
+    o3.type="sawtooth"; o3.frequency.setValueAtTime(155,t); o3.frequency.exponentialRampToValueAtTime(28,t+1.15);
+    o3.connect(g3); g3.connect(Au.ctx.destination);
+    g3.gain.setValueAtTime(.10,t); g3.gain.exponentialRampToValueAtTime(.001,t+1.35); o3.start(t); o3.stop(t+1.4); }
+  else if(jenis==="bisik"){
+    // noise pendek yang disaring seperti bisikan/gesekan dari kejauhan
+    const buf=Au.ctx.createBuffer(1,Au.ctx.sampleRate*.6,Au.ctx.sampleRate);
+    const d=buf.getChannelData(0);
+    for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*(1-i/d.length);
+    const src=Au.ctx.createBufferSource(); src.buffer=buf;
+    const bp=Au.ctx.createBiquadFilter(); bp.type="bandpass"; bp.frequency.value=900+Math.random()*1500; bp.Q.value=6;
+    const gg=Au.ctx.createGain(); gg.gain.setValueAtTime(0,t); gg.gain.linearRampToValueAtTime(.045,t+.05); gg.gain.exponentialRampToValueAtTime(.001,t+.6);
+    src.connect(bp); bp.connect(gg); gg.connect(Au.ctx.destination); src.start(t); src.stop(t+.65); }
   else { o.type="square"; o.frequency.setValueAtTime(220,t);
-    g.gain.setValueAtTime(.05,t); g.gain.exponentialRampToValueAtTime(.001,t+.12); o.start(t); o.stop(t+.14); }
+    g.gain.setValueAtTime(.03,t); g.gain.exponentialRampToValueAtTime(.001,t+.12); o.start(t); o.stop(t+.14); }
 }
 el("b-suara").onclick=()=>{
   if(!Au.ctx) suaraNyala();
   Au.on=!Au.on;
-  if(Au.ctx){ try{ Au.ctx.resume(); }catch(e){} Au.gain.gain.value=Au.on?.05:0; }
+  if(Au.ctx){ try{ Au.ctx.resume(); }catch(e){} Au.gain.gain.value=Au.on?.022:0; }
   el("b-suara").textContent="Suara: "+(Au.on?"nyala":"mati");
 };
 
-/* ===================== ANTREAN ===================== */
+/* ===================== GENERATE ANTREAN ===================== */
 function buatAntrean(malam){
-  const jml=12+Math.min(3,malam-1);
-  const dasar=malam<=1?3:(malam===2?2:(malam===3?2:1));
+  const jml=10+Math.min(6,malam*2);
+  const dasar=malam<=1?3:(malam===2?2:1);
   const wargaPool=kocok(WARGA);
   const bukanPool=kocok(BUKAN.filter(b=>!b.minMalam||malam>=b.minMalam));
   const antre=[]; let iw=0, ib=0;
   for(let i=0;i<jml;i++){
-    const porsi=Math.min(.34+(i/jml)*.22+(malam-1)*.05,.6);
+    const porsi=Math.min(.35+(i/jml)*.2+(malam-1)*.06,.65);
     if(Math.random()<porsi){
       const t=bukanPool[ib++%bukanPool.length];
       let p=Math.max(1,dasar-(i>jml*.6?1:0));
@@ -654,14 +864,16 @@ function buatAntrean(malam){
       antre.push({...t,jahat:false,data:{...t.c},kanal:[]});
     }
   }
-  // pastikan peniru muncul setelah aslinya pernah datang
   for(let i=0;i<antre.length;i++){
-    if(antre[i].id==="peniru"){
-      const asliDiDepan=antre.slice(0,i).some(o=>o.id==="sarno");
+    if(antre[i].peniruDari){
+      const targetAsli=antre[i].peniruDari;
+      const asliDiDepan=antre.slice(0,i).some(o=>o.id===targetAsli);
       if(!asliDiDepan){
         const kandidat=antre.findIndex((o,j)=>j<i&&!o.jahat);
-        if(kandidat>=0){ antre[kandidat]={...WARGA.find(w=>w.id==="sarno"),jahat:false,data:{...WARGA.find(w=>w.id==="sarno").c},kanal:[]}; }
-        else { antre[i]={...ambilAcak(WARGA),jahat:false}; antre[i].data={...antre[i].c}; antre[i].kanal=[]; }
+        if(kandidat>=0){ 
+          const wObj=WARGA.find(w=>w.id===targetAsli)||WARGA[0];
+          antre[kandidat]={...wObj,jahat:false,data:{...wObj.c},kanal:[]}; 
+        }
       }
     }
   }
@@ -669,16 +881,17 @@ function buatAntrean(malam){
 }
 
 function mulaiMalam(malam){
-  G={malam,waktu:AWAL,kas:0,target:150000+(malam-1)*35000,nyawa:3,rep:3,
+  const targetPerMalam = [150000, 180000, 220000, 260000, 300000];
+  G={malam,waktu:AWAL,kas:0,target:targetPerMalam[Math.min(malam-1, 4)],nyawa:3,rep:3,
      alat:{senter:malam<=1?4:3,garam:3,cermin:3,telepon:1},
      antre:buatAntrean(malam),idx:-1,kini:null,dipakai:[],terpakaiSabar:0,
-     fase:"idle",dilayani:0,salahTolak:0,kabur:0,benar:0,runtun:0,catatan:[]};
+     fase:"layani",dilayani:0,salahTolak:0,kabur:0,benar:0,runtun:0,peniruLolos:0,catatan:[]};
   gambarStatus(); lanjut();
 }
 
-/* ===================== GAMBAR ===================== */
+/* ===================== RENDERING ===================== */
 function gambarStatus(){
-  el("s-malam").textContent=G.malam;
+  el("s-malam").textContent=G.malam+"/5";
   el("s-kas").textContent=rupiah(G.kas);
   el("s-target").textContent=rupiah(G.target);
   el("s-antre").textContent=Math.max(0,G.antre.length-G.idx-1);
@@ -714,7 +927,6 @@ function svgTokoh(look,opt){
      '<stop offset="0%" stop-color="#cfe9d8" stop-opacity="'+(terang?.42:.18)+'"/>'+
      '<stop offset="100%" stop-color="#0a1412" stop-opacity="0"/></radialGradient></defs>';
   s+='<rect width="320" height="340" fill="url(#lp)"/>';
-  // rak di kejauhan
   s+='<g opacity="'+(terang?.30:.16)+'" fill="#1c3a33">';
   s+='<rect x="6" y="150" width="58" height="150"/><rect x="256" y="140" width="58" height="160"/>';
   s+='<rect x="6" y="182" width="58" height="3" fill="#0a1412"/><rect x="6" y="228" width="58" height="3" fill="#0a1412"/>';
@@ -737,16 +949,12 @@ function svgTokoh(look,opt){
   s+='<path d="M'+(cx-lebarBadan/2)+' '+bY+' L'+(cx-lebarBadan/2.4)+' '+leherY+' Q'+cx+' '+(leherY-12)+' '+(cx+lebarBadan/2.4)+' '+leherY+' L'+(cx+lebarBadan/2)+' '+bY+' Z" fill="'+look.baju+'" opacity="'+amb+'"/>';
   s+='<rect x="'+(cx-lebarBadan/2-9*t)+'" y="'+(leherY+16)+'" width="'+(10*t)+'" height="'+(tinggiBadan*.62)+'" rx="5" fill="'+look.baju+'" opacity="'+(amb*.92)+'"/>';
   s+='<rect x="'+(cx+lebarBadan/2-t)+'" y="'+(leherY+16)+'" width="'+(10*t)+'" height="'+(tinggiBadan*.62)+'" rx="5" fill="'+look.baju+'" opacity="'+(amb*.92)+'"/>';
-  if(look.bulu&&terang){
-    for(let i=0;i<22;i++){
-      const x=cx-lebarBadan/2+Math.random()*lebarBadan, y=leherY+Math.random()*tinggiBadan*.8;
-      s+='<line x1="'+x+'" y1="'+y+'" x2="'+(x+3)+'" y2="'+(y+7)+'" stroke="#0d0b09" stroke-width="1.4" opacity=".75"/>';
-    }
-  }
+  
   const leherTinggi=(opt.leherPanjang&&terang)?34:10;
   s+='<rect x="'+(cx-7*t)+'" y="'+(kepalaY+kepalaR-4)+'" width="'+(14*t)+'" height="'+(leherTinggi+6)+'" fill="'+look.kulit+'" opacity="'+amb+'"/>';
   const kY=(opt.leherPanjang&&terang)?kepalaY-24:kepalaY;
   s+='<ellipse cx="'+cx+'" cy="'+kY+'" rx="'+(kepalaR*.86)+'" ry="'+kepalaR+'" fill="'+look.kulit+'" opacity="'+amb+'"/>';
+  
   const k=look.kepala;
   if(k==="panjang")
     s+='<path d="M'+(cx-kepalaR*.9)+' '+(kY-6)+' Q'+cx+' '+(kY-kepalaR*1.5)+' '+(cx+kepalaR*.9)+' '+(kY-6)+' L'+(cx+kepalaR*1.05)+' '+(kY+tinggiBadan*.55)+' Q'+cx+' '+(kY+tinggiBadan*.66)+' '+(cx-kepalaR*1.05)+' '+(kY+tinggiBadan*.55)+' Z" fill="#100f0e" opacity="'+amb+'"/>';
@@ -761,7 +969,7 @@ function svgTokoh(look,opt){
     s+='<rect x="'+(cx-kepalaR*1.5)+'" y="'+(kY-kepalaR*.62)+'" width="'+(kepalaR*1.6)+'" height="7" fill="#20303c" opacity="'+amb+'"/>';
   }else if(k==="helm")
     s+='<path d="M'+(cx-kepalaR*1.05)+' '+(kY+4)+' Q'+cx+' '+(kY-kepalaR*1.7)+' '+(cx+kepalaR*1.05)+' '+(kY+4)+' Z" fill="#1c6b52" opacity="'+amb+'"/>';
-  else if(k==="sanggul"){
+  else if(k==="sanggul"||k==="sanggul_mewah"){
     s+='<path d="M'+(cx-kepalaR*.95)+' '+(kY-2)+' Q'+cx+' '+(kY-kepalaR*1.35)+' '+(cx+kepalaR*.95)+' '+(kY-2)+' Z" fill="#8e8a84" opacity="'+amb+'"/>';
     s+='<circle cx="'+cx+'" cy="'+(kY-kepalaR*1.15)+'" r="'+(kepalaR*.36)+'" fill="#8e8a84" opacity="'+amb+'"/>';
   }else if(k==="ekor"){
@@ -771,6 +979,9 @@ function svgTokoh(look,opt){
     s+='<path d="M'+(cx-kepalaR*1.2)+' '+(kY+kepalaR*.9)+' Q'+cx+' '+(kY-kepalaR*1.6)+' '+(cx+kepalaR*1.2)+' '+(kY+kepalaR*.9)+' Z" fill="#dcd6c8" opacity="'+amb+'"/>';
   else if(k==="cepak")
     s+='<path d="M'+(cx-kepalaR*.88)+' '+(kY-4)+' Q'+cx+' '+(kY-kepalaR*1.25)+' '+(cx+kepalaR*.88)+' '+(kY-4)+' Z" fill="#15120f" opacity="'+amb+'"/>';
+  else if(k==="kuyang"){
+    s+='<path d="M'+(cx-kepalaR*1.1)+' '+(kY+kepalaR*.7)+' Q'+cx+' '+(kY-kepalaR*1.5)+' '+(cx+kepalaR*1.1)+' '+(kY+kepalaR*.7)+' Z" fill="#2d1d28" opacity="'+amb+'"/>';
+  }
 
   const mataW=look.wajah==="pucat"?"#e8e4dc":"#f0ece0", mataY=kY-2, mo=terang?1:.55;
   if(opt.mataMenyala&&terang){
@@ -792,11 +1003,11 @@ function gambarScene(opt){
   if(!c){ el("scene").innerHTML=svgTokoh({kosong:true},{}); return; }
   const o=Object.assign({},opt||{});
   if(o.terang&&c.jahat&&c.kanal.includes("senter")){
-    if(c.id==="tuyul"||c.id==="kuntilanak") o.tanpaBayangan=true;
-    if(c.id==="pocong") o.melayang=true;
-    if(c.id==="genderuwo"||c.id==="ngepet") o.bayanganBesar=true;
+    if(c.id==="tuyul"||c.id==="kuntilanak"||c.id==="sundel") o.tanpaBayangan=true;
+    if(c.id==="pocong"||c.id==="kuyang") o.melayang=true;
+    if(c.id==="genderuwo"||c.id==="ngepet"||c.id==="lampor") o.bayanganBesar=true;
     if(c.id==="wewe") o.leherPanjang=true;
-    if(c.id==="banaspati") o.mataMenyala=true;
+    if(c.id==="banaspati"||c.id==="peniru_mardi") o.mataMenyala=true;
   }
   if(o.terang&&c.jahat&&c.kanal.includes("amati")&&c.id==="genderuwo") o.mataMenyala=true;
   el("scene").innerHTML=svgTokoh(c.look,o);
@@ -839,7 +1050,7 @@ function tombolLanjut(teks,fn){
   G.lanjutFn=fn;
 }
 
-/* ===================== ALUR ===================== */
+/* ===================== LOGIKA SHIFT ===================== */
 function majuWaktu(m){ G.waktu+=m; gambarStatus(); }
 
 function lanjut(){
@@ -847,22 +1058,22 @@ function lanjut(){
   if(G.nyawa<=0||G.rep<=0) return;
   if(G.waktu>=AKHIR||G.idx+1>=G.antre.length){ tutupToko(); return; }
   G.idx++; G.kini=G.antre[G.idx]; G.dipakai=[]; G.terpakaiSabar=0; G.fase="layani";
-  majuWaktu(8+acak(5));
+  majuWaktu(6+acak(5));
   gambarScene({terang:false}); gambarSabar(); bunyi("bel");
 
   let amb="";
-  if(Math.random()<.3){
-    amb='<p class="baris samar"><b>Sebelum dia masuk</b>'+ambilAcak(AMBIEN)+'</p>';
+  if(Math.random()<.35){
+    amb='<p class="baris samar"><b>Atmosfer minimarket:</b> '+ambilAcak(AMBIEN)+'</p>';
     el("etalase").classList.add("getar"); setTimeout(()=>el("etalase").classList.remove("getar"),400);
   }
   const pernah=G.catatan.filter(x=>x.nama===G.kini.nama).length;
-  const ulang=pernah>0?'<p class="baris bahaya">Catatan shift: nama ini sudah tercatat datang malam ini, '+pernah+' kali.</p>':"";
+  const ulang=pernah>0?'<p class="baris bahaya">Catatan shift: nama ini sudah tercatat datang malam ini ('+pernah+'x).</p>':"";
 
-  tulisNota("Pelanggan ke-"+(G.idx+1), jamStr(G.waktu)+" · sisa antre "+(G.antre.length-G.idx-1),
+  tulisNota("Pelanggan ke-"+(G.idx+1)+" (Malam "+G.malam+")", jamStr(G.waktu)+" · antre sisa "+(G.antre.length-G.idx-1),
     amb+
     '<p class="baris"><b>Mengaku bernama</b>'+G.kini.nama+' — '+G.kini.peran+'</p>'+
     '<p class="ucap">'+G.kini.ucap+'</p>'+ulang+
-    '<p class="baris samar">Periksa seperlunya. Setiap pemeriksaan memakan waktu, dan orang yang diinterogasi terlalu lama bisa pergi sendiri.</p>');
+    '<p class="baris samar">Periksa dengan teliti sebelum membuat keputusan. Waktu berjalan setiap kali kamu memeriksa.</p>');
   gambarAksi();
 }
 
@@ -881,8 +1092,8 @@ function periksa(s){
   const c=G.kini;
   if(s==="telepon"){
     const jwb=c.jahat
-      ? 'Pak Mardi terdengar mengantuk. "'+c.nama+'? Lha wong orangnya tak lihat tidur di rumahnya dari tadi, Mas. Yang di warungmu itu siapa?" Sambungan langsung putus.'
-      : 'Pak Mardi mengomel karena dibangunkan. "Iya, itu memang '+c.nama+'. Suruh cepat pulang, besok subuh ada kerja bakti."';
+      ? 'Telepon diangkat. Suara Pak Mardi terdengar curiga: "'+c.nama+'? Orang itu ada di pos ronda sama saya dari tadi, Mas. Siapa yang di minimarketmu?!" Sambungan terputus.'
+      : 'Pak Mardi menjawab gembira. "Iya benar, itu '+c.nama+'. Tolong layani ya, orangnya memang lagi cari kebutuhan."';
     tambahNota('<p class="baris"><b>'+LABEL.telepon+' · '+jamStr(G.waktu)+'</b><span class="'+(c.jahat?"bahaya":"aman")+'">'+jwb+'</span></p>');
     if(c.jahat) bunyi("buruk");
   }else{
@@ -901,7 +1112,7 @@ function periksa(s){
 
   if(G.terpakaiSabar>=c.sabar&&!c.jahat){ kaburKarenaBosan(); return; }
   if(G.waktu>=AKHIR){
-    tambahNota('<p class="baris bahaya">Jam sudah lewat 03.00. Tidak ada waktu memeriksa lagi — putuskan sekarang.</p>');
+    tambahNota('<p class="baris bahaya">Jam menunjukkan 03.00. Waktu habis—ambil keputusan sekarang!</p>');
     el("aksi").innerHTML="";
   }
 }
@@ -910,11 +1121,10 @@ function kaburKarenaBosan(){
   G.fase="hasil"; G.kabur++; G.runtun=0;
   G.catatan.push({nama:G.kini.nama,jam:jamStr(G.waktu),hasil:"pergi sendiri"});
   gambarScene({terang:false}); gambarSabar();
-  tambahNota('<p class="baris" style="border-top:2px dashed #9c8f6d;padding-top:8px"><b>Pelanggan pergi · '+jamStr(G.waktu)+'</b>'+
-    '<span class="samar">'+G.kini.nama+' meletakkan barangnya kembali ke rak. "Wis, Mas, mbok ora usah ditakoni koyo maling." Dia keluar tanpa membeli apa-apa.</span></p>'+
-    '<p class="baris samar">Tidak ada penalti nama baik, tapi penjualannya hilang. Menginterogasi terlalu lama ada harganya.</p>');
+  tambahNota('<p class="baris" style="border-top:2px dashed #9c8f6d;padding-top:8px"><b>Pelanggan Pergi · '+jamStr(G.waktu)+'</b>'+
+    '<span class="samar">'+G.kini.nama+' menggerutu kesal: "Kelamaan ditanyai seperti penjahat wae!" Dia keluar tanpa belanja.</span></p>');
   const habis=(G.waktu>=AKHIR||G.idx+1>=G.antre.length);
-  tombolLanjut(habis?"Tutup rolling door":"Panggil antrean berikutnya",habis?tutupToko:lanjut);
+  tombolLanjut(habis?"Tutup toko":"Pelanggan berikutnya",habis?tutupToko:lanjut);
 }
 
 function putuskan(dilayani){
@@ -929,27 +1139,26 @@ function putuskan(dilayani){
     let bonus=0;
     if(G.runtun>=3){ bonus=Math.round(bayar*.2); }
     G.kas+=bayar+bonus; G.dilayani++; G.benar++; hasil="dilayani, benar";
-    judul="Transaksi selesai";
-    html='<p class="baris aman">'+c.nama+' membayar '+rupiah(bayar)+', menitip salam, lalu pulang. Warga asli. Kamu benar.</p>'+
-      (bonus?'<p class="baris aman">Runtun '+G.runtun+' keputusan tepat. Dia menolak kembalian: bonus '+rupiah(bonus)+'.</p>':"");
+    judul="Transaksi Berhasil";
+    html='<p class="baris aman">'+c.nama+' membayar '+rupiah(bayar)+', mengucapkan terima kasih lalu pergi. Dia warga asli.</p>'+
+      (bonus?'<p class="baris aman">Bonus ketelitian (Runtun '+G.runtun+'x): +'+rupiah(bonus)+'</p>':"");
     bunyi("baik");
   }else if(dilayani&&c.jahat){
-    G.nyawa--; G.runtun=0; hasil="dilayani, keliru";
+    G.nyawa--; G.runtun=0; G.peniruLolos++; hasil="dilayani, keliru";
     const rugi=Math.min(G.kas,15000+acak(25000)); G.kas-=rugi;
-    judul="Ada yang salah";
-    html='<p class="baris bahaya">'+akibat(c)+'</p><p class="baris">Uang di laci berkurang '+rupiah(rugi)+'. Kamu tidak ingat kapan laci itu terbuka.</p>';
+    judul="Bahaya! Teror Terjadi";
+    html='<p class="baris bahaya">'+akibat(c)+'</p><p class="baris">Laci kas berkurang '+rupiah(rugi)+'. Keselamatanmu terancam!</p>';
     el("wrap").classList.add("padam"); setTimeout(()=>el("wrap").classList.remove("padam"),1000);
     bunyi("buruk");
   }else if(!dilayani&&c.jahat){
     G.runtun++; G.benar++; hasil="ditolak, benar";
-    judul="Dia pergi";
+    judul="Ancaman Ditolak";
     html='<p class="baris aman">'+usir(c)+'</p>';
     bunyi("baik");
   }else{
     G.rep--; G.salahTolak++; G.runtun=0; hasil="ditolak, keliru";
-    judul="Warga tersinggung";
-    html='<p class="baris bahaya">'+c.nama+' cuma warga biasa. Dia pergi tanpa bicara, dan besok pagi seisi dusun tahu penjaga KOPDES mengusir orang tanpa alasan.</p>'+
-      '<p class="baris">Nama baikmu berkurang. Satu penjualan melayang.</p>';
+    judul="Warga Kecewa";
+    html='<p class="baris bahaya">'+c.nama+' adalah warga asli! Dia pergi dengan perasaan jengkel. Reputasi tokomu menurun.</p>';
     bunyi("buruk");
   }
 
@@ -958,119 +1167,165 @@ function putuskan(dilayani){
   tambahNota('<p class="baris" style="border-top:2px dashed #9c8f6d;padding-top:8px"><b>'+judul+' · '+jamStr(G.waktu)+'</b></p>'+html);
   gambarStatus();
 
-  if(G.nyawa<=0){ setTimeout(()=>akhir("kalah-hantu"),700); return; }
-  if(G.rep<=0){ setTimeout(()=>akhir("kalah-dipecat"),700); return; }
+  if(G.nyawa<=0){ setTimeout(()=>tampilkanEnding("bad_hantu"),700); return; }
+  if(G.rep<=0){ setTimeout(()=>tampilkanEnding("bad_dipecat"),700); return; }
   const habis=(G.waktu>=AKHIR||G.idx+1>=G.antre.length);
-  tombolLanjut(habis?"Tutup rolling door":"Panggil antrean berikutnya",habis?tutupToko:lanjut);
+  tombolLanjut(habis?"Tutup rolling door":"Pelanggan berikutnya",habis?tutupToko:lanjut);
 }
 
 function akibat(c){
   const m={
-   tuyul:"Begitu kembalian kamu serahkan, tangan kecil itu dingin seperti keramik. Semalaman kemudian kamu mendengar koin berjatuhan di dalam laci yang terkunci.",
-   kuntilanak:"Dia mengambil kembangnya tanpa menyentuh meja. Tawa perempuan terdengar dari atap seng, bergerak dari ujung ke ujung, sampai subuh.",
-   pocong:"Kapur barusnya kamu bungkus. Waktu menoleh, dia sudah di dalam toko, berdiri di lorong rak, menghadap tembok.",
-   genderuwo:"Uang kertas lama itu masuk laci. Baunya tanah kuburan. Sepanjang sisa malam ada yang bernapas berat tepat di belakang tengkukmu.",
-   wewe:"Dia tersenyum dan pergi. Pagi harinya dua anak dusun dilaporkan hilang, dan kamu orang terakhir yang melihat mereka lewat.",
-   ngepet:"Kamu berpaling sebentar. Waktu menoleh lagi, laci kas sudah menganga, dan ada jejak kaki berkuku di lantai yang baru kamu pel.",
-   banaspati:"Botol yang dia pegang meleleh di tanganmu. Rak paling ujung menghitam dan mengeluarkan asap, padahal tidak ada api.",
-   peniru:"Dia pergi membawa belanjaannya. Sepuluh menit kemudian Pak Sarno yang asli masuk, bingung kenapa kamu pucat. Sesuatu sekarang tahu persis rupa orang-orang di dusun ini."};
-  return m[c.id]||"Sesuatu yang salah masuk ke dalam toko, dan sekarang ada di sini bersamamu.";
+   tuyul:"Anak kecil itu mengambil uang dari laci sambil tertawa melengking, lalu lenyap merayap di langit-langit.",
+   kuntilanak:"Tawa melengking memecahkan udara malam. Bunga melati basah berhamburan menutup seluruh meja kasir.",
+   pocong:"Kapur barus berhamburan. Sosok itu melompat berdiri di lorong rak mi instan sampai subuh tiba.",
+   genderuwo:"Bayangan raksasa berbulu menimpa tubuhmu. Udara di toko mendadak sesak dan berbau busuk.",
+   sundel:"Cairan hitam berbau bangkai menetes membasahi lantai kasir. Bayangannya berlubang menganga.",
+   kuyang:"Kepalanya terlepas dari leher dan terbang memutar di atas rak toko sebelum menghilang keluar!",
+   lampor:"Dentang keranda besi menggelegar di dalam toko. Lampu-lampu pecah berhamburan!",
+   peniru_mardi:"Sosok Pak Mardi palsu tersenyum lebar hingga robek ke telinga, lalu berjalan mundur tanpa suara.",
+   peniru:"Dia mengambil kembalian lalu berjalan menembus dinding kayu toko."};
+  return m[c.id]||"Sesuatu yang jahat telah kamu izinkan masuk!";
 }
 function usir(c){
   const m={
-   tuyul:"Anak itu memekik dengan suara orang tua, menyambar kantong recehnya, lalu menyelinap ke kolong rak dan hilang.",
-   kuntilanak:"Dia mundur pelan tanpa membalikkan badan, keluar pintu, dan larut ke dalam gerimis. Bau melati tertinggal sampai pagi.",
-   pocong:"Sosok itu bergeser mundur, satu kali, dua kali, sampai gelap. Rolling door bergetar sekali, lalu diam.",
-   genderuwo:"Dia menggeram, meninju kusen pintu sampai retak, lalu pergi ke arah kebun bambu.",
-   wewe:"Nenek itu menjerit seperti bayi, lalu merangkak cepat sekali ke arah sungai. Kamu menutup pintu dan tidak melihat keluar lagi.",
-   ngepet:"Dia menyeruduk rak mi instan dan lari dengan empat kaki. Lilinnya jatuh berserakan di ambang pintu.",
-   banaspati:"Sosok itu meletup jadi bola api dan melesat ke atas pohon asam. Cat kusen pintu menggelembung kepanasan.",
-   peniru:"Wajah itu berkedut, berganti-ganti antara Pak Sarno dan sesuatu yang tidak punya wajah, lalu berbalik pergi tanpa suara langkah."};
-  return (m[c.id]||"Sosok itu pergi tanpa protes, seolah memang sedang menguji apakah kamu akan mempersilakannya masuk.")+
-    " Kamu kehilangan satu penjualan, tapi tokonya masih milikmu.";
+   tuyul:"Anak itu memekik dengan suara tua serak lalu lari menyeruduk kegelapan malam.",
+   kuntilanak:"Dia mundur pelan sambil merintih melengking, larut dalam kabut gerimis.",
+   pocong:"Sosok itu berguling mundur menjauhi toko. Suara gesekan kain kafannya terdengar mengerikan.",
+   genderuwo:"Dia menggeram dahsyat sampai kaca minimarket bergetar, lalu pergi menuju kebun bambu.",
+   sundel:"Dia menjerit histeris dan terbang melintasi atap minimarket meninggalkan bau kembang busuk.",
+   kuyang:"Kepalanya memekik nyaring dan melayang melintasi jendela keluar desa.",
+   lampor:"Suara keranda berdentang menggelegar perlahan menjauh ke arah kuburan tua.",
+   peniru_mardi:"Wajah Pak Mardi berkedut hancur sebelum akhirnya kabur melompati pagar desa.",
+   peniru:"Wajahnya mendadak rata tanpa mata dan hidung, lalu kabur ke kegelapan."};
+  return m[c.id]||"Makhluk itu pergi setelah sadar penyamarannya terbongkar!";
 }
 
-/* ===================== PENUTUP ===================== */
+/* ===================== EVALUASI NIKAH & ENDINGS ===================== */
 function tutupToko(){
   G.fase="tutup"; G.kini=null; gambarScene(); gambarSabar();
-  akhir(G.kas>=G.target?"menang":"kurang-setoran");
-}
-function akhir(jenis){
-  const sisa=Math.max(0,G.antre.length-G.idx-1);
-  let judul,teks,lanjutTeks,aksi;
-  if(jenis==="menang"){
-    judul="Shift selesai";
-    teks='<p>Rolling door turun jam '+jamStr(Math.min(G.waktu,AKHIR))+'. Setoran terpenuhi, dan tidak ada yang perlu dijelaskan ke pengurus koperasi besok pagi.</p>';
-    simpanMalam(G.malam+1); lanjutTeks="Jalani malam ke-"+(G.malam+1);
-    aksi=()=>{tutupLayar();mulaiMalam(G.malam+1);};
-  }else if(jenis==="kurang-setoran"){
-    judul="Setoran kurang";
-    teks='<p>Toko aman, tapi laci tidak. Kurang '+rupiah(G.target-G.kas)+' dari setoran wajib. Pengurus memberi kesempatan sekali lagi, dengan catatan di buku besar.</p>';
-    lanjutTeks="Ulangi malam ke-"+G.malam; aksi=()=>{tutupLayar();mulaiMalam(G.malam);};
-  }else if(jenis==="kalah-hantu"){
-    judul="Toko tidak lagi milikmu";
-    teks='<p>Tiga kali kamu mempersilakan sesuatu masuk. Yang ketiga tidak pulang. Lampu TL padam satu per satu dari ujung rak, dan pintu depan terkunci dari luar.</p>'+
-      '<p class="kecil">Pagi harinya warung buka seperti biasa. Ada penjaga baru di balik meja kasir. Wajahnya persis wajahmu.</p>';
-    lanjutTeks="Mulai lagi dari malam ke-"+G.malam; aksi=()=>{tutupLayar();mulaiMalam(G.malam);};
-  }else{
-    judul="Kamu dipecat";
-    teks='<p>Tiga warga pulang tersinggung, dan di dusun sekecil ini kabar jalan lebih cepat dari motor. Pengurus KOPDES mencabut shift malammu sebelum kamu sempat menjelaskan apa yang kamu lihat.</p>';
-    lanjutTeks="Minta shift lagi"; aksi=()=>{tutupLayar();mulaiMalam(G.malam);};
+  if(G.kas < G.target){
+    tampilkanEnding("bad_bangkrut");
+    return;
   }
-  bukaLayar('<h2>'+judul+'</h2>'+
-    '<p class="kecil">Malam ke-'+G.malam+' · '+G.benar+' dari '+(G.idx+1)+' keputusan benar'+(sisa?' · '+sisa+' orang batal dilayani':'')+'</p>'+
-    teks+'<h3>Rekap laci</h3>'+
-    '<ul><li>Kas terkumpul '+rupiah(G.kas)+' dari target '+rupiah(G.target)+'</li>'+
-    '<li>Dilayani '+G.dilayani+' orang · ditolak keliru '+G.salahTolak+' · pergi karena bosan ditanyai '+G.kabur+'</li>'+
-    '<li>Keselamatan '+G.nyawa+'/3 · nama baik '+G.rep+'/3</li></ul>'+
-    '<button class="mulai" id="tbl-lanjut">'+lanjutTeks+'</button>');
-  el("tbl-lanjut").onclick=aksi;
+  
+  if(G.malam < 5){
+    simpanMalam(G.malam+1);
+    bukaLayar('<h2>Shift Malam '+G.malam+' Selesai</h2>'+
+      '<p class="kecil">Target setoran tercapai ('+rupiah(G.kas)+'/'+rupiah(G.target)+')</p>'+
+      '<div class="cerita-box">Malam ke-'+G.malam+' berhasil kamu lalui. Namun teror di Karangwuni semakin pekat. Besok malam akan lebih banyak peniru yang berkeliaran...</div>'+
+      '<button class="mulai" id="tbl-lanjut">Lanjut Malam ke-'+(G.malam+1)+'</button>');
+    el("tbl-lanjut").onclick=()=>{ tutupLayar(); mulaiMalam(G.malam+1); };
+  } else {
+    // Malam 5 selesai! Tentukan True / Normal Happy Ending atau Bad Ending Peniru
+    if(G.peniruLolos >= 3){
+      tampilkanEnding("bad_doppelganger");
+    } else if(G.nyawa >= 2 && G.rep >= 2 && G.benar >= 8){
+      tampilkanEnding("happy_true");
+    } else {
+      tampilkanEnding("happy_normal");
+    }
+  }
 }
 
-/* ===================== LAYAR ===================== */
+function tampilkanEnding(kunci){
+  const end = ENDING_STORY[kunci];
+  simpanMalam(1); // Reset malam ke 1 jika main ulang
+  bukaLayar('<h2>'+end.judul+'</h2>'+
+    '<span class="ending-badge '+end.badge+'">'+(end.badge==="ending-happy"?"HAPPY ENDING":"BAD ENDING")+'</span>'+
+    '<div class="cerita-box">'+end.teks+'</div>'+
+    '<h3>Statistik Akhir Shift:</h3>'+
+    '<ul><li>Total Kas Terkumpul: '+rupiah(G?G.kas:0)+'</li>'+
+    '<li>Keputusan Benar: '+(G?G.benar:0)+' kali</li>'+
+    '<li>Tingkat Keselamatan: '+(G?G.nyawa:0)+'/3</li>'+
+    '<li>Reputasi Warga: '+(G?G.rep:0)+'/3</li></ul>'+
+    '<button class="mulai" id="tbl-ulang">Mainkan Lagi Dari Malam 1</button>');
+  el("tbl-ulang").onclick=()=>{ tutupLayar(); tampilkanProlog(); };
+}
+
+/* ===================== PROLOG & UI MODAL ===================== */
 function bukaLayar(html){ el("layar-isi").innerHTML=html; el("layar").classList.remove("sembunyi"); }
 function tutupLayar(){ el("layar").classList.add("sembunyi"); }
 
 el("b-buku").onclick=()=>{
   const nama=G&&G.kini?G.kini.nama:null;
   let baris=BUKU.map(b=>'<tr'+(b.n===nama?' class="tandai"':'')+'><td>'+b.n+'</td><td>'+b.u+'</td><td>'+b.rt+'</td><td>'+b.k+'</td></tr>').join("");
-  bukaLayar('<h2>Buku anggota KOPDES</h2>'+
-    '<p class="kecil">Dusun Karangwuni · RT 01 sampai RT 05 · ketua RT: Mardi Susanto</p>'+
-    '<p>Cocokkan nama, umur, dan RT yang tertera di KTP dengan catatan ini. Ada nama yang masih tercantum walaupun orangnya sudah tidak ada.</p>'+
-    '<table><tr><th>Nama</th><th>Umur</th><th>RT</th><th>Catatan</th></tr>'+baris+'</table>'+
-    '<button class="tutup" id="x">Tutup buku</button>');
+  bukaLayar('<h2>Buku Anggota KOPDES</h2>'+
+    '<p class="kecil">Dusun Karangwuni · RT 01 s/d RT 05 · Ketua RT: Mardi Susanto</p>'+
+    '<p>Cocokkan nama, usia, RT, serta ciri khusus dengan KTP pelanggan. Perhatikan warga yang sudah wafat!</p>'+
+    '<table><tr><th>Nama</th><th>Usia</th><th>RT</th><th>Catatan Khusus</th></tr>'+baris+'</table>'+
+    '<button class="tutup" id="x">Tutup Buku</button>');
   el("x").onclick=tutupLayar;
 };
+
 el("b-catatan").onclick=()=>{
   const c=G&&G.catatan?G.catatan:[];
-  const isi=c.length?('<table><tr><th>Jam</th><th>Nama</th><th>Keputusan</th></tr>'+
+  const isi=c.length?('<table><tr><th>Jam</th><th>Nama</th><th>Hasil</th></tr>'+
     c.map(x=>'<tr><td>'+x.jam+'</td><td>'+x.nama+'</td><td>'+x.hasil+'</td></tr>').join("")+'</table>')
-    :'<p class="kecil">Belum ada yang tercatat malam ini.</p>';
-  bukaLayar('<h2>Catatan shift</h2>'+
-    '<p class="kecil">Malam ke-'+(G?G.malam:1)+' · ditulis sendiri di balik nota</p>'+
-    '<p>Kalau satu nama muncul dua kali dalam semalam, salah satunya bukan orangnya.</p>'+isi+
-    '<button class="tutup" id="x">Tutup catatan</button>');
+    :'<p class="kecil">Belum ada aktivitas transaksi malam ini.</p>';
+  bukaLayar('<h2>Catatan Shift Malam</h2>'+
+    '<p class="kecil">Malam ke-'+(G?G.malam:1)+'</p>'+
+    '<p>Jika ada nama yang muncul 2 kali dalam satu malam, salah satunya pasti Peniru!</p>'+isi+
+    '<button class="tutup" id="x">Tutup Catatan</button>');
   el("x").onclick=tutupLayar;
 };
+
+function ketik(elm,teks,speed,cb){
+  if(!elm) return;
+  elm.textContent=""; elm.classList.add("mengetik");
+  let i=0;
+  const iv=setInterval(()=>{
+    elm.textContent+=teks[i]; i++;
+    if(i>=teks.length){ clearInterval(iv); elm.classList.remove("mengetik"); if(cb) cb(); }
+  },speed);
+}
+
+function tampilkanProlog(){
+  let pIdx = 0;
+  const muatParagraf = ()=>{
+    bukaLayar('<h2>Kisah Karangwuni — Prolog</h2>'+
+      '<div class="cerita-box" id="prolog-text"></div>'+
+      '<button class="mulai" id="tbl-prolog">'+(pIdx<PROLOG_TEKS.length-1?"Lanjut...":"Mulai Shift Malam 1")+'</button>');
+    
+    ketik(el("prolog-text"), PROLOG_TEKS[pIdx], 18);
+    el("tbl-prolog").onclick=()=>{
+      pIdx++;
+      if(pIdx < PROLOG_TEKS.length){
+        muatParagraf();
+      } else {
+        tutupLayar();
+        mulaiMalam(1);
+      }
+    };
+  };
+  muatParagraf();
+}
 
 function layarJudul(){
   const malam=muatMalam();
-  bukaLayar('<h2>Midnight KOPDES</h2>'+
-   '<p class="kecil">Warung koperasi desa · shift 21.00–03.00</p>'+
-   '<p>Kamu jaga warung KOPDES malam ini. Layani warga, kumpulkan setoran, jangan tutup sebelum jam tiga — tapi sejak pohon asam di pertigaan ditebang, tidak semua yang mengetuk kaca itu warga.</p>'+
-   '<h3>Cara bermain</h3><ul>'+
-   '<li>Periksa tiap pelanggan lewat 7 cara + 1 telepon pos ronda (sekali pakai, jawabannya pasti). Semua makan waktu, stok senter/garam/cermin terbatas.</li>'+
-   '<li>Warga asli bisa kehabisan sabar kalau kelamaan diinterogasi lalu pergi sendiri. Yang bukan warga tidak pernah kehabisan sabar — itu sendiri petunjuk.</li>'+
-   '<li><span class="tanda">Layani yang bukan warga = keselamatan berkurang.</span> Tolak warga asli = nama baik berkurang. 3x salah di salah satunya, shift berakhir.</li>'+
-   '<li>Curiga? Cocokkan di <b>Buku anggota</b> dan cek <b>Catatan shift</b> — dua hal yang paling sering kelupaan.</li>'+
+  bukaLayar('<h2 class="judul-flicker">Midnight KOPDES</h2>'+
+   '<p class="kecil">Story Edition · Minimarket Koperasi Desa Karangwuni</p>'+
+   '<p id="intro-p"></p>'+
+   '<h3>Instruksi Penjaga Shift</h3><ul class="cara-list">'+
+   '<li>🔦 Periksa identitas pelanggan lewat 7 alat ukur + 1 Bantuan Telepon RT Mardi.</li>'+
+   '<li>⏳ Warga asli punya batas kesabaran. Makhluk gaib TIDAK PERNAH kehabisan sabar.</li>'+
+   '<li>⚠️ Melayani Hantu = Keselamatan turun. Menolak Warga Asli = Reputasi turun.</li>'+
+   '<li>📖 Selalu cek <b>Buku Anggota</b> dan <b>Catatan Shift</b> untuk menemukan peniru!</li>'+
    '</ul>'+
-   '<button class="mulai" id="tbl-mulai">Buka rolling door · mulai malam ke-'+malam+'</button>'+
-   (malam>1?'<p class="kecil" style="text-align:center;margin-top:8px"><a href="#" id="reset" style="color:#89a79a">Mulai lagi dari malam pertama</a></p>':''));
-  el("tbl-mulai").onclick=()=>{ if(!Au.ctx&&Au.on) suaraNyala(); tutupLayar(); mulaiMalam(malam); };
-  const r=el("reset"); if(r) r.onclick=e=>{e.preventDefault();simpanMalam(1);layarJudul();};
+   '<button class="mulai mulai-glow" id="tbl-mulai">'+(malam===1?"Mulai Kisah & Shift Malam 1":"Lanjut Malam ke-"+malam)+'</button>'+
+   (malam>1?'<p class="kecil" style="text-align:center;margin-top:8px"><a href="#" id="reset" style="color:#89a79a">Ulangi Cerita Dari Malam 1</a></p>':''));
+
+  ketik(el("intro-p"),"Malam makin larut di Karangwuni. Sejak pohon asam tua ditebang, sesuatu dari hutan bambu mulai mengetuk jendela minimarket...",16);
+
+  el("tbl-mulai").onclick=()=>{ 
+    if(!Au.ctx&&Au.on) suaraNyala(); 
+    tutupLayar(); 
+    if(malam===1) tampilkanProlog();
+    else mulaiMalam(malam); 
+  };
+  const r=el("reset"); if(r) r.onclick=e=>{e.preventDefault(); simpanMalam(1); layarJudul(); };
 }
 
-/* ===================== KEYBOARD ===================== */
+/* ===================== KONTROL KEYBOARD ===================== */
 document.addEventListener("keydown",e=>{
   if(!el("layar").classList.contains("sembunyi")) return;
   const k=e.key.toLowerCase();
@@ -1083,7 +1338,7 @@ document.addEventListener("keydown",e=>{
   if(k==="enter"&&G&&G.lanjutFn){ e.preventDefault(); const f=G.lanjutFn; G.lanjutFn=null; f(); }
 });
 
-/* ===================== MULAI ===================== */
+/* ===================== INIT ===================== */
 G={malam:muatMalam(),waktu:AWAL,kas:0,target:150000,nyawa:3,rep:3,antre:[],idx:-1,kini:null,catatan:[],fase:"idle"};
 gambarStatus();
 el("scene").innerHTML=svgTokoh({kosong:true},{});
