@@ -66,3 +66,6 @@ Tiga hari lalu, pohon asam tua di pertigaan Dusun Karangwuni ditebang. Sejak mal
 - **Web Audio API:** Synthesizer suara (BiquadFilter, OscillatorNode) untuk *ambience* dan *sound effects*.
 
 ---
+
+## Game ini dapat dijalankan langsung di browser apa pun
+LINK NYA : midnight-kopdes.vercel.app
