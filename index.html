@@ -497,6 +497,10 @@ button{touch-action:manipulation}
 .home-credit h3{margin-top:8px}
 .home-credit .credit-box{background:#0a1210;border:1px solid #2e4d43;padding:14px 16px;font-family:'Special Elite',monospace;line-height:1.7;color:#cbdad3}
 .home-credit .credit-box b{color:#e5c46b}
+.home-credit .credit-box{text-align:center}
+.home-credit .credit-peran{font-size:10px;letter-spacing:.14em;color:#6f9686;margin:14px 0 4px}
+.home-credit .credit-nama{font-family:'Staatliches',sans-serif;font-size:clamp(20px,4.6vw,27px);letter-spacing:.07em;color:#eafff2;line-height:1.35;text-shadow:0 0 14px rgba(47,148,104,.35)}
+.home-credit .credit-rule{height:1px;background:linear-gradient(90deg,transparent,#315247,transparent);margin:14px auto;max-width:300px}
 
 /* ===================== MENU PENGATURAN ===================== */
 .menu-overlay{position:fixed;inset:0;z-index:9000;display:none;align-items:center;justify-content:center;background:rgba(5,3,2,.82);backdrop-filter:blur(5px);padding:20px;box-sizing:border-box}
@@ -1498,14 +1502,6 @@ const AMBIEN=[
 ];
 
 /* ===================== NARRATIVE CERITA (PROLOG & ENDINGS) ===================== */
-const PROLOG_TEKS = [
-  "Dusun Karangwuni dulu tenang. Tapi tiga hari lalu, pohon asam berusia dua abad di pertigaan desa ditebang atas perintah pemborong jalan.",
-  "Sejak malam itu, sesepuh desa bilang 'pintu penghubung' ke kebun bambu kuno telah terbuka. Bau bangkai dan tanah basah menyelimuti gang-gang desa setiap pukul 21.00.",
-  "Kamu menerima pekerjaan penjaga shift malam KOPDES Mekar Jaya karena terdesak kebutuhan ekonomi. Pak RT Mardi memberimu kunci minimarket dan buku anggota desa.",
-  "'Ingat, Le...' pesan Pak RT Mardi sore tadi. 'Karangwuni sekarang sedang aneh. Kalau ada yang mau belanja lewat jam sembilan malam, periksa baik-baik. Jangan sampai yang bukan warga kamu izinkan masuk ke dalam laci dan toko ini...'",
-  "Warga juga mulai berbisik soal hal-hal yang dulu cuma dianggap dongeng: ada yang melihat babi hitam gemuk berkalung emas mondar-mandir di pematang sawah tengah malam, dan sesosok api berjalan terbalik di dekat gardu listrik dusun. Kamu cuma bisa berharap keduanya tidak pernah mampir ke depan kasirmu."
-];
-
 const ENDING_STORY = {
   "happy_true": {
     judul: "Happy End: Pahlawan Karangwuni (True Ending)",
@@ -1549,7 +1545,9 @@ function kocok(a){const b=a.slice();for(let i=b.length-1;i>0;i--){const j=acak(i
 const rupiah=n=>"Rp "+n.toLocaleString("id-ID");
 const jamStr=m=>String(Math.floor(m/60)%24).padStart(2,"0")+"."+String(m%60).padStart(2,"0");
 const muatMalam=()=>{try{return Math.max(1,parseInt(localStorage.getItem("kopdes_malam"),10)||1)}catch(e){return 1}};
-const simpanMalam=n=>{try{localStorage.setItem("kopdes_malam",String(n))}catch(e){}};
+const simpanMalam=n=>{try{localStorage.setItem("kopdes_malam",String(n)); if(n===1) localStorage.setItem("kopdes_peniru","0");}catch(e){}};
+const muatPeniru=()=>{try{return Math.max(0,parseInt(localStorage.getItem("kopdes_peniru"),10)||0)}catch(e){return 0}};
+const simpanPeniru=n=>{try{localStorage.setItem("kopdes_peniru",String(n))}catch(e){}};
 
 /* ===================== SUARA (aset audio asli, di-render & di-embed) ===================== */
 // tingkat volume: mati / nyala / keras (tersimpan, jadi tidak perlu diatur ulang tiap buka game)
@@ -1740,11 +1738,11 @@ function buatAntrean(malam){
 }
 
 function mulaiMalam(malam){
-  const targetPerMalam = [150000, 180000, 220000, 260000, 300000];
+  const targetPerMalam = [130000, 150000, 165000, 170000, 175000]; // diseimbangkan lewat simulasi: pemain mahir menang ~89% (M1) turun ke ~59% (M5)
   G={malam,waktu:AWAL,kas:0,target:targetPerMalam[Math.min(malam-1, 4)],nyawa:3,rep:3,
      alat:{senter:malam<=1?4:3,garam:3,cermin:3,telepon:1},
      antre:buatAntrean(malam),idx:-1,kini:null,dipakai:[],terpakaiSabar:0,
-     fase:"layani",dilayani:0,salahTolak:0,kabur:0,benar:0,runtun:0,peniruLolos:0,catatan:[]};
+     fase:"layani",dilayani:0,salahTolak:0,kabur:0,benar:0,runtun:0,peniruLolos:0,doppel:0,doppelBawaan:muatPeniru(),catatan:[]};
   gambarStatus(); lanjut();
 }
 
@@ -1773,21 +1771,71 @@ function gambarSabar(){
   el("cap-sabar").textContent = pct<34 ? "Dia mulai gelisah — sisa "+sisa+" menit" : "Kesabaran pelanggan";
 }
 
+/* ===================== RENDER TOKOH v2: bentuk badan, wajah, bayangan, detail ===================== */
+function tkHex(h){
+  h=String(h||"#888888").replace("#","");
+  if(h.length===3)h=h.split("").map(c=>c+c).join("");
+  if(!/^[0-9a-fA-F]{6}$/.test(h))h="888888";
+  return [parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)];
+}
+function tkMix(a,b,k){
+  const A=tkHex(a),B=tkHex(b);
+  return "#"+A.map((v,i)=>Math.round(v+(B[i]-v)*k).toString(16).padStart(2,"0")).join("");
+}
+function tkGelap(h,k){return tkMix(h,"#000000",k);}
+function tkTerang(h,k){return tkMix(h,"#ffffff",k);}
+function tkHash(str){let h=2166136261>>>0;for(let i=0;i<str.length;i++){h^=str.charCodeAt(i);h=Math.imul(h,16777619)>>>0;}return h>>>0;}
+function tkRand(seed){let x=(seed>>>0)||1;return function(){x^=x<<13;x>>>=0;x^=x>>>17;x^=x<<5;x>>>=0;return x/4294967296;};}
+/* kapsul meruncing dari titik a ke titik b (dipakai untuk lengan) */
+function tkKapsul(ax,ay,bx,by,wa,wb){
+  const dx=bx-ax,dy=by-ay,L=Math.hypot(dx,dy)||1,ux=dx/L,uy=dy/L,nx=-uy,ny=ux;
+  const p1=[ax+nx*wa/2,ay+ny*wa/2],p2=[bx+nx*wb/2,by+ny*wb/2],p3=[bx-nx*wb/2,by-ny*wb/2],p4=[ax-nx*wa/2,ay-ny*wa/2];
+  return "M"+p1+" L"+p2+" Q"+(bx+ux*wb*.6)+","+(by+uy*wb*.6)+" "+p3+" L"+p4+" Q"+(ax-ux*wa*.6)+","+(ay-uy*wa*.6)+" "+p1+" Z";
+}
+let tkUid=0;
+
 function svgTokoh(look,opt){
   opt=opt||{};
+  const u="k"+(++tkUid);
   const t=look.tinggi||1, kakiY=300, cx=160;
-  const tinggiBadan=150*t, lebarBadan=46*t*(look.bulu?1.25:1);
-  const angkat=(opt.terang&&opt.melayang)?16:0;
-  const bY=kakiY-angkat, kepalaR=25*t;
-  const leherY=bY-tinggiBadan;
-  let kepalaY=leherY-kepalaR-5;
-  const terang=opt.terang, amb=terang?1:.42;
+  const terang=!!opt.terang, amb=terang?1:.42;
   const hilang=!!(opt.kepalaHilang&&terang);
-  const kulit=(opt.rangka&&terang)?"#e6e1d3":look.kulit;
+  const rangka=!!(opt.rangka&&terang);
+  const melayang=!!(opt.melayang&&terang);
+  const w=look.wajah||"normal", k=look.kepala||"";
+  const lebarBadan=46*t*(look.bulu?1.25:1);
+  const tinggiBadan=158*t;
+  const bY=kakiY-(melayang?16:0);
+  const R=23*t;
+  const leherY=bY-tinggiBadan;
+  const pL=(opt.leherPanjang&&terang)?24:0;
+  const kY=leherY-R-9-pL;
+  const rx=R*(w==="anak"?.93:.84);
+  const kulit=rangka?"#e6e1d3":look.kulit;
+  const seed=tkHash((look.baju||"")+(look.kulit||"")+k+w);
+  const rnd=tkRand(seed);
+  const sh=lebarBadan*.63, wa=lebarBadan*.52, hipY=bY-56*t;
+  const pocong=(k==="tutup");
+  const gaun=["kerudung","jilbab","sanggul","sanggul_mewah","panjang","kuyang"].includes(k);
+  const v=seed%3;                       /* 0 kemeja, 1 kaos, 2 jaket */
+  const baju=look.baju||"#444444";
+  const bajuG=tkGelap(baju,.38), bajuT=tkTerang(baju,.16);
+  const celana=["#1d232b","#2b2620","#232a35","#2f2a22","#1b1f1d"][seed%5];
+  const hc=look.rambut||(w==="tua"?"#77726c":["#15110e","#1a130e","#100d0b","#201510"][seed%4]);
+  const browC=w==="tua"?"#8d877f":tkGelap(hc,.1);
+  const tinta="#1a110c";
+  const kulitG=tkGelap(kulit,.32), kulitT=tkTerang(kulit,.17);
+  const ov=(d,g,extra)=>'<path d="'+d+'" fill="url(#'+g+u+')"'+(extra||"")+'/>';
+
   let s='<svg viewBox="0 0 320 340" role="img" aria-label="Sosok di depan pintu kaca">';
   s+='<defs><radialGradient id="lp" cx="50%" cy="6%" r="78%">'+
      '<stop offset="0%" stop-color="#cfe9d8" stop-opacity="'+(terang?.42:.18)+'"/>'+
-     '<stop offset="100%" stop-color="#0a1412" stop-opacity="0"/></radialGradient></defs>';
+     '<stop offset="100%" stop-color="#0a1412" stop-opacity="0"/></radialGradient>'+
+     '<radialGradient id="gk'+u+'" cx="40%" cy="34%" r="78%"><stop offset="0%" stop-color="'+kulitT+'"/><stop offset=".55" stop-color="'+kulit+'"/><stop offset="1" stop-color="'+kulitG+'"/></radialGradient>'+
+     '<linearGradient id="gx'+u+'" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#000" stop-opacity=".30"/><stop offset=".3" stop-color="#000" stop-opacity=".03"/><stop offset=".62" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".42"/></linearGradient>'+
+     '<linearGradient id="gy'+u+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".13"/><stop offset=".4" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".36"/></linearGradient>'+
+     '<linearGradient id="gs'+u+'" x1="0" y1="0" x2="0" y2="1"><stop offset=".25" stop-color="#1a120c" stop-opacity="0"/><stop offset="1" stop-color="#1a120c" stop-opacity=".36"/></linearGradient>'+
+     '<radialGradient id="gm'+u+'"><stop offset="0" stop-color="#ff6a3a" stop-opacity=".85"/><stop offset="1" stop-color="#ff3a1a" stop-opacity="0"/></radialGradient></defs>';
   s+='<rect width="320" height="340" fill="url(#lp)"/>';
   s+='<g opacity="'+(terang?.30:.16)+'" fill="#1c3a33">';
   s+='<rect x="6" y="150" width="58" height="150"/><rect x="256" y="140" width="58" height="160"/>';
@@ -1809,101 +1857,369 @@ function svgTokoh(look,opt){
       if(opt.duaBayangan) s+='<ellipse cx="'+(cx+48)+'" cy="'+(kakiY+7)+'" rx="'+(lebarBadan*.8)+'" ry="'+(8*t)+'" fill="#000" opacity="0.4"/>';
     }
   }
-  if(!(opt.melayang&&terang)){
-    s+='<rect x="'+(cx-16*t)+'" y="'+(bY-34*t)+'" width="'+(12*t)+'" height="'+(34*t)+'" fill="#151c19" opacity="'+amb+'"/>';
-    s+='<rect x="'+(cx+4*t)+'" y="'+(bY-34*t)+'" width="'+(12*t)+'" height="'+(34*t)+'" fill="#151c19" opacity="'+amb+'"/>';
+
+  /* ---------- rambut & penutup kepala: dibuat sebagai tiga lapis (b = di belakang badan, m = di atas badan tapi di bawah wajah, f = di depan wajah) ---------- */
+  const L={b:"",m:"",f:""};
+  const topiWarna=["#20303c","#3a2a24","#2b3b2d","#40322a","#2c2f3a","#4a2f2f"][seed%6];
+  function hairCap(top,line,col,sorot){
+    const part=(seed%2?-1:1)*rx*.28, hl=sorot===false?"":
+      '<path d="M'+(cx-rx*.62)+' '+(kY-R*(top-.38))+' Q'+(cx-rx*.1)+' '+(kY-R*top)+' '+(cx+rx*.46)+' '+(kY-R*(top-.14))+'" stroke="'+tkTerang(col,.32)+'" stroke-width="'+(2.2*t)+'" fill="none" stroke-linecap="round" opacity=".5"/>'+
+      '<path d="M'+(cx-rx*.3)+' '+(kY-R*(line+.04))+' Q'+(cx-rx*.15)+' '+(kY-R*(top-.3))+' '+(cx+rx*.05)+' '+(kY-R*(top-.05))+'" stroke="'+tkGelap(col,.35)+'" stroke-width="'+(.9*t)+'" fill="none" opacity=".5"/>';
+    return '<path d="M'+(cx-rx*1.06)+' '+(kY+R*.14)+' C'+(cx-rx*1.22)+' '+(kY-R*1.0)+' '+(cx-rx*.5)+' '+(kY-R*top)+' '+cx+' '+(kY-R*top)+
+      ' C'+(cx+rx*.5)+' '+(kY-R*top)+' '+(cx+rx*1.22)+' '+(kY-R*1.0)+' '+(cx+rx*1.06)+' '+(kY+R*.14)+
+      ' L'+(cx+rx*.84)+' '+(kY-R*.12)+' Q'+(cx+rx*.5+part)+' '+(kY-R*(line+.12))+' '+(cx+part*.4)+' '+(kY-R*line)+
+      ' Q'+(cx-rx*.5+part)+' '+(kY-R*(line+.08))+' '+(cx-rx*.84)+' '+(kY-R*.12)+' Z" fill="'+col+'"/>'+hl;
   }
-  s+='<path d="M'+(cx-lebarBadan/2)+' '+bY+' L'+(cx-lebarBadan/2.4)+' '+leherY+' Q'+cx+' '+(leherY-12)+' '+(cx+lebarBadan/2.4)+' '+leherY+' L'+(cx+lebarBadan/2)+' '+bY+' Z" fill="'+look.baju+'" opacity="'+amb+'"/>';
-  s+='<rect x="'+(cx-lebarBadan/2-9*t)+'" y="'+(leherY+16)+'" width="'+(10*t)+'" height="'+(tinggiBadan*.62)+'" rx="5" fill="'+look.baju+'" opacity="'+(amb*.92)+'"/>';
-  s+='<rect x="'+(cx+lebarBadan/2-t)+'" y="'+(leherY+16)+'" width="'+(10*t)+'" height="'+(tinggiBadan*.62)+'" rx="5" fill="'+look.baju+'" opacity="'+(amb*.92)+'"/>';
-  if(look.bulu&&terang){
-    for(let i=0;i<22;i++){
-      const x=cx-lebarBadan/2+Math.random()*lebarBadan, y=leherY+Math.random()*tinggiBadan*.8;
-      s+='<line x1="'+x+'" y1="'+y+'" x2="'+(x+3)+'" y2="'+(y+7)+'" stroke="#0d0b09" stroke-width="1.4" opacity=".75"/>';
+  function peci(col,tepi){
+    return '<path d="M'+(cx-rx*.96)+' '+(kY-R*.5)+' L'+(cx-rx*.9)+' '+(kY-R*1.2)+' Q'+cx+' '+(kY-R*1.34)+' '+(cx+rx*.9)+' '+(kY-R*1.2)+' L'+(cx+rx*.96)+' '+(kY-R*.5)+' Q'+cx+' '+(kY-R*.42)+' '+(cx-rx*.96)+' '+(kY-R*.5)+' Z" fill="'+col+'"/>'+
+      ov('M'+(cx-rx*.96)+' '+(kY-R*.5)+' L'+(cx-rx*.9)+' '+(kY-R*1.2)+' Q'+cx+' '+(kY-R*1.34)+' '+(cx+rx*.9)+' '+(kY-R*1.2)+' L'+(cx+rx*.96)+' '+(kY-R*.5)+' Q'+cx+' '+(kY-R*.42)+' '+(cx-rx*.96)+' '+(kY-R*.5)+' Z',"gx")+
+      '<path d="M'+(cx-rx*.94)+' '+(kY-R*.62)+' Q'+cx+' '+(kY-R*.54)+' '+(cx+rx*.94)+' '+(kY-R*.62)+'" stroke="'+(tepi||tkTerang(col,.18))+'" stroke-width="'+(1.6*t)+'" fill="none" opacity=".7"/>'+
+      '<path d="M'+(cx-rx*.5)+' '+(kY-R*1.12)+' Q'+(cx-rx*.1)+' '+(kY-R*1.25)+' '+(cx+rx*.3)+' '+(kY-R*1.2)+'" stroke="#fff" stroke-width="'+(1.6*t)+'" fill="none" opacity=".12" stroke-linecap="round"/>';
+  }
+  const pakaiRambutBawah=["peci","kopiah","topi","kupluk","helm","caping"].includes(k);
+  if(pakaiRambutBawah) L.m+=hairCap(1.1,.5,hc,false);
+
+  if(k==="panjang"||k==="gondrong"||k==="kuyang"){
+    const kk=(k==="kuyang"), col=kk?"#2d1d28":hc, ujung=k==="gondrong"?R*2.3:(kk?R*3.5:tinggiBadan*.5);
+    const lebar=k==="gondrong"?1.3:1.25;
+    let d='M'+(cx-rx*1.1)+' '+(kY-R*.3)+' C'+(cx-rx*1.5)+' '+(kY-R*1.6)+' '+(cx+rx*1.5)+' '+(kY-R*1.6)+' '+(cx+rx*1.1)+' '+(kY-R*.3)+
+      ' L'+(cx+rx*lebar)+' '+(kY+ujung*.75);
+    if(kk){ for(let i=0;i<7;i++){ d+=' L'+(cx+rx*lebar-(i+.5)*rx*lebar*2/7)+' '+(kY+ujung+((i%2)?-8:6)*t)+' L'+(cx+rx*lebar-(i+1)*rx*lebar*2/7)+' '+(kY+ujung*.9); } }
+    else d+=' Q'+cx+' '+(kY+ujung*1.12)+' '+(cx-rx*lebar)+' '+(kY+ujung*.75);
+    d+=' Z';
+    L.b+='<path d="'+d+'" fill="'+col+'"/>'+ov(d,"gx",' opacity=".8"');
+    L.f+=hairCap(k==="gondrong"?1.4:1.38,k==="gondrong"?.52:.7,col);
+    if(k==="panjang"||kk){
+      const sd=[-1,1].map(sg=>'<path d="M'+(cx+sg*rx*.98)+' '+(kY-R*.1)+' C'+(cx+sg*rx*1.28)+' '+(kY+R*1.3)+' '+(cx+sg*rx*1.3)+' '+(kY+R*2.6)+' '+(cx+sg*rx*1.12)+' '+(kY+ujung*.72)+' L'+(cx+sg*rx*.84)+' '+(kY+ujung*.7)+' C'+(cx+sg*rx*.9)+' '+(kY+R*2.4)+' '+(cx+sg*rx*.9)+' '+(kY+R*1.3)+' '+(cx+sg*rx*.84)+' '+(kY+R*.15)+' Z" fill="'+col+'"/>').join("");
+      L.f+=sd;
+    }else{
+      L.f+='<path d="M'+(cx-rx*.9)+' '+(kY-R*.2)+' Q'+(cx-rx*.3)+' '+(kY-R*.25)+' '+(cx+rx*.8)+' '+(kY-R*.62)+' L'+(cx+rx*.9)+' '+(kY-R*.15)+' Q'+(cx+rx*.1)+' '+(kY-R*.3)+' '+(cx-rx*.9)+' '+(kY+R*.2)+' Z" fill="'+col+'"/>';
+    }
+  }else if(k==="bob"){
+    const col=hc;
+    L.b+='<path d="M'+(cx-rx*1.12)+' '+(kY-R*.2)+' C'+(cx-rx*1.5)+' '+(kY-R*1.55)+' '+(cx+rx*1.5)+' '+(kY-R*1.55)+' '+(cx+rx*1.12)+' '+(kY-R*.2)+' L'+(cx+rx*1.22)+' '+(kY+R*1.25)+' Q'+cx+' '+(kY+R*1.55)+' '+(cx-rx*1.22)+' '+(kY+R*1.25)+' Z" fill="'+col+'"/>';
+    L.f+=hairCap(1.4,.7,col);
+    L.f+='<path d="M'+(cx-rx*1.0)+' '+(kY+R*.1)+' Q'+(cx-rx*1.18)+' '+(kY+R*.9)+' '+(cx-rx*1.0)+' '+(kY+R*1.2)+' L'+(cx-rx*.82)+' '+(kY+R*.6)+' Z" fill="'+col+'"/><path d="M'+(cx+rx*1.0)+' '+(kY+R*.1)+' Q'+(cx+rx*1.18)+' '+(kY+R*.9)+' '+(cx+rx*1.0)+' '+(kY+R*1.2)+' L'+(cx+rx*.82)+' '+(kY+R*.6)+' Z" fill="'+col+'"/>';
+  }else if(k==="ekor"){
+    const dir=(seed%2)?-1:1;
+    L.b+='<path d="M'+(cx+dir*rx*.7)+' '+(kY-R*.45)+' C'+(cx+dir*rx*1.9)+' '+(kY-R*.2)+' '+(cx+dir*rx*1.9)+' '+(kY+R*1.4)+' '+(cx+dir*rx*1.35)+' '+(kY+R*2.4)+' C'+(cx+dir*rx*1.35)+' '+(kY+R*1.3)+' '+(cx+dir*rx*1.1)+' '+(kY+R*.5)+' '+(cx+dir*rx*.6)+' '+(kY-R*.1)+' Z" fill="'+hc+'"/>';
+    L.f+=hairCap(1.36,.74,hc);
+    L.f+='<circle cx="'+(cx+dir*rx*1.0)+'" cy="'+(kY-R*.35)+'" r="'+(2.6*t)+'" fill="#b8453a"/>';
+  }else if(k==="sanggul"||k==="sanggul_mewah"){
+    const cs=look.rambut||"#8e8a84", mewah=k==="sanggul_mewah";
+    L.f+=hairCap(1.3,.78,cs);
+    const br=R*(mewah?.5:.4);
+    L.f+='<circle cx="'+cx+'" cy="'+(kY-R*1.38)+'" r="'+br+'" fill="'+cs+'"/>'+
+      '<circle cx="'+(cx-br*.3)+'" cy="'+(kY-R*1.38-br*.3)+'" r="'+(br*.45)+'" fill="'+tkTerang(cs,.3)+'" opacity=".45"/>'+
+      '<path d="M'+(cx-br*.7)+' '+(kY-R*1.4)+' Q'+cx+' '+(kY-R*1.38+br*.6)+' '+(cx+br*.7)+' '+(kY-R*1.4)+'" stroke="'+tkGelap(cs,.4)+'" stroke-width="'+(.9*t)+'" fill="none" opacity=".6"/>';
+    if(mewah) L.f+='<path d="M'+(cx-br*1.4)+' '+(kY-R*1.55)+' L'+(cx+br*1.4)+' '+(kY-R*1.2)+'" stroke="#d4b25a" stroke-width="'+(1.5*t)+'" stroke-linecap="round"/><circle cx="'+(cx+br*1.4)+'" cy="'+(kY-R*1.2)+'" r="'+(2.2*t)+'" fill="#e4c46b"/><circle cx="'+(cx-br*.9)+'" cy="'+(kY-R*1.1)+'" r="'+(2*t)+'" fill="#c0392b"/>';
+  }else if(k==="cepak"){
+    L.f+=hairCap(1.2,.55,hc);
+  }else if(k==="botak"){
+    L.f+='<ellipse cx="'+(cx-rx*.3)+'" cy="'+(kY-R*.78)+'" rx="'+(rx*.35)+'" ry="'+(R*.16)+'" fill="#fff" opacity=".14" transform="rotate(-18 '+(cx-rx*.3)+' '+(kY-R*.78)+')"/>';
+    if(w==="tua") [-1,1].forEach(sg=>{L.f+='<path d="M'+(cx+sg*rx*1.02)+' '+(kY-R*.25)+' Q'+(cx+sg*rx*1.2)+' '+(kY+R*.05)+' '+(cx+sg*rx*1.0)+' '+(kY+R*.32)+' L'+(cx+sg*rx*.86)+' '+(kY-R*.05)+' Z" fill="'+hc+'"/>';});
+  }else if(k==="peci"){
+    L.f+=peci("#14181e","#2a313b");
+  }else if(k==="kopiah"){
+    L.f+=peci("#e8e4d8","#bdb7a6");
+  }else if(k==="topi"){
+    const th=topiWarna;
+    L.f+='<path d="M'+(cx-rx*1.02)+' '+(kY-R*.46)+' C'+(cx-rx*1.12)+' '+(kY-R*1.5)+' '+(cx+rx*1.12)+' '+(kY-R*1.5)+' '+(cx+rx*1.02)+' '+(kY-R*.46)+' Z" fill="'+th+'"/>'+
+      ov('M'+(cx-rx*1.02)+' '+(kY-R*.46)+' C'+(cx-rx*1.12)+' '+(kY-R*1.5)+' '+(cx+rx*1.12)+' '+(kY-R*1.5)+' '+(cx+rx*1.02)+' '+(kY-R*.46)+' Z',"gx")+
+      '<path d="M'+cx+' '+(kY-R*1.1)+' L'+cx+' '+(kY-R*.5)+' M'+(cx-rx*.5)+' '+(kY-R*1.0)+' Q'+(cx-rx*.45)+' '+(kY-R*.7)+' '+(cx-rx*.55)+' '+(kY-R*.5)+' M'+(cx+rx*.5)+' '+(kY-R*1.0)+' Q'+(cx+rx*.45)+' '+(kY-R*.7)+' '+(cx+rx*.55)+' '+(kY-R*.5)+'" stroke="'+tkGelap(th,.4)+'" stroke-width="'+(.9*t)+'" fill="none" opacity=".7"/>'+
+      '<circle cx="'+cx+'" cy="'+(kY-R*1.08)+'" r="'+(1.8*t)+'" fill="'+tkTerang(th,.2)+'"/>'+
+      '<path d="M'+(cx-rx*1.12)+' '+(kY-R*.48)+' Q'+cx+' '+(kY+R*.02)+' '+(cx+rx*1.12)+' '+(kY-R*.48)+' Q'+cx+' '+(kY-R*.36)+' '+(cx-rx*1.12)+' '+(kY-R*.48)+' Z" fill="'+tkGelap(th,.18)+'"/>'+
+      '<path d="M'+(cx-rx*1.12)+' '+(kY-R*.48)+' Q'+cx+' '+(kY-R*.36)+' '+(cx+rx*1.12)+' '+(kY-R*.48)+'" stroke="'+tkTerang(th,.25)+'" stroke-width="'+(1*t)+'" fill="none" opacity=".6"/>';
+  }else if(k==="helm"){
+    const hd='M'+(cx-rx*1.14)+' '+(kY+R*.1)+' C'+(cx-rx*1.3)+' '+(kY-R*1.55)+' '+(cx+rx*1.3)+' '+(kY-R*1.55)+' '+(cx+rx*1.14)+' '+(kY+R*.1)+' Q'+cx+' '+(kY-R*.3)+' '+(cx-rx*1.14)+' '+(kY+R*.1)+' Z';
+    L.f+='<path d="M'+(cx-rx*.98)+' '+(kY+R*.05)+' L'+(cx-rx*.74)+' '+(kY+R*.9)+' Q'+cx+' '+(kY+R*1.28)+' '+(cx+rx*.74)+' '+(kY+R*.9)+' L'+(cx+rx*.98)+' '+(kY+R*.05)+'" stroke="#101412" stroke-width="'+(1.8*t)+'" fill="none"/>'+
+      '<path d="'+hd+'" fill="#1c6b52"/>'+ov(hd,"gx")+ov(hd,"gy")+
+      '<path d="M'+(cx-rx*.9)+' '+(kY-R*.42)+' Q'+cx+' '+(kY-R*.14)+' '+(cx+rx*.9)+' '+(kY-R*.42)+'" stroke="#0d3a2c" stroke-width="'+(3.4*t)+'" fill="none"/>'+
+      '<path d="M'+(cx-rx*.6)+' '+(kY-R*1.05)+' Q'+(cx-rx*.2)+' '+(kY-R*1.35)+' '+(cx+rx*.3)+' '+(kY-R*1.3)+'" stroke="#bfeed9" stroke-width="'+(2*t)+'" fill="none" stroke-linecap="round" opacity=".5"/>';
+  }else if(k==="caping"){
+    const cd='M'+(cx-R*1.95)+' '+(kY-R*.28)+' L'+cx+' '+(kY-R*2.1)+' L'+(cx+R*1.95)+' '+(kY-R*.28)+' Q'+cx+' '+(kY+R*.1)+' '+(cx-R*1.95)+' '+(kY-R*.28)+' Z';
+    let ln="";
+    for(let i=-4;i<=4;i++) ln+='M'+cx+' '+(kY-R*2.1)+' L'+(cx+i*R*.46)+' '+(kY-R*.2+(Math.abs(i)<3?R*.07:0));
+    for(let j=1;j<5;j++){ const yy=kY-R*2.1+j*R*.37, hw=R*1.95*(yy-(kY-R*2.1))/(R*1.82); ln+='M'+(cx-hw)+' '+yy+' Q'+cx+' '+(yy+R*.12)+' '+(cx+hw)+' '+yy; }
+    L.f+='<path d="'+cd+'" fill="#b39a63"/>'+ov(cd,"gx")+'<path d="'+ln+'" stroke="'+tkGelap("#b39a63",.45)+'" stroke-width="'+(.8*t)+'" fill="none" opacity=".55"/>'+
+      '<path d="M'+(cx-R*1.95)+' '+(kY-R*.28)+' Q'+cx+' '+(kY+R*.1)+' '+(cx+R*1.95)+' '+(kY-R*.28)+'" stroke="'+tkGelap("#b39a63",.5)+'" stroke-width="'+(1.6*t)+'" fill="none"/>'+
+      '<path d="M'+(cx-rx*.98)+' '+(kY-R*.2)+' L'+(cx-rx*.7)+' '+(kY+R*.95)+' M'+(cx+rx*.98)+' '+(kY-R*.2)+' L'+(cx+rx*.7)+' '+(kY+R*.95)+'" stroke="#3a2c1a" stroke-width="'+(1*t)+'" opacity=".7"/>'+
+      '<ellipse cx="'+cx+'" cy="'+(kY-R*.02)+'" rx="'+(rx*.95)+'" ry="'+(R*.16)+'" fill="#000" opacity=".25"/>';
+  }else if(k==="blangkon"){
+    const bd='M'+(cx-rx*1.04)+' '+(kY-R*.3)+' C'+(cx-rx*1.2)+' '+(kY-R*1.3)+' '+(cx+rx*1.2)+' '+(kY-R*1.3)+' '+(cx+rx*1.04)+' '+(kY-R*.3)+' Q'+cx+' '+(kY-R*.62)+' '+(cx-rx*1.04)+' '+(kY-R*.3)+' Z';
+    let dm="";
+    for(let i=-3;i<=3;i++){ const px=cx+i*rx*.28, py=kY-R*.55-Math.abs(i)*R*.02; dm+='M'+px+' '+(py-R*.12)+' l'+(rx*.1)+' '+(R*.12)+' l'+(-rx*.1)+' '+(R*.12)+' l'+(-rx*.1)+' '+(-R*.12)+' Z '; }
+    L.f+='<ellipse cx="'+(cx+rx*1.0)+'" cy="'+(kY-R*.62)+'" rx="'+(R*.26)+'" ry="'+(R*.32)+'" fill="#3b2412"/>'+
+      '<path d="'+bd+'" fill="#4a2f1a"/>'+ov(bd,"gx")+
+      '<path d="'+dm+'" fill="none" stroke="#a88455" stroke-width="'+(.8*t)+'" opacity=".6"/>'+
+      '<path d="M'+(cx-rx*1.0)+' '+(kY-R*.36)+' Q'+cx+' '+(kY-R*.7)+' '+(cx+rx*1.0)+' '+(kY-R*.36)+'" stroke="#8a6a3a" stroke-width="'+(1.6*t)+'" fill="none" opacity=".8"/>'+
+      '<path d="M'+(cx-rx*.6)+' '+(kY-R*1.05)+' Q'+(cx-rx*.1)+' '+(kY-R*1.22)+' '+(cx+rx*.4)+' '+(kY-R*1.1)+'" stroke="#fff" stroke-width="'+(1.6*t)+'" fill="none" opacity=".14" stroke-linecap="round"/>';
+  }else if(k==="kupluk"){
+    const kd='M'+(cx-rx*1.02)+' '+(kY-R*.3)+' C'+(cx-rx*1.12)+' '+(kY-R*1.5)+' '+(cx+rx*1.12)+' '+(kY-R*1.5)+' '+(cx+rx*1.02)+' '+(kY-R*.3)+' Z';
+    let rb=""; for(let i=-4;i<=4;i++) rb+='M'+(cx+i*rx*.22)+' '+(kY-R*1.3+Math.abs(i)*R*.04)+' L'+(cx+i*rx*.24)+' '+(kY-R*.55);
+    L.f+='<path d="'+kd+'" fill="#2c3a4a"/>'+ov(kd,"gx")+'<path d="'+rb+'" stroke="#1a2430" stroke-width="'+(.9*t)+'" opacity=".6"/>'+
+      '<rect x="'+(cx-rx*1.06)+'" y="'+(kY-R*.66)+'" width="'+(rx*2.12)+'" height="'+(R*.4)+'" rx="'+(R*.12)+'" fill="#3f5468"/>'+
+      '<rect x="'+(cx-rx*1.06)+'" y="'+(kY-R*.66)+'" width="'+(rx*2.12)+'" height="'+(R*.4)+'" rx="'+(R*.12)+'" fill="url(#gx'+u+')"/>'+
+      '<path d="M'+(cx-rx*1.0)+' '+(kY-R*.5)+' L'+(cx+rx*1.0)+' '+(kY-R*.5)+'" stroke="#2a3a4c" stroke-width="'+(.9*t)+'" opacity=".6"/>';
+  }else if(k==="kerudung"||k==="jilbab"){
+    const col=look.warna||"#5b4a72", len=(k==="jilbab")?R*3.5:R*2.5, sw=sh*.98;
+    const dd='M'+(cx-rx*1.2)+' '+(kY+R*.1)+' C'+(cx-rx*1.5)+' '+(kY-R*1.6)+' '+(cx+rx*1.5)+' '+(kY-R*1.6)+' '+(cx+rx*1.2)+' '+(kY+R*.1)+
+      ' C'+(cx+rx*1.32)+' '+(kY+R*.9)+' '+(cx+sw)+' '+(kY+R*1.4)+' '+(cx+sw)+' '+(kY+len)+' Q'+cx+' '+(kY+len+R*.5)+' '+(cx-sw)+' '+(kY+len)+
+      ' C'+(cx-sw)+' '+(kY+R*1.4)+' '+(cx-rx*1.32)+' '+(kY+R*.9)+' '+(cx-rx*1.2)+' '+(kY+R*.1)+' Z';
+    L.m+='<path d="'+dd+'" fill="'+col+'"/>'+ov(dd,"gx")+ov(dd,"gy")+
+      '<path d="M'+(cx-rx*.95)+' '+(kY+R*1.0)+' Q'+(cx-rx*1.2)+' '+(kY+R*1.9)+' '+(cx-sw*.8)+' '+(kY+len-R*.1)+' M'+(cx+rx*.95)+' '+(kY+R*1.0)+' Q'+(cx+rx*1.2)+' '+(kY+R*1.9)+' '+(cx+sw*.8)+' '+(kY+len-R*.1)+' M'+cx+' '+(kY+R*1.25)+' Q'+(cx+rx*.2)+' '+(kY+R*2.0)+' '+(cx-rx*.1)+' '+(kY+len-R*.2)+'" stroke="'+tkGelap(col,.4)+'" stroke-width="'+(1.1*t)+'" fill="none" opacity=".65"/>'+
+      '<path d="M'+(cx-sw*.55)+' '+(kY+R*1.7)+' Q'+cx+' '+(kY+R*1.25)+' '+(cx+sw*.55)+' '+(kY+R*1.7)+'" stroke="'+tkTerang(col,.2)+'" stroke-width="'+(1.2*t)+'" fill="none" opacity=".35"/>';
+    L.f+='<path d="M'+(cx-rx*1.22)+' '+(kY+R*.7)+' C'+(cx-rx*1.5)+' '+(kY-R*1.55)+' '+(cx+rx*1.5)+' '+(kY-R*1.55)+' '+(cx+rx*1.22)+' '+(kY+R*.7)+' L'+(cx+rx*.94)+' '+(kY+R*.62)+' C'+(cx+rx*1.0)+' '+(kY-R*.3)+' '+(cx+rx*.55)+' '+(kY-R*.82)+' '+cx+' '+(kY-R*.82)+' C'+(cx-rx*.55)+' '+(kY-R*.82)+' '+(cx-rx*1.0)+' '+(kY-R*.3)+' '+(cx-rx*.94)+' '+(kY+R*.62)+' Z" fill="'+col+'"/>'+
+      '<path d="M'+(cx-rx*.94)+' '+(kY+R*.5)+' C'+(cx-rx*1.0)+' '+(kY-R*.3)+' '+(cx-rx*.55)+' '+(kY-R*.82)+' '+cx+' '+(kY-R*.82)+' C'+(cx+rx*.55)+' '+(kY-R*.82)+' '+(cx+rx*1.0)+' '+(kY-R*.3)+' '+(cx+rx*.94)+' '+(kY+R*.5)+'" stroke="'+tkGelap(col,.45)+'" stroke-width="'+(1.5*t)+'" fill="none" opacity=".7"/>'+
+      '<path d="M'+(cx-rx*.7)+' '+(kY-R*1.0)+' Q'+(cx-rx*.1)+' '+(kY-R*1.3)+' '+(cx+rx*.5)+' '+(kY-R*1.1)+'" stroke="'+tkTerang(col,.3)+'" stroke-width="'+(2*t)+'" fill="none" stroke-linecap="round" opacity=".35"/>';
+  }else if(k==="tutup"){
+    const col="#dcd6c8";
+    const dd='M'+(cx-rx*1.2)+' '+(kY+R*.15)+' C'+(cx-rx*1.45)+' '+(kY-R*1.55)+' '+(cx+rx*1.45)+' '+(kY-R*1.55)+' '+(cx+rx*1.2)+' '+(kY+R*.15)+' L'+(cx+rx*.96)+' '+(kY+R*1.0)+' L'+(cx+9*t)+' '+(leherY+3*t)+' Q'+cx+' '+(leherY+9*t)+' '+(cx-9*t)+' '+(leherY+3*t)+' L'+(cx-rx*.96)+' '+(kY+R*1.0)+' Z';
+    L.m+='<path d="'+dd+'" fill="'+col+'"/>'+ov(dd,"gx")+
+      '<path d="M'+(cx-9*t)+' '+(leherY+3*t)+' Q'+cx+' '+(leherY+9*t)+' '+(cx+9*t)+' '+(leherY+3*t)+'" stroke="#8d8676" stroke-width="'+(2.2*t)+'" fill="none"/>'+
+      '<path d="M'+(cx-rx*.9)+' '+(kY+R*1.0)+' Q'+(cx-rx*.8)+' '+(kY+R*1.6)+' '+(cx-8*t)+' '+(leherY+1*t)+' M'+(cx+rx*.9)+' '+(kY+R*1.0)+' Q'+(cx+rx*.8)+' '+(kY+R*1.6)+' '+(cx+8*t)+' '+(leherY+1*t)+'" stroke="#aaa493" stroke-width="'+(.9*t)+'" fill="none" opacity=".7"/>';
+    L.f+='<path d="M'+(cx-rx*1.2)+' '+(kY+R*.5)+' C'+(cx-rx*1.5)+' '+(kY-R*1.55)+' '+(cx+rx*1.5)+' '+(kY-R*1.55)+' '+(cx+rx*1.2)+' '+(kY+R*.5)+' L'+(cx+rx*.94)+' '+(kY+R*.55)+' C'+(cx+rx*1.0)+' '+(kY-R*.3)+' '+(cx+rx*.55)+' '+(kY-R*.8)+' '+cx+' '+(kY-R*.8)+' C'+(cx-rx*.55)+' '+(kY-R*.8)+' '+(cx-rx*1.0)+' '+(kY-R*.3)+' '+(cx-rx*.94)+' '+(kY+R*.55)+' Z" fill="'+col+'"/>'+
+      '<path d="M'+(cx-rx*.94)+' '+(kY+R*.45)+' C'+(cx-rx*1.0)+' '+(kY-R*.3)+' '+(cx-rx*.55)+' '+(kY-R*.8)+' '+cx+' '+(kY-R*.8)+' C'+(cx+rx*.55)+' '+(kY-R*.8)+' '+(cx+rx*1.0)+' '+(kY-R*.3)+' '+(cx+rx*.94)+' '+(kY+R*.45)+'" stroke="#9c9583" stroke-width="'+(1.4*t)+'" fill="none" opacity=".8"/>'+
+      '<path d="M'+(cx-2*t)+' '+(kY-R*1.28)+' L'+(cx-11*t)+' '+(kY-R*1.72)+' L'+(cx-3*t)+' '+(kY-R*1.2)+' Z M'+(cx+2*t)+' '+(kY-R*1.28)+' L'+(cx+11*t)+' '+(kY-R*1.68)+' L'+(cx+3*t)+' '+(kY-R*1.2)+' Z" fill="'+col+'" stroke="#a8a291" stroke-width="'+(.8*t)+'"/>'+
+      '<circle cx="'+cx+'" cy="'+(kY-R*1.26)+'" r="'+(2.6*t)+'" fill="#cfc9ba" stroke="#a8a291" stroke-width="'+(.8*t)+'"/>';
+  }
+
+  /* ---------- susun lapisan ---------- */
+  s+='<g opacity="'+amb+'">';
+  s+=L.b;
+
+  /* kaki / rok */
+  if(!pocong){
+    if(gaun){
+      if(!melayang){
+        [-1,1].forEach(sg=>{ s+='<ellipse cx="'+(cx+sg*8*t)+'" cy="'+(bY-1)+'" rx="'+(6.5*t)+'" ry="'+(3.2*t)+'" fill="#0d0f0e"/>'; });
+      }
+    }else if(!melayang){
+      [-1,1].forEach(sg=>{
+        const x0=sg<0?cx-wa*.98:cx+1.2*t, ww=wa*.98-1.2*t;
+        const dl='M'+x0+' '+hipY+' L'+(x0+ww)+' '+hipY+' L'+(x0+ww-1.2*t)+' '+(bY-7*t)+' L'+(x0+1.2*t)+' '+(bY-7*t)+' Z';
+        s+='<path d="'+dl+'" fill="'+celana+'"/>'+ov(dl,"gx")+ov(dl,"gy");
+        s+='<rect x="'+(x0-(sg<0?2.5*t:0))+'" y="'+(bY-8.5*t)+'" width="'+(ww+2.5*t)+'" height="'+(8.5*t)+'" rx="'+(4*t)+'" fill="#0d0e0d"/>';
+        s+='<path d="M'+(x0+1*t)+' '+(bY-6.5*t)+' L'+(x0+ww-1*t)+' '+(bY-6.5*t)+'" stroke="#fff" stroke-width="'+(.8*t)+'" opacity=".12"/>';
+      });
     }
   }
-  if(opt.rangka&&terang){
+
+  /* badan */
+  const bahu='M'+(cx-7*t)+' '+(leherY-2)+' Q'+(cx-sh*.7)+' '+leherY+' '+(cx-sh)+' '+(leherY+9*t)+' Q'+(cx-sh-2*t)+' '+(leherY+15*t)+' '+(cx-sh+1*t)+' '+(leherY+26*t);
+  const bahuR='L'+(cx+sh-1*t)+' '+(leherY+26*t)+' Q'+(cx+sh+2*t)+' '+(leherY+15*t)+' '+(cx+sh)+' '+(leherY+9*t)+' Q'+(cx+sh*.7)+' '+leherY+' '+(cx+7*t)+' '+(leherY-2)+' Z';
+  let dBadan;
+  if(pocong){
+    dBadan=bahu+' L'+(cx-wa*.95)+' '+hipY+' L'+(cx-wa*.66)+' '+(bY-12*t)+' L'+(cx-wa*1.05)+' '+(bY-1)+' Q'+cx+' '+(bY+6)+' '+(cx+wa*1.05)+' '+(bY-1)+' L'+(cx+wa*.66)+' '+(bY-12*t)+' L'+(cx+wa*.95)+' '+hipY+' '+bahuR;
+  }else if(gaun){
+    dBadan=bahu+' L'+(cx-wa)+' '+(leherY+tinggiBadan*.4)+' L'+(cx-wa*1.32)+' '+(bY-4*t)+' Q'+cx+' '+(bY+4)+' '+(cx+wa*1.32)+' '+(bY-4*t)+' L'+(cx+wa)+' '+(leherY+tinggiBadan*.4)+' '+bahuR;
+  }else{
+    dBadan=bahu+' L'+(cx-wa)+' '+(hipY+4*t)+' L'+(cx+wa)+' '+(hipY+4*t)+' '+bahuR;
+  }
+  s+='<path d="'+dBadan+'" fill="'+baju+'"/>'+ov(dBadan,"gx")+ov(dBadan,"gy");
+  const rnd2=tkRand(seed^0x9e3779b9);
+  /* kerutan kain */
+  if(!pocong){
+    const wy=leherY+tinggiBadan*(gaun?.3:.5);
+    s+='<path d="M'+(cx-wa*.8)+' '+wy+' Q'+(cx-wa*.3)+' '+(wy+5*t)+' '+(cx-wa*.05)+' '+(wy+1*t)+' M'+(cx+wa*.1)+' '+(wy+2*t)+' Q'+(cx+wa*.5)+' '+(wy+6*t)+' '+(cx+wa*.82)+' '+(wy+1*t)+'" stroke="'+bajuG+'" stroke-width="'+(1*t)+'" fill="none" opacity=".45"/>';
+  }
+  /* detail baju */
+  if(pocong){
+    [[leherY+16*t,.78],[hipY-8*t,.74],[bY-13*t,.68]].forEach(a=>{
+      s+='<path d="M'+(cx-wa*a[1])+' '+a[0]+' Q'+cx+' '+(a[0]+4*t)+' '+(cx+wa*a[1])+' '+a[0]+'" stroke="#8d8676" stroke-width="'+(2.2*t)+'" fill="none"/>';
+    });
+    s+='<path d="M'+(cx-wa*.2)+' '+(leherY+22*t)+' Q'+(cx-wa*.1)+' '+(hipY)+' '+(cx-wa*.25)+' '+(bY-16*t)+' M'+(cx+wa*.3)+' '+(leherY+22*t)+' Q'+(cx+wa*.35)+' '+hipY+' '+(cx+wa*.25)+' '+(bY-16*t)+'" stroke="#aaa493" stroke-width="'+(1*t)+'" fill="none" opacity=".6"/>';
+    s+='<path d="M'+(cx-wa*.66)+' '+(bY-12*t)+' L'+(cx-wa*1.05)+' '+(bY-1)+' Q'+cx+' '+(bY+6)+' '+(cx+wa*1.05)+' '+(bY-1)+' L'+(cx+wa*.66)+' '+(bY-12*t)+'" stroke="#8d8676" stroke-width="'+(1.1*t)+'" fill="none" opacity=".7"/>';
+  }else if(gaun){
+    s+='<path d="M'+(cx-wa*1.3)+' '+(bY-9*t)+' Q'+cx+' '+(bY-3*t)+' '+(cx+wa*1.3)+' '+(bY-9*t)+'" stroke="'+tkTerang(baju,.22)+'" stroke-width="'+(3*t)+'" fill="none" opacity=".5"/>';
+    let titik=""; for(let i=0;i<9;i++){ titik+='<circle cx="'+(cx-wa*1.15+i*wa*.29)+'" cy="'+(bY-7*t+(i%2?1.5*t:0))+'" r="'+(.9*t)+'" fill="'+tkTerang(baju,.45)+'" opacity=".5"/>'; }
+    s+=titik;
+    s+='<path d="M'+(cx-wa*.7)+' '+(leherY+tinggiBadan*.4)+' Q'+cx+' '+(leherY+tinggiBadan*.4+5*t)+' '+(cx+wa*.7)+' '+(leherY+tinggiBadan*.4)+'" stroke="'+tkGelap(baju,.5)+'" stroke-width="'+(2.6*t)+'" fill="none" opacity=".55"/>';
+  }else{
+    /* sabuk */
+    s+='<rect x="'+(cx-wa)+'" y="'+(hipY-1*t)+'" width="'+(wa*2)+'" height="'+(4*t)+'" fill="#17130f"/><rect x="'+(cx-2.4*t)+'" y="'+(hipY-1.4*t)+'" width="'+(4.8*t)+'" height="'+(4.8*t)+'" rx="'+(.8*t)+'" fill="#b49b5c" opacity=".85"/>';
+    if(v===0){
+      s+='<path d="M'+cx+' '+(leherY+14*t)+' L'+cx+' '+(hipY-1*t)+'" stroke="'+bajuG+'" stroke-width="'+(1.1*t)+'" opacity=".7"/>';
+      for(let i=0;i<5;i++) s+='<circle cx="'+cx+'" cy="'+(leherY+24*t+i*17*t)+'" r="'+(1.3*t)+'" fill="'+bajuT+'" stroke="'+bajuG+'" stroke-width=".5"/>';
+      s+='<path d="M'+(cx-wa*.78)+' '+(leherY+36*t)+' h'+(wa*.42)+' v'+(wa*.46)+' h'+(-wa*.42)+' Z" fill="none" stroke="'+bajuG+'" stroke-width="'+(.9*t)+'" opacity=".6"/>';
+    }else if(v===2){
+      s+='<path d="M'+cx+' '+(leherY+6*t)+' L'+cx+' '+(hipY)+'" stroke="'+bajuG+'" stroke-width="'+(1.5*t)+'"/><path d="M'+(cx+1.4*t)+' '+(leherY+6*t)+' L'+(cx+1.4*t)+' '+hipY+'" stroke="'+bajuT+'" stroke-width="'+(.8*t)+'" stroke-dasharray="'+(1.2*t)+' '+(1.4*t)+'" opacity=".7"/>';
+      [-1,1].forEach(sg=>{ s+='<path d="M'+(cx+sg*wa*.45)+' '+(hipY-22*t)+' L'+(cx+sg*wa*.78)+' '+(hipY-16*t)+'" stroke="'+bajuG+'" stroke-width="'+(1.3*t)+'" opacity=".8"/>'; });
+    }else{
+      s+='<path d="M'+(cx-wa*.55)+' '+(leherY+30*t)+' Q'+cx+' '+(leherY+34*t)+' '+(cx+wa*.55)+' '+(leherY+30*t)+'" stroke="'+bajuG+'" stroke-width="'+(.8*t)+'" fill="none" opacity=".35"/>';
+    }
+  }
+
+  /* lengan */
+  if(!pocong){
+    const pendek=(!gaun&&v===1);
+    [-1,1].forEach(sg=>{
+      const sx=cx+sg*(sh-2*t), sy=leherY+12*t, hx=cx+sg*(sh+4.5*t), hy=leherY+tinggiBadan*.60;
+      const dl=tkKapsul(sx,sy,hx,hy,12.5*t,8.6*t);
+      if(pendek){
+        s+='<path d="'+dl+'" fill="url(#gk'+u+')"/>';
+        const dl2=tkKapsul(sx,sy,sx+(hx-sx)*.42,sy+(hy-sy)*.42,12.8*t,11.2*t);
+        s+='<path d="'+dl2+'" fill="'+baju+'"/>'+ov(dl2,"gx");
+      }else{
+        s+='<path d="'+dl+'" fill="'+baju+'"/>'+ov(dl,"gx")+ov(dl,"gy");
+        const cu=tkKapsul(sx+(hx-sx)*.84,sy+(hy-sy)*.84,hx,hy,9*t,8.7*t);
+        s+='<path d="'+cu+'" fill="'+bajuG+'" opacity=".55"/>';
+      }
+      s+='<path d="'+dl+'" fill="url(#gx'+u+')" opacity=".5"/>';
+      const hxx=hx+sg*.8*t, hyy=hy+4.6*t;
+      s+='<ellipse cx="'+hxx+'" cy="'+hyy+'" rx="'+(4.4*t)+'" ry="'+(5.6*t)+'" fill="url(#gk'+u+')"/>';
+      s+='<path d="M'+(hxx-1.5*t)+' '+(hyy+2*t)+' v'+(2.4*t)+' M'+(hxx+.8*t)+' '+(hyy+2.4*t)+' v'+(2.4*t)+'" stroke="'+kulitG+'" stroke-width="'+(.7*t)+'" opacity=".7"/>';
+      if(look.bulu&&terang){
+        for(let i=0;i<9;i++){ const fx=sx+(hx-sx)*rnd2()+(rnd2()-.5)*8*t, fy=sy+(hy-sy)*rnd2(); s+='<line x1="'+fx+'" y1="'+fy+'" x2="'+(fx+sg*2)+'" y2="'+(fy+6)+'" stroke="#0d0b09" stroke-width="1.3" opacity=".7"/>'; }
+      }
+    });
+  }
+  if(look.bulu&&terang){
+    for(let i=0;i<40;i++){
+      const x=cx-lebarBadan/2+rnd2()*lebarBadan, y=leherY+rnd2()*tinggiBadan*.8;
+      s+='<line x1="'+x+'" y1="'+y+'" x2="'+(x+3)+'" y2="'+(y+8)+'" stroke="#0d0b09" stroke-width="1.5" opacity=".75"/>';
+    }
+  }
+  if(rangka){
     for(let i=0;i<5;i++){
       s+='<path d="M'+(cx-lebarBadan*.32)+' '+(leherY+22+i*13)+' q'+(lebarBadan*.32)+' 8 '+(lebarBadan*.64)+' 0" stroke="#e8e4d8" stroke-width="2.2" fill="none" opacity=".85"/>';
     }
     s+='<line x1="'+cx+'" y1="'+(leherY+16)+'" x2="'+cx+'" y2="'+(leherY+74)+'" stroke="#e8e4d8" stroke-width="2.4" opacity=".85"/>';
   }
 
-  const leherTinggi=(opt.leherPanjang&&terang)?34:10;
-  if(!hilang) s+='<rect x="'+(cx-7*t)+'" y="'+(kepalaY+kepalaR-4)+'" width="'+(14*t)+'" height="'+(leherTinggi+6)+'" fill="'+kulit+'" opacity="'+amb+'"/>';
-  const kY=(opt.leherPanjang&&terang)?kepalaY-24:kepalaY;
-  if(!hilang) s+='<ellipse cx="'+cx+'" cy="'+kY+'" rx="'+(kepalaR*.86)+'" ry="'+kepalaR+'" fill="'+kulit+'" opacity="'+amb+'"/>';
-  if(look.jenggot&&!hilang)
-    s+='<path d="M'+(cx-kepalaR*.62)+' '+(kY+kepalaR*.3)+' Q'+cx+' '+(kY+kepalaR*1.75)+' '+(cx+kepalaR*.62)+' '+(kY+kepalaR*.3)+' Z" fill="'+look.jenggot+'" opacity="'+amb+'"/>';
-
-  const k=look.kepala;
-  if(k==="panjang")
-    s+='<path d="M'+(cx-kepalaR*.9)+' '+(kY-6)+' Q'+cx+' '+(kY-kepalaR*1.5)+' '+(cx+kepalaR*.9)+' '+(kY-6)+' L'+(cx+kepalaR*1.05)+' '+(kY+tinggiBadan*.55)+' Q'+cx+' '+(kY+tinggiBadan*.66)+' '+(cx-kepalaR*1.05)+' '+(kY+tinggiBadan*.55)+' Z" fill="#100f0e" opacity="'+amb+'"/>';
-  else if(k==="gondrong")
-    s+='<path d="M'+(cx-kepalaR)+' '+(kY+4)+' Q'+cx+' '+(kY-kepalaR*1.6)+' '+(cx+kepalaR)+' '+(kY+4)+' L'+(cx+kepalaR*.95)+' '+(kY+kepalaR*1.2)+' L'+(cx-kepalaR*.95)+' '+(kY+kepalaR*1.2)+' Z" fill="#140f0b" opacity="'+amb+'"/>';
-  else if(k==="kerudung"||k==="jilbab")
-    s+='<path d="M'+(cx-kepalaR*1.15)+' '+(kY+kepalaR*.7)+' Q'+cx+' '+(kY-kepalaR*1.45)+' '+(cx+kepalaR*1.15)+' '+(kY+kepalaR*.7)+' L'+(cx+kepalaR*1.3)+' '+(kY+kepalaR*2.4)+' L'+(cx-kepalaR*1.3)+' '+(kY+kepalaR*2.4)+' Z" fill="'+(look.warna||"#5b4a72")+'" opacity="'+amb+'"/>';
-  else if(k==="peci")
-    s+='<rect x="'+(cx-kepalaR*.8)+'" y="'+(kY-kepalaR*1.15)+'" width="'+(kepalaR*1.6)+'" height="'+(kepalaR*.7)+'" fill="#14181e" opacity="'+amb+'"/>';
-  else if(k==="topi"){
-    s+='<rect x="'+(cx-kepalaR*.85)+'" y="'+(kY-kepalaR*1.1)+'" width="'+(kepalaR*1.7)+'" height="'+(kepalaR*.55)+'" fill="#20303c" opacity="'+amb+'"/>';
-    s+='<rect x="'+(cx-kepalaR*1.5)+'" y="'+(kY-kepalaR*.62)+'" width="'+(kepalaR*1.6)+'" height="7" fill="#20303c" opacity="'+amb+'"/>';
-  }else if(k==="helm")
-    s+='<path d="M'+(cx-kepalaR*1.05)+' '+(kY+4)+' Q'+cx+' '+(kY-kepalaR*1.7)+' '+(cx+kepalaR*1.05)+' '+(kY+4)+' Z" fill="#1c6b52" opacity="'+amb+'"/>';
-  else if(k==="sanggul"||k==="sanggul_mewah"){
-    const cs=look.rambut||"#8e8a84";
-    s+='<path d="M'+(cx-kepalaR*.95)+' '+(kY-2)+' Q'+cx+' '+(kY-kepalaR*1.35)+' '+(cx+kepalaR*.95)+' '+(kY-2)+' Z" fill="'+cs+'" opacity="'+amb+'"/>';
-    s+='<circle cx="'+cx+'" cy="'+(kY-kepalaR*1.15)+'" r="'+(kepalaR*.36)+'" fill="'+cs+'" opacity="'+amb+'"/>';
-  }else if(k==="ekor"){
-    s+='<path d="M'+(cx-kepalaR*.95)+' '+(kY-2)+' Q'+cx+' '+(kY-kepalaR*1.4)+' '+(cx+kepalaR*.95)+' '+(kY-2)+' Z" fill="#12100e" opacity="'+amb+'"/>';
-    s+='<path d="M'+(cx+kepalaR*.7)+' '+kY+' q14 18 4 40" stroke="#12100e" stroke-width="7" fill="none" opacity="'+amb+'"/>';
-  }else if(k==="tutup")
-    s+='<path d="M'+(cx-kepalaR*1.2)+' '+(kY+kepalaR*.9)+' Q'+cx+' '+(kY-kepalaR*1.6)+' '+(cx+kepalaR*1.2)+' '+(kY+kepalaR*.9)+' Z" fill="#dcd6c8" opacity="'+amb+'"/>';
-  else if(k==="cepak")
-    s+='<path d="M'+(cx-kepalaR*.88)+' '+(kY-4)+' Q'+cx+' '+(kY-kepalaR*1.25)+' '+(cx+kepalaR*.88)+' '+(kY-4)+' Z" fill="#15120f" opacity="'+amb+'"/>';
-  else if(k==="kuyang"){
-    s+='<path d="M'+(cx-kepalaR*1.1)+' '+(kY+kepalaR*.7)+' Q'+cx+' '+(kY-kepalaR*1.5)+' '+(cx+kepalaR*1.1)+' '+(kY+kepalaR*.7)+' Z" fill="#2d1d28" opacity="'+amb+'"/>';
-  }else if(k==="caping")
-    s+='<path d="M'+(cx-kepalaR*1.9)+' '+(kY-kepalaR*.3)+' L'+cx+' '+(kY-kepalaR*2)+' L'+(cx+kepalaR*1.9)+' '+(kY-kepalaR*.3)+' Z" fill="#b39a63" opacity="'+amb+'"/>';
-  else if(k==="kopiah")
-    s+='<rect x="'+(cx-kepalaR*.8)+'" y="'+(kY-kepalaR*1.05)+'" width="'+(kepalaR*1.6)+'" height="'+(kepalaR*.62)+'" rx="3" fill="#e8e4d8" opacity="'+amb+'"/>';
-  else if(k==="bob")
-    s+='<path d="M'+(cx-kepalaR*.9)+' '+(kY-6)+' Q'+cx+' '+(kY-kepalaR*1.5)+' '+(cx+kepalaR*.9)+' '+(kY-6)+' L'+(cx+kepalaR*1.05)+' '+(kY+kepalaR*.9)+' L'+(cx-kepalaR*1.05)+' '+(kY+kepalaR*.9)+' Z" fill="'+(look.rambut||"#100f0e")+'" opacity="'+amb+'"/>';
-  else if(k==="blangkon"){
-    s+='<path d="M'+(cx-kepalaR*.95)+' '+(kY-2)+' Q'+cx+' '+(kY-kepalaR*1.5)+' '+(cx+kepalaR*.95)+' '+(kY-2)+' Z" fill="#4a2f1a" opacity="'+amb+'"/>';
-    s+='<circle cx="'+(cx+kepalaR*.95)+'" cy="'+(kY-kepalaR*.25)+'" r="'+(kepalaR*.3)+'" fill="#4a2f1a" opacity="'+amb+'"/>';
-  }else if(k==="kupluk"){
-    s+='<path d="M'+(cx-kepalaR*.95)+' '+(kY-kepalaR*.35)+' Q'+cx+' '+(kY-kepalaR*1.7)+' '+(cx+kepalaR*.95)+' '+(kY-kepalaR*.35)+' Z" fill="#2c3a4a" opacity="'+amb+'"/>';
-    s+='<rect x="'+(cx-kepalaR*.98)+'" y="'+(kY-kepalaR*.55)+'" width="'+(kepalaR*1.96)+'" height="'+(kepalaR*.32)+'" fill="#3f5468" opacity="'+amb+'"/>';
+  /* leher + kerah */
+  const leherPanjang=(opt.leherPanjang&&terang);
+  if(!pocong){
+    const nk=kY+R*.7;
+    let bawah;
+    if(!gaun&&v===0) bawah='L'+(cx-8*t)+' '+(leherY+2*t)+' L'+cx+' '+(leherY+17*t)+' L'+(cx+8*t)+' '+(leherY+2*t);
+    else if(!gaun&&v===2) bawah='L'+(cx-8*t)+' '+(leherY+1*t)+' Q'+cx+' '+(leherY+4*t)+' '+(cx+8*t)+' '+(leherY+1*t);
+    else if(gaun&&seed%2) bawah='L'+(cx-8*t)+' '+(leherY+2*t)+' L'+cx+' '+(leherY+14*t)+' L'+(cx+8*t)+' '+(leherY+2*t);
+    else bawah='L'+(cx-9*t)+' '+(leherY+1*t)+' Q'+cx+' '+(leherY+13*t)+' '+(cx+9*t)+' '+(leherY+1*t);
+    if(!hilang){
+      const dn='M'+(cx-6.6*t)+' '+nk+' '+bawah+' L'+(cx+6.6*t)+' '+nk+' Z';
+      s+='<path d="'+dn+'" fill="url(#gk'+u+')"/>'+ov(dn,"gx",' opacity=".55"');
+      s+='<ellipse cx="'+cx+'" cy="'+(kY+R*1.04)+'" rx="'+(8.5*t)+'" ry="'+(4.2*t)+'" fill="#000" opacity=".32"/>';
+      if(!gaun&&v===1) s+='<path d="M'+(cx-9*t)+' '+(leherY+1*t)+' Q'+cx+' '+(leherY+13*t)+' '+(cx+9*t)+' '+(leherY+1*t)+'" stroke="'+tkGelap(baju,.25)+'" stroke-width="'+(2.6*t)+'" fill="none"/>';
+      if(gaun) s+='<path d="M'+(cx-9*t)+' '+(leherY+1*t)+' '+(seed%2?'L'+cx+' '+(leherY+14*t)+' L'+(cx+9*t)+' '+(leherY+1*t):'Q'+cx+' '+(leherY+13*t)+' '+(cx+9*t)+' '+(leherY+1*t))+'" stroke="'+tkTerang(baju,.3)+'" stroke-width="'+(1.6*t)+'" fill="none" opacity=".7"/>';
+      if(!gaun&&v===0){
+        s+='<path d="M'+(cx-9.5*t)+' '+(leherY-1)+' L'+(cx-.5*t)+' '+(leherY+17*t)+' L'+(cx-13*t)+' '+(leherY+14*t)+' Z" fill="'+bajuT+'" stroke="'+bajuG+'" stroke-width="'+(.7*t)+'"/>';
+        s+='<path d="M'+(cx+9.5*t)+' '+(leherY-1)+' L'+(cx+.5*t)+' '+(leherY+17*t)+' L'+(cx+13*t)+' '+(leherY+14*t)+' Z" fill="'+bajuT+'" stroke="'+bajuG+'" stroke-width="'+(.7*t)+'"/>';
+      }
+      if(!gaun&&v===2){
+        s+='<path d="M'+(cx-10.5*t)+' '+(leherY+2*t)+' L'+(cx-7.5*t)+' '+(leherY-7*t)+' Q'+cx+' '+(leherY-4*t)+' '+(cx+7.5*t)+' '+(leherY-7*t)+' L'+(cx+10.5*t)+' '+(leherY+2*t)+' Q'+cx+' '+(leherY+8*t)+' '+(cx-10.5*t)+' '+(leherY+2*t)+' Z" fill="'+bajuT+'" stroke="'+bajuG+'" stroke-width="'+(.8*t)+'"/>';
+      }
+    }else{
+      s+='<ellipse cx="'+cx+'" cy="'+(leherY-1)+'" rx="'+(9*t)+'" ry="'+(3.8*t)+'" fill="#130808"/><ellipse cx="'+cx+'" cy="'+(leherY-1)+'" rx="'+(5.5*t)+'" ry="'+(2.1*t)+'" fill="#4a1010"/>';
+    }
+  }else if(hilang){
+    s+='<ellipse cx="'+cx+'" cy="'+(leherY+2)+'" rx="'+(9*t)+'" ry="'+(3.8*t)+'" fill="#130808"/>';
   }
+  /* cahaya tepi bahu */
+  if(terang&&!pocong) s+='<path d="M'+(cx-sh)+' '+(leherY+9*t)+' Q'+(cx-sh*.7)+' '+leherY+' '+(cx-7*t)+' '+(leherY-2)+' Q'+(cx+sh*.7)+' '+leherY+' '+(cx+sh)+' '+(leherY+9*t)+'" stroke="#cfe9d8" stroke-width="'+(1.2*t)+'" fill="none" opacity=".32" stroke-linecap="round"/>';
 
-  const mataW=look.wajah==="pucat"?"#e8e4dc":"#f0ece0", mataY=kY-2, mo=terang?1:.55;
+  s+=L.m;
+
+  /* ---------- kepala ---------- */
   if(!hilang){
+    const jw=({kasar:.8,tua:.5,anak:.64,normal:.6,muda:.54,lelah:.56,pucat:.5})[w]||.58;
+    const dagu=kY+R*(w==="anak"?.99:1.06);
+    const telinga=(pocong||k==="kerudung"||k==="jilbab")?"":
+      [-1,1].map(sg=>'<ellipse cx="'+(cx+sg*rx*.99)+'" cy="'+(kY+R*.13)+'" rx="'+(3.3*t)+'" ry="'+(5.2*t)+'" fill="'+kulit+'"/><ellipse cx="'+(cx+sg*rx*1.0)+'" cy="'+(kY+R*.14)+'" rx="'+(1.5*t)+'" ry="'+(3*t)+'" fill="'+kulitG+'" opacity=".55"/>').join("");
+    s+=telinga;
+    const df='M'+(cx-rx)+' '+(kY-R*.05)+' C'+(cx-rx)+' '+(kY-R*1.3)+' '+(cx+rx)+' '+(kY-R*1.3)+' '+(cx+rx)+' '+(kY-R*.05)+' C'+(cx+rx)+' '+(kY+R*.5)+' '+(cx+rx*jw)+' '+dagu+' '+cx+' '+dagu+' C'+(cx-rx*jw)+' '+dagu+' '+(cx-rx)+' '+(kY+R*.5)+' '+(cx-rx)+' '+(kY-R*.05)+' Z';
+    s+='<path d="'+df+'" fill="url(#gk'+u+')"/>';
+    s+=ov(df,"gx",' opacity=".7"');
+    if(w==="pucat"&&!rangka) s+='<path d="'+df+'" fill="#9fb0a8" opacity=".14"/>';
+    if(w==="kasar"&&!look.jenggot&&!rangka) s+='<path d="M'+(cx-rx*.97)+' '+(kY+R*.2)+' C'+(cx-rx*.9)+' '+(kY+R*.8)+' '+(cx-rx*.5)+' '+(dagu-1)+' '+cx+' '+(dagu-1)+' C'+(cx+rx*.5)+' '+(dagu-1)+' '+(cx+rx*.9)+' '+(kY+R*.8)+' '+(cx+rx*.97)+' '+(kY+R*.2)+' C'+(cx+rx*.5)+' '+(kY+R*.3)+' '+(cx-rx*.5)+' '+(kY+R*.3)+' '+(cx-rx*.97)+' '+(kY+R*.2)+' Z" fill="url(#gs'+u+')"/>';
+    if(look.jenggot){
+      const jc=look.jenggot;
+      s+='<path d="M'+(cx-rx*.98)+' '+(kY+R*.08)+' C'+(cx-rx*.92)+' '+(kY+R*1.0)+' '+(cx-rx*.4)+' '+(kY+R*1.5)+' '+cx+' '+(kY+R*1.5)+' C'+(cx+rx*.4)+' '+(kY+R*1.5)+' '+(cx+rx*.92)+' '+(kY+R*1.0)+' '+(cx+rx*.98)+' '+(kY+R*.08)+' L'+(cx+rx*.72)+' '+(kY+R*.32)+' C'+(cx+rx*.5)+' '+(kY+R*.56)+' '+(cx+rx*.32)+' '+(kY+R*.52)+' '+cx+' '+(kY+R*.6)+' C'+(cx-rx*.32)+' '+(kY+R*.52)+' '+(cx-rx*.5)+' '+(kY+R*.56)+' '+(cx-rx*.72)+' '+(kY+R*.32)+' Z" fill="'+jc+'"/>';
+      s+='<path d="M'+(cx-rx*.4)+' '+(kY+R*1.1)+' Q'+cx+' '+(kY+R*1.4)+' '+(cx+rx*.4)+' '+(kY+R*1.1)+'" stroke="'+tkGelap(jc,.3)+'" stroke-width="'+(.9*t)+'" fill="none" opacity=".5"/>';
+    }
+    s+='<ellipse cx="'+(cx-rx*.35)+'" cy="'+(kY-R*.62)+'" rx="'+(rx*.38)+'" ry="'+(R*.16)+'" fill="#fff" opacity=".07"/>';
+
     const polos=!!(opt.tanpaWajah&&terang);
     if(!polos){
-      if(opt.mataMenyala&&terang){
-        s+='<circle cx="'+(cx-9*t)+'" cy="'+mataY+'" r="'+(4.6*t)+'" fill="#ff5b3a"/>';
-        s+='<circle cx="'+(cx+9*t)+'" cy="'+mataY+'" r="'+(4.6*t)+'" fill="#ff5b3a"/>';
-      }else if(opt.rangka&&terang){
-        s+='<ellipse cx="'+(cx-9*t)+'" cy="'+mataY+'" rx="'+(5.2*t)+'" ry="'+(6.2*t)+'" fill="#0b0a09"/>';
-        s+='<ellipse cx="'+(cx+9*t)+'" cy="'+mataY+'" rx="'+(5.2*t)+'" ry="'+(6.2*t)+'" fill="#0b0a09"/>';
+      const ey=kY+R*.04, ed=R*.4, er=(w==="anak")?1.2:1;
+      const mataW=w==="pucat"?"#e8e4dc":"#f4efe3";
+      /* pipi & kerut */
+      if((w==="muda"||w==="anak")&&!rangka) [-1,1].forEach(sg=>{ s+='<circle cx="'+(cx+sg*rx*.56)+'" cy="'+(kY+R*.44)+'" r="'+(4.6*t)+'" fill="#d9604a" opacity="'+(w==="anak"?.2:.1)+'"/>'; });
+      if(w==="tua"&&!rangka){
+        s+='<path d="M'+(cx-9.5*t)+' '+(kY-R*.52)+' Q'+cx+' '+(kY-R*.58)+' '+(cx+9.5*t)+' '+(kY-R*.52)+' M'+(cx-7.5*t)+' '+(kY-R*.4)+' Q'+cx+' '+(kY-R*.45)+' '+(cx+7.5*t)+' '+(kY-R*.4)+'" stroke="'+kulitG+'" stroke-width="'+(.9*t)+'" fill="none" opacity=".5"/>';
+        [-1,1].forEach(sg=>{
+          s+='<path d="M'+(cx+sg*6.4*t)+' '+(kY+R*.32)+' Q'+(cx+sg*9*t)+' '+(kY+R*.5)+' '+(cx+sg*7.2*t)+' '+(kY+R*.7)+'" stroke="'+kulitG+'" stroke-width="'+(1*t)+'" fill="none" opacity=".55"/>';
+          s+='<path d="M'+(cx+sg*(ed+5.2*t))+' '+(ey-1*t)+' l'+(sg*3*t)+' '+(-1.2*t)+' M'+(cx+sg*(ed+5.2*t))+' '+(ey+1*t)+' l'+(sg*3*t)+' '+(.6*t)+'" stroke="'+kulitG+'" stroke-width="'+(.8*t)+'" opacity=".55"/>';
+        });
+      }
+      /* mata */
+      [-1,1].forEach(sg=>{
+        const ex=cx+sg*ed;
+        if(opt.mataMenyala&&terang){
+          s+='<circle cx="'+ex+'" cy="'+ey+'" r="'+(10*t)+'" fill="url(#gm'+u+')"/><circle cx="'+ex+'" cy="'+ey+'" r="'+(4.6*t)+'" fill="#ff5b3a"/><circle cx="'+ex+'" cy="'+ey+'" r="'+(1.8*t)+'" fill="#ffe0b0"/>';
+        }else if(rangka){
+          s+='<ellipse cx="'+ex+'" cy="'+ey+'" rx="'+(5.4*t)+'" ry="'+(6.4*t)+'" fill="#0b0a09"/><ellipse cx="'+ex+'" cy="'+(ey+1*t)+'" rx="'+(2.6*t)+'" ry="'+(3*t)+'" fill="#1d1a16"/>';
+        }else{
+          s+='<ellipse cx="'+ex+'" cy="'+ey+'" rx="'+(4.4*t*er)+'" ry="'+(2.8*t*er)+'" fill="'+mataW+'"/>';
+          s+='<circle cx="'+(ex+sg*-.4*t)+'" cy="'+(ey+.1*t)+'" r="'+(2.3*t*er)+'" fill="'+(w==="pucat"?"#17181a":"#2b1d14")+'"/>';
+          s+='<circle cx="'+(ex+sg*-.4*t)+'" cy="'+(ey+.1*t)+'" r="'+(1.1*t*er)+'" fill="#050403"/>';
+          s+='<circle cx="'+(ex-1*t)+'" cy="'+(ey-.9*t)+'" r="'+(.75*t)+'" fill="#fff" opacity=".9"/>';
+          s+='<path d="M'+(ex-4.9*t*er)+' '+(ey+.4*t)+' Q'+ex+' '+(ey-5.4*t*er)+' '+(ex+4.9*t*er)+' '+(ey+.4*t)+'" stroke="'+tinta+'" stroke-width="'+(1.4*t)+'" fill="none" stroke-linecap="round"/>';
+          s+='<path d="M'+(ex-3.6*t)+' '+(ey+3*t)+' Q'+ex+' '+(ey+4.4*t)+' '+(ex+3.6*t)+' '+(ey+3*t)+'" stroke="'+kulitG+'" stroke-width="'+(.8*t)+'" fill="none" opacity=".55"/>';
+          if(w==="lelah"){
+            s+='<path d="M'+(ex-4.9*t)+' '+(ey+.2*t)+' Q'+ex+' '+(ey-5.2*t)+' '+(ex+4.9*t)+' '+(ey+.2*t)+' Q'+ex+' '+(ey-.4*t)+' '+(ex-4.9*t)+' '+(ey+.2*t)+' Z" fill="'+tkGelap(kulit,.18)+'"/>';
+            s+='<path d="M'+(ex-4.9*t)+' '+(ey+.2*t)+' Q'+ex+' '+(ey-.4*t)+' '+(ex+4.9*t)+' '+(ey+.2*t)+'" stroke="'+tinta+'" stroke-width="'+(1.3*t)+'" fill="none" stroke-linecap="round"/>';
+            s+='<path d="M'+(ex-4.6*t)+' '+(ey+5.4*t)+' Q'+ex+' '+(ey+8.6*t)+' '+(ex+4.6*t)+' '+(ey+5.4*t)+'" stroke="#3b2438" stroke-width="'+(1.5*t)+'" fill="none" opacity=".4"/>';
+          }
+        }
+        /* alis */
+        const by=ey-R*.28;
+        if(!rangka){
+          const tebal=w==="kasar"?3*t:(w==="anak"||w==="muda"?1.5*t:1.9*t);
+          let a,b;
+          if(w==="kasar"){ a=[ex+sg*-5.2*t,by+1.4*t]; b=[ex+sg*5.4*t,by-1.4*t]; }
+          else if(w==="lelah"||w==="tua"){ a=[ex+sg*-4.8*t,by-.4*t]; b=[ex+sg*5.2*t,by+.9*t]; }
+          else { a=[ex+sg*-4.8*t,by+.6*t]; b=[ex+sg*5.2*t,by-.2*t]; }
+          if(sg>0){ /* cermin: alis kanan membalik sisi dalam/luar */ }
+          s+='<path d="M'+a+' Q'+(ex)+' '+(by-2.4*t)+' '+b+'" stroke="'+browC+'" stroke-width="'+tebal+'" fill="none" stroke-linecap="round"/>';
+        }
+      });
+      /* hidung */
+      if(rangka){
+        s+='<path d="M'+cx+' '+(kY+R*.2)+' L'+(cx-3*t)+' '+(kY+R*.5)+' L'+(cx+3*t)+' '+(kY+R*.5)+' Z" fill="#14110e"/>';
       }else{
-        s+='<ellipse cx="'+(cx-9*t)+'" cy="'+mataY+'" rx="'+(4.4*t)+'" ry="'+(2.9*t)+'" fill="'+mataW+'" opacity="'+mo+'"/>';
-        s+='<ellipse cx="'+(cx+9*t)+'" cy="'+mataY+'" rx="'+(4.4*t)+'" ry="'+(2.9*t)+'" fill="'+mataW+'" opacity="'+mo+'"/>';
-        s+='<circle cx="'+(cx-9*t)+'" cy="'+mataY+'" r="'+(1.9*t)+'" fill="#0b0a09" opacity="'+mo+'"/>';
-        s+='<circle cx="'+(cx+9*t)+'" cy="'+mataY+'" r="'+(1.9*t)+'" fill="#0b0a09" opacity="'+mo+'"/>';
+        s+='<path d="M'+(cx+1.6*t)+' '+(kY+R*.0)+' Q'+(cx+4.6*t)+' '+(kY+R*.34)+' '+(cx+1.8*t)+' '+(kY+R*.45)+'" stroke="'+tkGelap(kulit,.38)+'" stroke-width="'+(1.3*t)+'" fill="none" opacity=".55" stroke-linecap="round"/>';
+        s+='<path d="M'+(cx-3.4*t)+' '+(kY+R*.46)+' Q'+cx+' '+(kY+R*.58)+' '+(cx+3.4*t)+' '+(kY+R*.46)+'" stroke="'+tkGelap(kulit,.5)+'" stroke-width="'+(1.2*t)+'" fill="none" opacity=".7" stroke-linecap="round"/>';
+        s+='<ellipse cx="'+(cx-.8*t)+'" cy="'+(kY+R*.28)+'" rx="'+(1.3*t)+'" ry="'+(3.4*t)+'" fill="#fff" opacity=".13"/>';
       }
-      s+='<path d="M'+(cx-7*t)+' '+(kY+13*t)+' q'+(7*t)+' '+(look.wajah==="pucat"?-1:4)+' '+(14*t)+' 0" stroke="#3a2f26" stroke-width="'+(1.8*t)+'" fill="none" opacity="'+mo+'"/>';
-      if(look.kacamata){
-        s+='<circle cx="'+(cx-9*t)+'" cy="'+mataY+'" r="'+(6.6*t)+'" fill="none" stroke="#1a1714" stroke-width="'+(1.6*t)+'" opacity="'+mo+'"/>';
-        s+='<circle cx="'+(cx+9*t)+'" cy="'+mataY+'" r="'+(6.6*t)+'" fill="none" stroke="#1a1714" stroke-width="'+(1.6*t)+'" opacity="'+mo+'"/>';
-        s+='<line x1="'+(cx-2.4*t)+'" y1="'+mataY+'" x2="'+(cx+2.4*t)+'" y2="'+mataY+'" stroke="#1a1714" stroke-width="'+(1.6*t)+'" opacity="'+mo+'"/>';
+      /* mulut */
+      const my=kY+R*.7;
+      if(rangka){
+        s+='<rect x="'+(cx-7*t)+'" y="'+(my-3*t)+'" width="'+(14*t)+'" height="'+(6*t)+'" rx="'+(1.5*t)+'" fill="#0b0a09"/>';
+        for(let i=-2;i<=2;i++) s+='<line x1="'+(cx+i*2.7*t)+'" y1="'+(my-3*t)+'" x2="'+(cx+i*2.7*t)+'" y2="'+(my+3*t)+'" stroke="#e6e1d3" stroke-width="'+(1*t)+'"/>';
+        s+='<line x1="'+(cx-7*t)+'" y1="'+my+'" x2="'+(cx+7*t)+'" y2="'+my+'" stroke="#e6e1d3" stroke-width="'+(.8*t)+'"/>';
+      }else{
+        const c=({muda:2.6,anak:3,normal:1.4,tua:-.6,lelah:.1,kasar:.2,pucat:-.2})[w];
+        const lip=w==="pucat"?tkMix(kulit,"#6f7684",.55):tkMix(kulit,"#7a2d2a",.42);
+        const lw=w==="anak"?3.6*t:5.2*t;
+        s+='<path d="M'+(cx-lw)+' '+(my-(c>0?c*.3*t:0))+' Q'+cx+' '+(my+c*1.6*t)+' '+(cx+lw)+' '+(my-(c>0?c*.3*t:0))+' Q'+cx+' '+(my+c*1.6*t+3.4*t)+' '+(cx-lw)+' '+(my-(c>0?c*.3*t:0))+' Z" fill="'+lip+'" opacity=".78"/>';
+        s+='<path d="M'+(cx-lw)+' '+(my-(c>0?c*.3*t:0))+' Q'+cx+' '+(my+c*1.6*t)+' '+(cx+lw)+' '+(my-(c>0?c*.3*t:0))+'" stroke="#2a1410" stroke-width="'+(1.2*t)+'" fill="none" stroke-linecap="round"/>';
+        if(w==="muda"||w==="anak") s+='<path d="M'+(cx-lw*.5)+' '+(my+c*.75*t+1.3*t)+' Q'+cx+' '+(my+c*.8*t+2.6*t)+' '+(cx+lw*.5)+' '+(my+c*.75*t+1.3*t)+'" stroke="#fff" stroke-width="'+(.9*t)+'" fill="none" opacity=".18"/>';
       }
-      if(look.kumis)
-        s+='<path d="M'+(cx-9*t)+' '+(kY+9*t)+' q'+(9*t)+' '+(-4*t)+' '+(18*t)+' 0" stroke="#1a1512" stroke-width="'+(3*t)+'" fill="none" stroke-linecap="round" opacity="'+mo+'"/>';
+      if(look.kumis) s+='<path d="M'+(cx-10*t)+' '+(kY+R*.58)+' Q'+(cx-5*t)+' '+(kY+R*.46)+' '+cx+' '+(kY+R*.56)+' Q'+(cx+5*t)+' '+(kY+R*.46)+' '+(cx+10*t)+' '+(kY+R*.58)+' Q'+(cx+5*t)+' '+(kY+R*.68)+' '+cx+' '+(kY+R*.62)+' Q'+(cx-5*t)+' '+(kY+R*.68)+' '+(cx-10*t)+' '+(kY+R*.58)+' Z" fill="#1c1510"/>';
+      if(look.kacamata&&!rangka){
+        [-1,1].forEach(sg=>{
+          const ex=cx+sg*ed;
+          s+='<circle cx="'+ex+'" cy="'+ey+'" r="'+(6.9*t)+'" fill="#bfe6e0" opacity=".1"/><circle cx="'+ex+'" cy="'+ey+'" r="'+(6.9*t)+'" fill="none" stroke="#14110f" stroke-width="'+(1.7*t)+'"/>';
+          s+='<path d="M'+(ex-4.5*t)+' '+(ey-3.2*t)+' Q'+(ex-2*t)+' '+(ey-5.2*t)+' '+(ex+1.5*t)+' '+(ey-5.4*t)+'" stroke="#fff" stroke-width="'+(.9*t)+'" fill="none" opacity=".4" stroke-linecap="round"/>';
+          s+='<line x1="'+(ex+sg*6.9*t)+'" y1="'+(ey-.5*t)+'" x2="'+(cx+sg*rx*1.0)+'" y2="'+(ey-.2*t)+'" stroke="#14110f" stroke-width="'+(1.3*t)+'"/>';
+        });
+        s+='<path d="M'+(cx-ed+6.9*t)+' '+(ey-.4*t)+' Q'+cx+' '+(ey-2.6*t)+' '+(cx+ed-6.9*t)+' '+(ey-.4*t)+'" stroke="#14110f" stroke-width="'+(1.5*t)+'" fill="none"/>';
+      }
     }
   }
-  s+='</svg>';
+  s+=L.f;
+  s+='</g></svg>';
   return s;
 }
 
@@ -2076,7 +2392,7 @@ function putuskan(dilayani){
       (bonus?'<p class="baris aman">Bonus ketelitian (Runtun '+G.runtun+'x): +'+rupiah(bonus)+'</p>':"");
     bunyi("baik");
   }else if(dilayani&&c.jahat){
-    G.nyawa--; G.runtun=0; G.peniruLolos++; hasil="dilayani, keliru";
+    G.nyawa--; G.runtun=0; G.peniruLolos++; if(c.peniruDari) G.doppel++; hasil="dilayani, keliru";
     jumpscare("DIA BUKAN WARGA...");
     const rugi=Math.min(G.kas,15000+acak(25000)); G.kas-=rugi;
     judul="Bahaya! Teror Terjadi";
@@ -2149,7 +2465,7 @@ function tutupToko(){
   }
   
   if(G.malam < 5){
-    simpanMalam(G.malam+1);
+    simpanMalam(G.malam+1); simpanPeniru(G.doppelBawaan+G.doppel);
     bukaLayar('<h2>Shift Malam '+G.malam+' Selesai</h2>'+
       '<p class="kecil">Target setoran tercapai ('+rupiah(G.kas)+'/'+rupiah(G.target)+')</p>'+
       '<div class="cerita-box">Malam ke-'+G.malam+' berhasil kamu lalui. Namun teror di Karangwuni semakin pekat. Besok malam akan lebih banyak peniru yang berkeliaran...</div>'+
@@ -2157,7 +2473,7 @@ function tutupToko(){
     el("tbl-lanjut").onclick=()=>{ tutupLayar(); tampilkanProlog(G.malam+1); };
   } else {
     // Malam 5 selesai! Tentukan True / Normal Happy Ending atau Bad Ending Peniru
-    if(G.peniruLolos >= 3){
+    if(G.doppelBawaan+G.doppel >= 3){
       tampilkanEnding("bad_doppelganger");
     } else if(G.nyawa >= 2 && G.rep >= 2 && G.benar >= 8){
       tampilkanEnding("happy_true");
@@ -2180,7 +2496,8 @@ function tampilkanEnding(kunci){
     '<ul><li>Total Kas Terkumpul: '+rupiah(G?G.kas:0)+'</li>'+
     '<li>Keputusan Benar: '+(G?G.benar:0)+' kali</li>'+
     '<li>Tingkat Keselamatan: '+(G?G.nyawa:0)+'/3</li>'+
-    '<li>Reputasi Warga: '+(G?G.rep:0)+'/3</li></ul>'+
+    '<li>Reputasi Warga: '+(G?G.rep:0)+'/3</li>'+
+    '<li>Peniru Lolos (total): '+(G?G.doppelBawaan+G.doppel:0)+'</li></ul>'+
     (kalah
       ? '<p class="kecil">Progres tersimpan. Kamu tidak perlu mengulang dari awal.</p>'+
         '<button class="mulai" id="tbl-ulang">Ulangi Malam ke-'+malamKalah+'</button>'+
@@ -2226,7 +2543,9 @@ function ketik(elm,teks,speed,cb){
   elm.textContent=""; elm.classList.add("mengetik");
   let i=0;
   const iv=setInterval(()=>{
-    elm.textContent+=teks[i]; i++;
+    if(teks[i]==="<"){ const j=teks.indexOf(">",i); i=(j<0)?i+1:j+1; }
+    else i++;
+    elm.innerHTML=teks.slice(0,i);
     if(i>=teks.length){ clearInterval(iv); elm.classList.remove("mengetik"); if(cb) cb(); }
   },speed);
 }
@@ -2297,9 +2616,13 @@ function layarJudul(){
     bukaLayar('<div class="home-credit">'+
       '<h2>CREDIT</h2>'+ 
       '<div class="credit-box">'+
-        '<p><b>Midnight KOPDES</b></p>'+ 
+        '<p><b>MIDNIGHT KOPDES</b></p>'+ 
         '<p>Story Edition · Horror Management Game</p>'+ 
-        '<p>Lokasi: KOPDES Mekar Jaya, Dusun Karangwuni</p>'+ 
+        '<div class="credit-rule"></div>'+ 
+        '<div class="credit-peran">DIKEMBANGKAN OLEH</div>'+ 
+        '<div class="credit-nama">Christian Nonti<br>Aglend Eka Martua<br>Agus Hendra Wibowo</div>'+ 
+        '<div class="credit-rule"></div>'+ 
+        '<p>Lokasi cerita: KOPDES Mekar Jaya, Dusun Karangwuni</p>'+ 
         '<p>Terima kasih sudah bermain.</p>'+ 
       '</div>'+ 
       '<button class="mulai" id="credit-back">KEMBALI KE HOME</button>'+ 
