@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Midnight KOPDES — Story Edition</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -406,7 +406,7 @@ button{touch-action:manipulation}
 }
 
 .putar-hp{display:none}
-@media (max-width:900px) and (orientation:landscape){
+@media (max-width:900px) and (orientation:landscape) and (pointer:coarse){
   .wrap{display:none}
   .putar-hp{
     display:flex;position:fixed;inset:0;z-index:200;background:var(--malam);
@@ -456,6 +456,23 @@ button{touch-action:manipulation}
 @keyframes jsFlash{0%{opacity:0}5%{opacity:1}12%{opacity:0}18%{opacity:1}30%{opacity:.94}100%{opacity:0}}
 #jumpscare-overlay.show .js-face{animation:jsFace .72s cubic-bezier(.1,.8,.2,1) forwards}
 @keyframes jsFace{0%{transform:scale(.15) rotate(-8deg)}35%{transform:scale(1.25) rotate(5deg)}55%{transform:scale(.95) rotate(-2deg)}100%{transform:scale(1.08)}}
+/* jumpscare khusus per karakter */
+#jumpscare-overlay .js-art{display:none;position:relative;width:min(88vw,560px);height:min(64vh,560px);margin-bottom:9vh;transform:scale(.2)}
+#jumpscare-overlay.js-khusus .js-art{display:block}
+#jumpscare-overlay.js-khusus .js-face{display:none}
+#jumpscare-overlay .js-art svg{width:100%;height:100%;display:block;filter:drop-shadow(0 0 36px rgba(190,20,10,.55))}
+#jumpscare-overlay .js-art.js-warga svg{filter:saturate(1.5) contrast(1.15) brightness(1.15) drop-shadow(0 0 34px rgba(210,20,10,.7))}
+#jumpscare-overlay .js-sub{position:absolute;bottom:2.4%;font-family:'Special Elite',monospace;color:#d9a79a;font-size:clamp(12px,2.4vw,18px);letter-spacing:.06em;opacity:.9;text-align:center;padding:0 12px}
+#jumpscare-overlay.show .js-art.js-an-zoom{animation:jsFace .72s cubic-bezier(.1,.8,.2,1) forwards}
+#jumpscare-overlay.show .js-art.js-an-jatuh{animation:jsJatuh .72s cubic-bezier(.2,.8,.3,1) forwards}
+#jumpscare-overlay.show .js-art.js-an-geser{animation:jsGeser .72s cubic-bezier(.15,.8,.25,1) forwards}
+#jumpscare-overlay.show .js-art.js-an-lompat{animation:jsLompat .78s ease-out forwards}
+#jumpscare-overlay.show .js-art.js-an-gemetar{animation:jsGemetar .72s linear forwards}
+@keyframes jsJatuh{0%{transform:translateY(-130%) scale(1)}38%{transform:translateY(6%) scale(1.14)}52%{transform:translateY(-4%) scale(1.06)}100%{transform:translateY(0) scale(1.08)}}
+@keyframes jsGeser{0%{transform:translateX(130%) scale(.9)}45%{transform:translateX(-4%) scale(1.15)}100%{transform:translateX(0) scale(1.06)}}
+@keyframes jsLompat{0%{transform:translateY(60%) scale(.4)}22%{transform:translateY(-14%) scale(1)}40%{transform:translateY(8%) scale(1.1)}58%{transform:translateY(-10%) scale(1.14)}100%{transform:translateY(0) scale(1.1)}}
+@keyframes jsGemetar{0%{transform:scale(.2)}30%{transform:scale(1.2)}40%{transform:scale(1.14) translateX(-8px)}50%{transform:scale(1.2) translateX(9px)}60%{transform:scale(1.14) translateX(-7px)}70%{transform:scale(1.2) translateX(7px)}100%{transform:scale(1.12)}}
+
 
 /* prolog jalan ke KOPDES */
 .prolog-adegan{position:relative;height:245px;margin:10px 0 12px;border:2px solid #000;overflow:hidden;background:linear-gradient(#06100d 0%,#0c1c17 58%,#030806 59%)}
@@ -558,6 +575,51 @@ body.res-90 .wrap{zoom:.9} body.res-80 .wrap{zoom:.8} body.res-70 .wrap{zoom:.7}
 .siluet.s1{right:18%;animation-delay:0s}.siluet.s2{right:28%;height:36px;opacity:.45;animation-delay:.7s}.siluet.s3{right:38%;height:50px;opacity:.3;animation-delay:1.3s}
 @keyframes siluetGerak{0%,100%{transform:translateX(0)}50%{transform:translateX(-9px)}}
 
+/* ===================== TAMPILAN PENUH (window view 100%) ===================== */
+/* HP (<=700px): sudah memenuhi layar lewat aturan mobile di atas; tambahkan safe-area (notch). */
+@media (max-width:700px){
+  .wrap{padding-top:max(6px,env(safe-area-inset-top));padding-bottom:max(6px,env(safe-area-inset-bottom));
+    padding-left:max(6px,env(safe-area-inset-left));padding-right:max(6px,env(safe-area-inset-right))}
+}
+/* Tablet & desktop (>700px): game memenuhi seluruh jendela, tanpa batas lebar 1120px dan tanpa scroll halaman. */
+@media (min-width:701px){
+  html,body{height:100%;overflow:hidden}
+  .wrap{max-width:none;width:100%;height:100vh;height:100dvh;margin:0;
+    padding:10px max(14px,env(safe-area-inset-right)) 10px max(14px,env(safe-area-inset-left));
+    display:flex;flex-direction:column;gap:10px;overflow:hidden}
+  .papan,.status{flex:0 0 auto}
+  .panggung{flex:1 1 auto;min-height:0;margin-top:0;align-items:stretch;grid-template-rows:minmax(0,1fr)}
+  .etalase{min-height:0;height:auto}
+  .scene{min-height:0}
+  .scene svg{max-height:none}
+  .meja{min-height:0}
+  .nota{flex:1 1 auto;min-height:120px;height:auto}
+  .aksi,.putusan{flex:0 0 auto}
+}
+/* Tablet potret: etalase di atas, meja di bawah, sama-sama mengisi tinggi layar */
+@media (min-width:701px) and (max-width:840px){
+  .panggung{grid-template-rows:minmax(0,38fr) minmax(0,62fr)}
+}
+/* Jendela pendek: jangan memaksa muat, izinkan scroll supaya tombol tetap terjangkau */
+@media (min-width:701px) and (max-height:560px){
+  html,body{height:auto;overflow:auto}
+  .wrap{height:auto;min-height:100vh;overflow:visible}
+  .panggung{min-height:520px}
+  .nota{min-height:220px}
+}
+/* Layar besar: perbesar teks dan tombol agar proporsional */
+@media (min-width:1500px) and (min-height:850px){
+  .baris{font-size:16.5px}
+  .baris b{font-size:13px}
+  .nota h2{font-size:20px}
+  .nota .waktu{font-size:13px}
+  .aksi button{font-size:15px;min-height:48px}
+  .putusan button{font-size:19px;min-height:54px}
+  .status .val{font-size:23px}
+  .status .lbl{font-size:11px}
+  .papan h1{font-size:38px}
+}
+
 </style>
 </head>
 <body>
@@ -657,7 +719,7 @@ body.res-90 .wrap{zoom:.9} body.res-80 .wrap{zoom:.8} body.res-70 .wrap{zoom:.7}
 </div>
 
 <div class="layar" id="layar"><div class="kartu" id="layar-isi"></div></div>
-<div id="jumpscare-overlay" aria-hidden="true"><div class="js-face"><div class="js-mouth"></div></div><div class="js-text">JANGAN SALAH LAGI...</div></div>
+<div id="jumpscare-overlay" aria-hidden="true"><div class="js-face"><div class="js-mouth"></div></div><div class="js-art"></div><div class="js-text">JANGAN SALAH LAGI...</div><div class="js-sub"></div></div>
 
 <script>
 
@@ -1759,7 +1821,7 @@ function terapkanSuaraMenu(v){
   if(Au.on && typeof bunyi==="function") bunyi("bel");
 }
 try{terapkanResolusi(localStorage.getItem("kopdes_resolusi")||"100")}catch(e){terapkanResolusi("100")}
-el("b-menu").onclick=()=>bukaMenu(false);
+el("b-menu").onclick=()=>layarJeda();
 el("menu-tutup").onclick=tutupMenu;
 el("menu-home").onclick=()=>{ tutupMenu(); layarJudul(); };
 el("menu-resolusi").onchange=e=>terapkanResolusi(e.target.value);
@@ -1767,7 +1829,7 @@ el("menu-suara").onchange=e=>terapkanSuaraMenu(e.target.value);
 el("menu-efek").onchange=e=>{ pengaturan.efek=(e.target.value==="0")?"0":"1"; try{localStorage.setItem("kopdes_efek",pengaturan.efek)}catch(_){} };
 el("menu-teks").onchange=e=>{ pengaturan.teks=(e.target.value in kecTeks)?e.target.value:"normal"; try{localStorage.setItem("kopdes_teks",pengaturan.teks)}catch(_){} };
 menuOverlay.addEventListener("click",e=>{if(e.target===menuOverlay)tutupMenu()});
-document.addEventListener("keydown",e=>{if(e.key==="Escape"&&menuOverlay.classList.contains("open"))tutupMenu()});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&menuOverlay.classList.contains("open")){tutupMenu();e.stopImmediatePropagation();}});
 
 /* ===================== GENERATE ANTREAN ===================== */
 function buatAntrean(malam,opt){
@@ -2325,10 +2387,64 @@ function npcPergi(kanan){
   void sc.offsetWidth;
   sc.classList.add(kanan?"npc-keluar-kanan":"npc-keluar");
 }
-function jumpscare(teks){
+/* ===================== JUMPSCARE PER KARAKTER ===================== */
+function _jsBulu(cx,cy,rx,ry,n,amp,fill){let p="";for(let i=0;i<n*2;i++){const a=i/(n*2)*Math.PI*2,r=(i%2?1:1+amp);p+=(i?"L":"M")+(cx+Math.cos(a)*rx*r).toFixed(1)+" "+(cy+Math.sin(a)*ry*r).toFixed(1);}return `<path d="${p}Z" fill="${fill}"/>`;}
+function _jsGigi(x1,x2,y,n,h,warna,naik){const w=(x2-x1)/n;let p="";for(let i=0;i<n;i++){const x=x1+i*w;p+=`M${x.toFixed(1)} ${y} l${(w/2).toFixed(1)} ${naik?-h:h} l${(w/2).toFixed(1)} ${naik?h:-h}Z`;}return `<path d="${p}" fill="${warna}"/>`;}
+const _jsMata=(x,y,rx,ry,w,rot)=>`<g transform="rotate(${rot||0} ${x} ${y})"><ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" fill="#000"/><ellipse cx="${x}" cy="${y}" rx="${rx*.5}" ry="${ry*.5}" fill="${w}" filter="url(#jsG)"/></g>`;
+const _jsKpl=(cx,cy,rx,ry,f)=>`<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="${f}"/><ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="url(#jsS)"/>`;
+const _jsKoin=(x,y)=>`<circle cx="${x}" cy="${y}" r="15" fill="#d6a826" stroke="#6b4c08" stroke-width="3"/><circle cx="${x}" cy="${y}" r="7" fill="none" stroke="#8a6410" stroke-width="2"/>`;
+const _jsDarah=(x,y,h)=>`<path d="M${x} ${y} q-4 ${h*.6} 0 ${h} q4 -${h*.4} 0 -${h}Z" fill="#9c0d0d"/>`;
+function jsBungkus(inner){return `<svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><filter id="jsG" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter><linearGradient id="jsS" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#000" stop-opacity=".22"/><stop offset=".45" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".55"/></linearGradient></defs>${inner}</svg>`;}
+
+const JS_ART={
+ tuyul:()=>`<ellipse cx="84" cy="205" rx="32" ry="48" fill="#76825f"/><ellipse cx="316" cy="205" rx="32" ry="48" fill="#76825f"/>${_jsKpl(200,215,114,106,"#93a07c")}<ellipse cx="170" cy="130" rx="46" ry="13" fill="#b4c19c" opacity=".45"/><circle cx="148" cy="200" r="40" fill="#000"/><circle cx="252" cy="200" r="40" fill="#000"/><circle cx="162" cy="187" r="10" fill="#fff"/><circle cx="266" cy="187" r="10" fill="#fff"/><path d="M108 262 Q200 345 292 262 Q200 292 108 262Z" fill="#1a0505"/>${_jsGigi(124,276,272,9,17,"#efe9d0")}${_jsKoin(60,350)}${_jsKoin(345,330)}${_jsKoin(300,380)}${_jsKoin(105,385)}`,
+ kuntilanak:()=>`<path d="M200 28 C60 40 30 210 52 400 H150 V230 H250 V400 H348 C370 210 340 40 200 28Z" fill="#040404"/><path d="M148 330 H252 L276 400 H124Z" fill="#efece4"/>${_jsKpl(200,200,68,92,"#ddd6cb")}<path d="M130 150 Q200 80 270 150 Q232 156 200 196 Q168 156 130 150Z" fill="#040404"/><ellipse cx="170" cy="208" rx="17" ry="12" fill="#000"/><ellipse cx="230" cy="208" rx="17" ry="12" fill="#000"/><circle cx="170" cy="208" r="6" fill="#d11" filter="url(#jsG)"/><circle cx="230" cy="208" r="6" fill="#d11" filter="url(#jsG)"/><path d="M164 266 Q200 306 236 266 Q200 284 164 266Z" fill="#120000"/>${_jsDarah(184,282,40)}${_jsDarah(218,280,28)}${[[70,90],[330,100],[48,210],[352,230],[86,300],[316,310]].map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="11" fill="#f4f1e8"/><circle cx="${p[0]}" cy="${p[1]}" r="4" fill="#d9b94a"/>`).join("")}`,
+ pocong:()=>`<path d="M200 22 L228 72 C304 94 322 206 302 334 V400 H98 V334 C78 206 96 94 172 72Z" fill="#e8e3d6"/><path d="M172 72 Q200 40 228 72 Q200 88 172 72Z" fill="#cdc6b3"/><path d="M200 22 L186 6 M200 22 L214 4" stroke="#cdc6b3" stroke-width="7" stroke-linecap="round"/><ellipse cx="200" cy="212" rx="66" ry="84" fill="#7d7566"/>${_jsKpl(200,212,56,74,"#bab3a2")}<ellipse cx="174" cy="198" rx="16" ry="21" fill="#000"/><ellipse cx="226" cy="198" rx="16" ry="21" fill="#000"/><circle cx="174" cy="204" r="5" fill="#d11" filter="url(#jsG)"/><circle cx="226" cy="204" r="5" fill="#d11" filter="url(#jsG)"/><ellipse cx="200" cy="270" rx="20" ry="30" fill="#000"/><path d="M104 336 Q200 362 296 336" stroke="#8a7f66" stroke-width="8" fill="none"/><path d="M118 300 q10 40 32 52 M262 290 q-6 30 -26 50 M150 120 q-10 30 -4 50" stroke="#6e5a3a" stroke-width="7" fill="none" opacity=".7"/>`,
+ genderuwo:()=>`${_jsBulu(200,205,118,128,22,.2,"#2c1c10")}${_jsKpl(200,215,104,112,"#5b4129")}<path d="M96 170 Q150 140 186 172 M304 170 Q250 140 214 172" stroke="#1a0d05" stroke-width="16" fill="none" stroke-linecap="round"/>${_jsMata(152,192,24,13,"#ff2a12",14)}${_jsMata(248,192,24,13,"#ff2a12",-14)}<path d="M172 226 Q200 210 228 226 L218 258 H182Z" fill="#241408"/><path d="M110 282 Q200 350 290 282 Q200 304 110 282Z" fill="#0b0302"/>${_jsGigi(128,272,288,8,22,"#e8dcc0")}<path d="M128 296 Q112 340 140 352 Q142 322 150 304Z M272 296 Q288 340 260 352 Q258 322 250 304Z" fill="#efe4c6"/>`,
+ wewe:()=>`${_jsBulu(200,170,132,118,26,.22,"#b8b3aa")}<circle cx="200" cy="38" r="34" fill="#a7a299"/>${_jsKpl(200,215,92,112,"#a89478")}<path d="M120 160 q30 -14 60 0 M220 160 q30 -14 60 0 M140 250 q20 12 40 0 M220 250 q20 12 40 0 M150 120 q50 -18 100 0" stroke="#4c3d2a" stroke-width="5" fill="none"/><ellipse cx="160" cy="200" rx="22" ry="15" fill="#e9e5da"/><ellipse cx="240" cy="200" rx="22" ry="15" fill="#e9e5da"/><circle cx="163" cy="202" r="5" fill="#000"/><circle cx="238" cy="204" r="5" fill="#000"/><path d="M146 276 Q200 340 254 276 Q226 292 200 288 Q174 292 146 276Z" fill="#150404"/><path d="M168 284 l7 20 l7 -16 M222 286 l7 18 l6 -14" stroke="#e7dcb8" stroke-width="6" fill="none"/>`,
+ sundel:()=>`<path d="M200 36 C84 46 56 220 74 400 H160 V240 H240 V400 H326 C344 220 316 46 200 36Z" fill="#040304"/>${_jsKpl(200,196,64,88,"#ded3c6")}<path d="M138 150 Q200 94 262 150 Q226 154 200 188 Q174 154 138 150Z" fill="#040304"/><ellipse cx="172" cy="204" rx="15" ry="11" fill="#000"/><ellipse cx="228" cy="204" rx="15" ry="11" fill="#000"/><path d="M172 214 q-6 36 -2 70 M228 214 q6 36 2 70" stroke="#9c0d0d" stroke-width="6" fill="none"/><path d="M172 262 Q200 282 228 262 Q200 270 172 262Z" fill="#7a0c18"/><ellipse cx="200" cy="352" rx="82" ry="52" fill="#d9cfc2"/><ellipse cx="200" cy="352" rx="62" ry="38" fill="#000" stroke="#7a0c0c" stroke-width="7"/><circle cx="178" cy="346" r="3" fill="#fff" opacity=".7"/><circle cx="226" cy="358" r="2" fill="#fff" opacity=".6"/>`,
+ kuyang:()=>`<path d="M180 262 q-30 40 -6 70 q22 24 -10 66 M200 266 q16 46 -10 78 q-18 28 6 54 M224 262 q30 44 6 76 q-18 26 10 60 M160 262 q-46 30 -34 64" stroke="#a3121a" stroke-width="13" fill="none" stroke-linecap="round"/><path d="M180 262 q-30 40 -6 70 M224 262 q30 44 6 76" stroke="#d94b4b" stroke-width="4" fill="none" opacity=".6"/><path d="M92 120 Q60 20 140 40 Q200 -4 260 40 Q340 20 308 120 Q330 190 300 230 H100 Q70 190 92 120Z" fill="#0b0a0c"/>${_jsKpl(200,170,86,100,"#e0d3c1")}${_jsMata(166,160,22,15,"#ffd21a")}${_jsMata(234,160,22,15,"#ffd21a")}<path d="M150 216 Q200 276 250 216 Q200 238 150 216Z" fill="#160404"/>${_jsGigi(158,242,222,7,13,"#efe6cf")}${_jsDarah(176,236,46)}${_jsDarah(232,236,34)}`,
+ lampor:()=>`<rect x="8" y="296" width="384" height="12" rx="6" fill="#3b2f23"/><path d="M52 296 L74 186 H326 L348 296Z" fill="#17120e"/><path d="M84 186 Q200 56 316 186Z" fill="#1f5a33"/><path d="M60 186 H340 L350 250 H50Z" fill="#1f5a33"/><path d="M50 250 H350 V264 H50Z" fill="#d6c26a"/><path d="M200 70 V250 M140 100 L112 250 M260 100 L288 250" stroke="#d6c26a" stroke-width="4" fill="none"/><path d="M62 264 v26 M110 264 v20 M158 264 v26 M242 264 v26 M290 264 v20 M338 264 v26" stroke="#d6c26a" stroke-width="5"/><path d="M96 190 Q200 240 304 190" stroke="#f4f1e8" stroke-width="9" stroke-dasharray="2 14" stroke-linecap="round" fill="none"/><ellipse cx="62" cy="352" rx="48" ry="52" fill="#000"/><ellipse cx="338" cy="352" rx="48" ry="52" fill="#000"/>${_jsMata(50,346,9,6,"#ff2a12")}${_jsMata(78,346,9,6,"#ff2a12")}${_jsMata(326,346,9,6,"#ff2a12")}${_jsMata(354,346,9,6,"#ff2a12")}<circle cx="200" cy="38" r="20" fill="#ffb347" filter="url(#jsG)"/><path d="M200 58 V70" stroke="#5a4630" stroke-width="5"/>`,
+ peniru_mardi:()=>`${_jsKpl(200,210,108,126,"#9e724a")}<path d="M112 116 Q112 54 200 54 Q288 54 288 116 V128 Q200 104 112 128Z" fill="#101010"/><ellipse cx="164" cy="196" rx="31" ry="25" fill="none" stroke="#2b1c10" stroke-width="6"/><ellipse cx="236" cy="196" rx="31" ry="25" fill="none" stroke="#2b1c10" stroke-width="6"/><path d="M195 196 h10" stroke="#2b1c10" stroke-width="6"/><ellipse cx="164" cy="198" rx="15" ry="19" fill="#000"/><ellipse cx="236" cy="198" rx="15" ry="19" fill="#000"/><circle cx="168" cy="202" r="4" fill="#ff2a12" filter="url(#jsG)"/><circle cx="240" cy="202" r="4" fill="#ff2a12" filter="url(#jsG)"/><path d="M92 244 Q200 372 308 244 Q200 308 92 244Z" fill="#0a0202"/>${_jsGigi(110,290,262,13,14,"#efe6cf")}<path d="M92 244 q-6 -20 4 -36 M308 244 q6 -20 -4 -36 M150 150 l-10 24 M262 156 l12 22" stroke="#2b1c10" stroke-width="4" fill="none"/>`,
+ peniru:()=>`${_jsKpl(200,214,104,122,"#a9784f")}<path d="M116 122 Q116 62 200 62 Q284 62 284 122 V134 Q200 110 116 134Z" fill="#101010"/><ellipse cx="164" cy="194" rx="22" ry="12" fill="#000" opacity=".08"/><ellipse cx="236" cy="194" rx="22" ry="12" fill="#000" opacity=".08"/><path d="M200 200 v40" stroke="#000" stroke-width="3" opacity=".08"/><path d="M168 286 H232" stroke="#2a150b" stroke-width="5" stroke-linecap="round"/><path d="M168 286 Q200 330 232 286" stroke="#5a0d0d" stroke-width="4" fill="none" opacity=".7"/>`,
+ peniru_tarjo:()=>`${_jsKpl(236,216,100,118,"#a97848")}<ellipse cx="236" cy="198" rx="16" ry="13" fill="#000"/><ellipse cx="282" cy="198" rx="16" ry="13" fill="#000"/>${_jsKpl(170,214,104,122,"#b58352")}<path d="M66 130 Q66 64 170 64 Q274 64 274 130 V142 Q170 118 66 142Z" fill="#8a4a2c"/><path d="M60 150 H280" stroke="#5e3018" stroke-width="9"/><ellipse cx="136" cy="196" rx="19" ry="25" fill="#000"/><ellipse cx="204" cy="196" rx="19" ry="25" fill="#000"/><circle cx="140" cy="204" r="6" fill="#e22" filter="url(#jsG)"/><circle cx="208" cy="204" r="6" fill="#e22" filter="url(#jsG)"/><path d="M90 266 Q170 384 250 266 Q170 308 90 266Z" fill="#0a0202"/>${_jsGigi(106,234,282,11,14,"#efe6cf")}<path d="M90 266 q-14 -26 -4 -44 M250 266 q14 -26 4 -44" stroke="#3a1a0c" stroke-width="4" fill="none"/><path d="M96 340 Q170 316 244 340 V400 H96Z" fill="#8a4a2c"/><path d="M130 350 q8 18 4 36 M200 356 q-8 16 -2 30" stroke="#5a1010" stroke-width="8" fill="none" opacity=".7"/>`,
+ mbahpalsu:()=>`${_jsKpl(200,214,98,116,"#c9c0b0")}<path d="M96 150 Q200 28 304 150 Q200 120 96 150Z" fill="#4a3020"/><path d="M130 118 l14 -14 l14 14 l14 -14 l14 14 l14 -14 l14 14 l14 -14 l14 14" stroke="#c9a15a" stroke-width="4" fill="none"/><ellipse cx="162" cy="196" rx="24" ry="17" fill="#ecebe6"/><ellipse cx="238" cy="196" rx="24" ry="17" fill="#ecebe6"/><circle cx="164" cy="198" r="4" fill="#777"/><circle cx="236" cy="198" r="4" fill="#777"/><path d="M104 266 Q200 410 296 266 Q200 322 104 266Z" fill="#e8e3d8"/><ellipse cx="200" cy="296" rx="38" ry="40" fill="#000"/><path d="M170 250 Q200 240 230 250" stroke="#8d877f" stroke-width="6" fill="none"/>`,
+ kucing:()=>`<path d="M96 150 L112 40 L176 112Z M304 150 L288 40 L224 112Z" fill="#1d1812"/>${_jsKpl(200,214,102,112,"#c3986d")}<path d="M96 150 Q200 80 304 150 Q250 130 200 160 Q150 130 96 150Z" fill="#1d1812"/><ellipse cx="160" cy="200" rx="30" ry="21" fill="#e8c91d" filter="url(#jsG)"/><ellipse cx="240" cy="200" rx="30" ry="21" fill="#e8c91d" filter="url(#jsG)"/><ellipse cx="160" cy="200" rx="6" ry="21" fill="#000"/><ellipse cx="240" cy="200" rx="6" ry="21" fill="#000"/><path d="M188 240 h24 l-12 14Z" fill="#7a2a2a"/><path d="M200 254 V272 M200 272 Q170 296 146 270 M200 272 Q230 296 254 270" stroke="#1a0e08" stroke-width="5" fill="none"/><path d="M60 236 L150 250 M60 262 L146 262 M340 236 L250 250 M340 262 L254 262" stroke="#eee" stroke-width="3"/><path d="M170 282 l8 28 l8 -26 M214 282 l8 28 l8 -26" stroke="#f1ead4" stroke-width="7" fill="none"/>`,
+ pramuka:()=>`${_jsKpl(200,222,92,98,"#cdbfae")}<ellipse cx="200" cy="140" rx="132" ry="26" fill="#6a4a22"/><path d="M122 140 Q122 56 200 56 Q278 56 278 140Z" fill="#7a5628"/><path d="M122 124 H278" stroke="#4e3515" stroke-width="9"/><ellipse cx="166" cy="212" rx="24" ry="29" fill="#000"/><ellipse cx="234" cy="212" rx="24" ry="29" fill="#000"/><circle cx="170" cy="204" r="6" fill="#fff" opacity=".85"/><circle cx="238" cy="204" r="6" fill="#fff" opacity=".85"/><ellipse cx="200" cy="288" rx="24" ry="30" fill="#000"/><path d="M118 316 L282 316 L200 396Z" fill="#c8201a"/><path d="M150 330 L250 330 L200 380Z" fill="#f2f2f2"/>`,
+ suster:()=>`${_jsKpl(200,222,86,104,"#e0d6cb")}<path d="M106 134 Q200 18 294 134 L282 168 Q200 138 118 168Z" fill="#f4f3ee"/><path d="M200 70 v44 M178 92 h44" stroke="#c8201a" stroke-width="12"/><path d="M144 164 q-10 20 -4 40" stroke="#9c0d0d" stroke-width="7" fill="none"/>${_jsMata(166,214,19,15,"#7a0c0c")}${_jsMata(234,214,19,15,"#7a0c0c")}<path d="M156 276 Q200 316 244 276 Q200 292 156 276Z" fill="#8c0f14"/>${_jsDarah(236,290,40)}${_jsDarah(206,296,24)}<path d="M110 340 Q200 300 290 340 V400 H110Z" fill="#f4f3ee"/><path d="M130 352 q10 20 30 22 M250 360 q16 14 30 6" stroke="#9c0d0d" stroke-width="9" fill="none"/>`,
+ jrangkong:()=>`<path d="M96 188 Q96 58 200 58 Q304 58 304 188 Q304 232 270 252 V322 H130 V252 Q96 232 96 188Z" fill="#e6e1d3"/><path d="M96 150 Q200 76 304 150 L318 170 H82Z" fill="#263447"/><path d="M92 170 h240" stroke="#14202e" stroke-width="10"/><ellipse cx="156" cy="206" rx="30" ry="36" fill="#000"/><ellipse cx="244" cy="206" rx="30" ry="36" fill="#000"/><circle cx="156" cy="210" r="7" fill="#e11" filter="url(#jsG)"/><circle cx="244" cy="210" r="7" fill="#e11" filter="url(#jsG)"/><path d="M200 236 l-16 34 h32Z" fill="#000"/>${_jsGigi(134,266,298,9,0,"#000")}<path d="M134 298 H266 M134 322 H266" stroke="#1a1814" stroke-width="5"/><path d="M152 298 V322 M174 298 V322 M200 298 V322 M226 298 V322 M248 298 V322" stroke="#1a1814" stroke-width="4"/><path d="M104 120 q-20 40 0 60" stroke="#222" stroke-width="5" fill="none" opacity=".5"/>`,
+ noni:()=>`${[[110,110],[150,76],[200,64],[250,76],[290,110],[96,170],[304,170],[100,230],[300,232]].map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="38" fill="#c9a24a"/>`).join("")}${_jsKpl(200,206,86,106,"#e2d6c6")}<path d="M120 124 Q200 74 280 124 Q226 130 200 166 Q172 130 120 124Z" fill="#c9a24a"/><path d="M160 74 L200 100 L240 74 L226 114 L200 100 L174 114Z" fill="#a31d1d"/><ellipse cx="166" cy="208" rx="20" ry="15" fill="#d8e6f0"/><ellipse cx="234" cy="208" rx="20" ry="15" fill="#d8e6f0"/><circle cx="166" cy="208" r="5" fill="#334"/><circle cx="234" cy="208" r="5" fill="#334"/><path d="M166 222 q-6 40 -2 70 M234 222 q6 40 2 70" stroke="#9c0d0d" stroke-width="6" fill="none"/><path d="M174 270 Q200 292 226 270" stroke="#7a1218" stroke-width="7" fill="none"/><path d="M118 330 Q200 300 282 330 V400 H118Z" fill="#efece4"/>`,
+ kurirhelm:()=>`<path d="M80 236 C80 62 320 62 320 236 V318 H80Z" fill="#d96a1a"/><path d="M80 236 C80 62 320 62 320 236 V250 H80Z" fill="#e88433" opacity=".35"/><path d="M112 190 H288 Q304 190 304 212 V262 Q304 282 288 282 H112 Q96 282 96 262 V212 Q96 190 112 190Z" fill="#050505"/><path d="M120 200 Q200 214 280 200" stroke="#fff" stroke-width="3" opacity=".12" fill="none"/>${_jsMata(158,238,15,9,"#ff2a12")}${_jsMata(242,238,15,9,"#ff2a12")}<path d="M80 150 H320" stroke="#7a3a0c" stroke-width="8"/><rect x="118" y="334" width="164" height="62" fill="#a9824f"/><path d="M200 334 V396" stroke="#d6c291" stroke-width="12"/>`,
+ penagih:()=>`${_jsKpl(200,206,98,116,"#b79878")}<path d="M106 150 Q200 52 294 150 Q200 112 106 150Z" fill="#0c0c0c"/><rect x="108" y="176" width="74" height="52" rx="8" fill="#e9eef0" stroke="#111" stroke-width="7"/><rect x="218" y="176" width="74" height="52" rx="8" fill="#e9eef0" stroke="#111" stroke-width="7"/><path d="M182 196 h36" stroke="#111" stroke-width="7"/><path d="M124 188 l22 -4 M234 188 l22 -4" stroke="#fff" stroke-width="4" opacity=".8"/><path d="M104 262 Q200 346 296 262 Q200 296 104 262Z" fill="#150404"/>${_jsGigi(120,280,272,12,15,"#f0ead6")}<path d="M150 340 L200 372 L250 340 L232 400 H168Z" fill="#2a2e38"/><path d="M200 372 L188 400 H212Z" fill="#b01818"/>`,
+ blorong:()=>`<path d="M62 330 Q30 200 84 130 Q104 190 120 200Z M338 330 Q370 200 316 130 Q296 190 280 200Z" fill="#2c6b3e"/><ellipse cx="62" cy="120" rx="30" ry="22" fill="#3a8a50"/><ellipse cx="338" cy="120" rx="30" ry="22" fill="#3a8a50"/>${_jsMata(54,118,8,7,"#ffd21a")}${_jsMata(346,118,8,7,"#ffd21a")}${_jsKpl(200,214,92,108,"#b9a07c")}<path d="M120 170 q20 -14 40 0 q20 14 40 0 q20 14 40 0 q20 -14 40 0 M126 230 q20 -14 40 0 M234 230 q20 -14 40 0" stroke="#2c6b3e" stroke-width="7" fill="none" opacity=".7"/><path d="M108 120 L130 56 L166 98 L200 40 L234 98 L270 56 L292 120Z" fill="#d6a826" stroke="#7a5a0b" stroke-width="4"/><ellipse cx="164" cy="200" rx="22" ry="14" fill="#1a1a1a"/><ellipse cx="236" cy="200" rx="22" ry="14" fill="#1a1a1a"/><ellipse cx="164" cy="200" rx="14" ry="10" fill="#6fe05a" filter="url(#jsG)"/><ellipse cx="236" cy="200" rx="14" ry="10" fill="#6fe05a" filter="url(#jsG)"/><ellipse cx="164" cy="200" rx="3" ry="12" fill="#000"/><ellipse cx="236" cy="200" rx="3" ry="12" fill="#000"/><path d="M164 264 Q200 280 236 264 Q200 270 164 264Z" fill="#150404"/><path d="M200 268 V332 M200 332 l-14 20 M200 332 l14 20" stroke="#c0171f" stroke-width="9" fill="none" stroke-linecap="round"/>`,
+ pengamen:()=>`<path d="M90 120 Q60 20 200 34 Q340 20 310 120 Q340 230 308 330 H92 Q60 230 90 120Z" fill="#14100c"/>${_jsKpl(200,206,86,106,"#a57a4f")}<ellipse cx="164" cy="190" rx="22" ry="15" fill="#e8e4d8"/><ellipse cx="236" cy="190" rx="22" ry="15" fill="#e8e4d8"/><path d="M150 168 q14 -10 28 0 M222 168 q14 -10 28 0" stroke="#14100c" stroke-width="6" fill="none"/><path d="M158 238 Q200 224 242 238 Q226 250 200 244 Q174 250 158 238Z" fill="#1a110a"/><ellipse cx="200" cy="278" rx="30" ry="36" fill="#000"/><path d="M180 262 Q200 270 220 262" stroke="#7a0c18" stroke-width="5" fill="none"/><ellipse cx="110" cy="372" rx="62" ry="40" fill="#8a5528"/><circle cx="110" cy="372" r="14" fill="#000"/><rect x="150" y="364" width="230" height="16" fill="#5a3a1c"/>`,
+ wongalus:()=>`<path d="M96 110 Q70 220 84 330 H316 Q330 220 304 110 Q250 20 200 22 Q150 20 96 110Z" fill="#0d0b0a"/>${_jsKpl(200,206,80,104,"#e2d2b6")}${_jsMata(168,194,19,13,"#ffffff")}${_jsMata(232,194,19,13,"#ffffff")}<path d="M82 262 Q200 372 318 262 Q200 306 82 262Z" fill="#100303"/>${_jsGigi(98,302,274,22,12,"#f4efe0")}${_jsGigi(110,290,296,20,-10,"#f4efe0")}<ellipse cx="200" cy="396" rx="190" ry="26" fill="#bcd0c8" opacity=".25"/>`,
+ petugas:()=>`${_jsKpl(200,214,92,110,"#b19a80")}<path d="M100 150 Q200 40 300 150 L316 170 H84Z" fill="#46603f"/><rect x="170" y="86" width="60" height="40" rx="6" fill="#d6a826" stroke="#6b4c08" stroke-width="3"/><circle cx="200" cy="106" r="10" fill="#6b4c08"/><rect x="108" y="184" width="70" height="48" rx="8" fill="#e9eef0" stroke="#111" stroke-width="7"/><rect x="222" y="184" width="70" height="48" rx="8" fill="#e9eef0" stroke="#111" stroke-width="7"/><path d="M178 202 h44" stroke="#111" stroke-width="7"/><path d="M168 276 Q200 296 232 276" stroke="#2a150b" stroke-width="6" fill="none"/><path d="M92 330 H308 V400 H92Z" fill="#5d7a5a"/><rect x="156" y="336" width="88" height="60" fill="#f2efe4" stroke="#444" stroke-width="3"/><path d="M168 354 h64 M168 370 h64 M168 384 h40" stroke="#444" stroke-width="4"/>`,
+ ngepet:()=>`<path d="M82 120 L96 30 L158 86Z M318 120 L304 30 L242 86Z" fill="#14100e"/>${_jsBulu(200,196,112,112,24,.14,"#0e0b0a")}${_jsKpl(200,200,106,104,"#1a1512")}${_jsMata(144,168,14,9,"#ff2a12")}${_jsMata(256,168,14,9,"#ff2a12")}<ellipse cx="200" cy="262" rx="70" ry="52" fill="#4a3a30"/><ellipse cx="172" cy="256" rx="12" ry="16" fill="#0a0504"/><ellipse cx="228" cy="256" rx="12" ry="16" fill="#0a0504"/><path d="M136 298 Q200 336 264 298 Q200 316 136 298Z" fill="#120404"/><path d="M130 290 Q86 270 92 220 Q116 252 148 272Z M270 290 Q314 270 308 220 Q284 252 252 272Z" fill="#efe9d4"/>${_jsKoin(176,350)}${_jsKoin(214,372)}${_jsKoin(250,346)}${_jsKoin(150,386)}${_jsKoin(284,382)}`,
+ banaspati:()=>`<path d="M200 -10 C240 70 330 90 310 200 C340 250 300 330 200 372 C100 330 60 250 90 200 C70 90 160 70 200 -10Z" fill="#e8580c" filter="url(#jsG)"/><path d="M200 40 C226 100 290 112 278 200 C296 250 262 312 200 336 C138 312 104 250 122 200 C110 112 174 100 200 40Z" fill="#ffa81f"/><path d="M200 120 C216 150 252 160 246 206 C256 240 232 280 200 294 C168 280 144 240 154 206 C148 160 184 150 200 120Z" fill="#ffe27a"/><ellipse cx="172" cy="210" rx="17" ry="25" fill="#1a0500"/><ellipse cx="228" cy="210" rx="17" ry="25" fill="#1a0500"/><path d="M200 232 l-8 18 h16Z" fill="#1a0500"/><ellipse cx="200" cy="274" rx="26" ry="14" fill="#1a0500"/>${_jsGigi(176,224,264,4,8,"#ffe9a0")}`
+};
+const JS_TEKS={tuyul:"UANG! UANG! UANG!",kuntilanak:"HIHIHIHIHI...",pocong:"LEPASKAN IKATANKU...",genderuwo:"MANUSIA KECIL...",wewe:"MANA CUCUKU?!",sundel:"PUNGGUNGKU BOLONG...",kuyang:"KEPALAKU LEPAS!",lampor:"KERANDA LEWAT...",peniru_mardi:"AKU... PAK MARDI...",peniru:"WAJAHMU... AKU PINJAM",peniru_tarjo:"DUA BAYANGAN... SATU AKU",mbahpalsu:"KOPI PAHIT... NAK...",kucing:"MEEOOONG...",pramuka:"KAMI BANYAK... OM...",suster:"PASIENKU BUTUH DARAH",jrangkong:"TULANGKU... MANA?!",noni:"WAAR BEN IK?!",kurirhelm:"PAKET... UNTUKMU",penagih:"BAYAR UTANGMU!",blorong:"BAYAR PAKAI NYAWA...",pengamen:"NINA BOBO... SELAMANYA",wongalus:"TERSESAT... SELAMANYA",petugas:"NAMAMU... TERDATA",ngepet:"NGEEEEK!",banaspati:"TERBAKAR...!"};
+const JS_LATAR={tuyul:"#041006",kuntilanak:"#0a0508",pocong:"#070707",genderuwo:"#0d0400",wewe:"#080602",sundel:"#0c0209",kuyang:"#030812",lampor:"#0a0000",peniru_mardi:"#060606",peniru:"#060606",peniru_tarjo:"#060606",mbahpalsu:"#070604",kucing:"#080600",suster:"#0a0000",noni:"#06050a",blorong:"#020a04",ngepet:"#0a0200",banaspati:"#160400",jrangkong:"#030508",wongalus:"#04080a"};
+const JS_ANIM={kuyang:"jatuh",banaspati:"jatuh",tuyul:"jatuh",lampor:"geser",pocong:"lompat",peniru:"gemetar",peniru_tarjo:"gemetar",peniru_mardi:"gemetar",jrangkong:"gemetar",kuntilanak:"gemetar"};
+function jsKhusus(c){
+  const f=JS_ART[c.id];
+  if(!f) return null;
+  return {svg:jsBungkus(f()),anim:JS_ANIM[c.id]||"zoom",latar:JS_LATAR[c.id]||"#050000"};
+}
+
+function jumpscare(teks,opt){
   const ov=el("jumpscare-overlay");
   if(!ov||pengaturan.efek!=="1") return;
   const tx=ov.querySelector(".js-text"); if(tx) tx.textContent=teks||"JANGAN SALAH LAGI...";
+  const seni=ov.querySelector(".js-art"), sub=ov.querySelector(".js-sub");
+  if(opt&&opt.svg){
+    seni.innerHTML=opt.svg; seni.className="js-art js-an-"+(opt.anim||"zoom")+(opt.warga?" js-warga":"");
+    ov.classList.add("js-khusus"); ov.style.background=opt.latar||"";
+    if(sub) sub.textContent=opt.sub||"";
+  }else{
+    seni.innerHTML=""; seni.className="js-art"; ov.classList.remove("js-khusus"); ov.style.background="";
+    if(sub) sub.textContent="";
+  }
   ov.classList.remove("show"); void ov.offsetWidth; ov.classList.add("show");
   el("wrap").classList.add("getar");
   setTimeout(()=>el("wrap").classList.remove("getar"),420);
@@ -2486,7 +2602,7 @@ function putuskan(dilayani){
     G.runtun=0; G.peniruLolos++; if(c.peniruDari) G.doppel++; hasil="dilayani, keliru";
     G.jejakLolos.push({n:c.nama,p:c.peran,m:G.malam,d:!!c.peniruDari});
     let jimatPakai=false; if(G.jimat>0){ G.jimat--; jimatPakai=true; } else G.nyawa--;
-    jumpscare("DIA BUKAN WARGA...");
+    jumpscare(JS_TEKS[c.id]||"DIA BUKAN WARGA...",jsKhusus(c));
     const rugi=Math.min(G.kas,15000+acak(25000)); G.kas-=rugi;
     judul="Bahaya! Teror Terjadi";
     html='<p class="baris bahaya">'+akibat(c)+'</p><p class="baris">Laci kas berkurang '+rupiah(rugi)+'. '+(jimatPakai?'Jimat pelindungmu retak dan menahan teror itu. Keselamatanmu aman.':'Keselamatanmu terancam!')+'</p>';
@@ -2500,7 +2616,7 @@ function putuskan(dilayani){
   }else{
     G.rep--; G.salahTolak++; G.runtun=0; hasil="ditolak, keliru";
     G.jejakSalah.push({n:c.nama,p:c.peran,m:G.malam});
-    jumpscare("SALAH ORANG!");
+    jumpscare("SALAH ORANG!",{svg:svgTokoh(c.look,{terang:true}),anim:"zoom",latar:"#140000",warga:true,sub:c.nama+" tersinggung dan pergi"});
     judul="Warga Kecewa";
     html='<p class="baris bahaya">'+c.nama+' adalah warga asli! Dia pergi dengan perasaan jengkel. Reputasi tokomu menurun.</p>';
     bunyi("buruk");
@@ -2803,12 +2919,16 @@ function layarJudul(){
     el("credit-back").onclick=layarJudul;
   };
 
-  el("home-keluar").onclick=()=>{
+  el("home-keluar").onclick=()=>layarKeluar(layarJudul,"KEMBALI KE HOME");
+}
+
+/* konfirmasi keluar permainan; dipakai Home dan menu jeda */
+function layarKeluar(kembali,labelKembali){
     bukaLayar('<div class="home-credit">'+
       '<h2>KELUAR PERMAINAN</h2>'+ 
       '<div class="credit-box"><p>Permainan akan ditutup. Jika browser tidak menutup tab secara otomatis, kamu bisa menutup tab ini secara manual.</p></div>'+ 
       '<button class="mulai" id="exit-confirm">TUTUP GAME</button>'+ 
-      '<button class="tutup" id="exit-cancel">KEMBALI KE HOME</button>'+ 
+      '<button class="tutup" id="exit-cancel">'+labelKembali+'</button>'+ 
     '</div>');
     el("exit-confirm").onclick=()=>{
       try{window.close()}catch(e){}
@@ -2816,9 +2936,46 @@ function layarJudul(){
         document.body.innerHTML='<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#050908;color:#d5e5dc;font-family:monospace;text-align:center;padding:24px"><div><h2 style="font-family:serif;letter-spacing:2px">GAME SELESAI</h2><p>Tab ini bisa kamu tutup sekarang.</p></div></div>';
       },120);
     };
-    el("exit-cancel").onclick=layarJudul;
-  };
+    el("exit-cancel").onclick=kembali;
 }
+
+/* ===================== MENU JEDA (tampilan seperti Home, tanpa Credit) ===================== */
+function layarJeda(){
+  if(!G) return;
+  const malam=G.malam||muatMalam();
+  bukaLayar('<div class="home-screen">'+
+    '<div class="home-logo">MIDNIGHT<br>KOPDES</div>'+
+    '<div class="home-sub">STORY EDITION · MINIMARKET KOPERASI DESA KARANGWUNI</div>'+
+    '<div class="home-rule"></div>'+
+    '<div class="home-buttons">'+
+      '<button class="home-btn primary" id="jeda-lanjut">LANJUTKAN GAME</button>'+
+      '<button class="home-btn" id="jeda-setting">PENGATURAN</button>'+
+      '<button class="home-btn" id="jeda-home">KEMBALI KE HOME</button>'+
+      '<button class="home-btn exit" id="jeda-keluar">KELUAR PERMAINAN</button>'+
+    '</div>'+
+    '<div class="home-note">Game dijeda · Malam ke-'+malam+' dari 5 · Jam '+jamStr(Math.min(G.waktu||AWAL,AKHIR))+'</div>'+
+    '</div>');
+  el("jeda-lanjut").onclick=tutupLayar;
+  el("jeda-setting").onclick=()=>bukaMenu(true);
+  el("jeda-home").onclick=()=>{
+    bukaLayar('<div class="home-credit">'+
+      '<h2>KEMBALI KE HOME</h2>'+
+      '<div class="credit-box"><p>Shift malam ini belum selesai. Kalau kembali ke Home, Malam '+malam+' akan diulang dari awal saat kamu melanjutkan.</p></div>'+
+      '<button class="mulai" id="jeda-home-ya">YA, KE HOME</button>'+
+      '<button class="tutup" id="jeda-home-batal">BATAL</button>'+
+    '</div>');
+    el("jeda-home-ya").onclick=layarJudul;
+    el("jeda-home-batal").onclick=layarJeda;
+  };
+  el("jeda-keluar").onclick=()=>layarKeluar(layarJeda,"KEMBALI KE MENU");
+}
+/* Esc: buka/tutup menu jeda selama shift */
+document.addEventListener("keydown",e=>{
+  if(e.key!=="Escape"||menuOverlay.classList.contains("open")) return;
+  const layarTampil=!el("layar").classList.contains("sembunyi");
+  if(layarTampil){ if(el("jeda-lanjut")) tutupLayar(); }
+  else if(G&&G.fase&&G.fase!=="idle") layarJeda();
+});
 
 /* ===================== KONTROL KEYBOARD ===================== */
 document.addEventListener("keydown",e=>{
