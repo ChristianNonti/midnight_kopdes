@@ -8,7 +8,7 @@
 ![License](https://img.shields.io/badge/License-MIT-green.style=for-the-badge)
 ![Platform](https://img.shields.io/badge/Platform-Web%20%7C%20Mobile-blue?style=for-the-badge)
 
-**Midnight KOPDES — Story Edition** adalah *indie horror-simulation web game* berbasis teks & visual bergaya retro-arcade. Pemain bertugas sebagai penjaga shift malam (21.00 – 03.00) di minimarket **KOPDES Mekar Jaya**, Dusun Karangwuni. Tugas utamanya adalah memverifikasi identitas pelanggan, mengumpulkan setoran kas harian, dan mencegah makhluk halus (*Doppelganger*, Tuyul, Kuntilanak, Pocong, Kuyang, dll.) masuk ke dalam toko.
+**Midnight KOPDES — Story Edition** adalah *indie horror-simulation web game* berbasis teks & visual bergaya retro-arcade. Pemain bertugas sebagai penjaga shift malam (23.00 – 06.00) di minimarket **KOPDES Mekar Jaya**, Dusun Karangwuni. Tugas utamanya adalah memverifikasi identitas pelanggan, mengumpulkan setoran kas harian, dan mencegah makhluk halus (*Doppelganger*, Tuyul, Kuntilanak, Pocong, Kuyang, dll.) masuk ke dalam toko.
 
 ---
 
