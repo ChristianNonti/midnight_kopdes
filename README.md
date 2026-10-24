@@ -1,71 +1,121 @@
-# 🏪 Midnight KOPDES — Story Edition
+# 🌙 Midnight KOPDES — Story Edition
 
-> **"Siapa yang sedang berdiri di balik pintu toko jam 3 pagi? Warga Karangwuni asli... atau Peniru?"**
+> *"Kalau ada warga datang malam-malam, kenali mereka baik-baik."*
+> — pesan Pak RT Mardi
 
-![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
-![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
-![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
-![License](https://img.shields.io/badge/License-MIT-green.style=for-the-badge)
-![Platform](https://img.shields.io/badge/Platform-Web%20%7C%20Mobile-blue?style=for-the-badge)
+Game horor investigasi berbasis browser, bernuansa dusun Jawa. Kamu menjaga **minimarket KOPDES Mekar Jaya** di Dusun Karangwuni selama 5 malam, dari pukul **23.00 sampai 06.00**. Tugasmu: layani warga asli, usir makhluk yang menyamar. Salah memilih, dan nyawa atau nama baikmu yang jadi taruhannya.
 
-**Midnight KOPDES — Story Edition** adalah *indie horror-simulation web game* berbasis teks & visual bergaya retro-arcade. Pemain bertugas sebagai penjaga shift malam (23.00 – 06.00) di minimarket **KOPDES Mekar Jaya**, Dusun Karangwuni. Tugas utamanya adalah memverifikasi identitas pelanggan, mengumpulkan setoran kas harian, dan mencegah makhluk halus (*Doppelganger*, Tuyul, Kuntilanak, Pocong, Kuyang, dll.) masuk ke dalam toko.
+🎮 **Main sekarang:** [midnight-kopdes.vercel.app](https://midnight-kopdes.vercel.app)
 
----
-
-## 📖 Latar Belakang Cerita
-
-Tiga hari lalu, pohon asam tua di pertigaan Dusun Karangwuni ditebang. Sejak malam itu, gerbang menuju kebun bambu kuno terbuka. Sesepuh desa dan para peniru dari alam lain berkeliaran menyamar sebagai warga asli. Pak RT Mardi memberimu kunci minimarket dan **Buku Anggota Desa**. Tugasmu sederhan: **layani warga asli, usir para peniru.**
+> Proyek ini dibuat sebagai **Tugas Project Desain Game**.
 
 ---
 
-## 🎮 Fitur Utama
+## ✨ Fitur
 
-- **8 Saluran Pemeriksaan Kritis:**
-  - 👁️ **Amati:** Cek detail fisik, kancing, tato, atau kejanggalan baju.
-  - 🪪 **Cek KTP:** Cocokkan nama, RT, dan tanda tangan dengan Buku Anggota.
-  - 🛍️ **Cek Belanjaan:** Analisis barang bawaan dan keanehan mata uang/uang basah.
-  - 🗣️ **Tanya Dusun:** Uji pengetahuan pelanggan tentang batas RT Karangwuni.
-  - 🔦 **Sorot Senter:** Cek apakah ada bayangan atau ciri fisik yang melayang.
-  - 🧂 **Tabur Garam:** Reaksi fisik terhadap zat penolak makhluk halus.
-  - 🪞 **Cermin Rak:** Cek pantulan asli pelanggan di cermin.
-  - 📞 **Telepon Pos Ronda:** Konfirmasi keberadaan warga asli secara langsung ke Pak RT.
-- **Dynamic Procedural Audio Engine:** Efek suara dan *ambient drone* dibuat secara lansung melalui Web Audio API tanpa *asset* eksternal.
-- **Multiple Endings:**
-  - 🏆 **Happy End (True / Normal):** Pahlawan Karangwuni & Bertahan 5 Malam.
-  - 💀 **Bad End (Teror Hantu):** 3x mengizinkan entitas jahat masuk.
-  - 🚪 **Bad End (Dipecat):** 3x salah menolak warga asli.
-  - 💸 **Bad End (Bangkrut):** Gagal memenuhi target kas wajib harian.
-  - 👥 **Bad End (Doppelganger):** Terlalu banyak peniru yang meloloskan diri ke desa.
-- **Responsive & Mobile-Optimized:** Tampilan retro CRT dengan dukungan khusus mode *portrait* pada smartphone.
+- **5 malam dengan cerita sendiri.** Tiap malam punya prolog, adegan jalan menuju toko, dan event khusus (Malam Tenang, Hujan Deras, Pemadaman Listrik, Bulan Purnama, Malam Jumat Kliwon).
+- **45 warga dusun** dan **30 makhluk penyamar** (tuyul, kuntilanak, pocong, genderuwo, wewe gombel, sundel bolong, kuyang, lampor, ngepet, banaspati, blorong, dan lainnya).
+- **Doppelganger (peniru).** Makhluk yang menyalin wajah, nama, bahkan kalimat warga asli. Kamu hanya bisa mengenalinya dengan membandingkan petunjuk dari warga aslinya yang datang lebih dulu.
+- **Dialog bervariasi.** Tiap tokoh punya 4 kalimat pembuka yang dipilih acak, jadi tidak bisa dihafal satu-satu.
+- **8 cara memeriksa pelanggan,** tiap cara punya biaya waktu dan kadang jatah terbatas.
+- **Toko upgrade.** Kelebihan kas di atas setoran wajib bisa dibelikan baterai senter, garam, cermin, pulsa telepon, lampu, dan jimat pelindung.
+- **3 tingkat kesulitan:** Easy, Normal, Hard.
+- **Tamu langka (easter egg)** yang muncul acak.
+- **Suasana audio dan visual:** jumpscare, suara yang dibuat lewat kode, adegan jalan beranimasi, dan latar dalam minimarket.
+- **Banyak ending:** 2 happy ending dan 4 bad ending.
 
 ---
 
-## 🕹️ Cara Bermain & Tombol Kontrol
+## 🕹️ Cara Bermain
 
-1. **Periksa Pelanggan:** Setiap analisis membutuhkan waktu beberapa menit. Perhatikan sisa kesabaran pelanggan.
-2. **Bandingkan Data:** Buka **Buku Anggota** untuk mencocokkan identitas resmi.
-3. **Ambil Keputusan:**
-   - **Layani (`L`):** Terima uang belanjaan jika pelanggan adalah warga asli.
-   - **Tolak (`T`):** Usir jika ditemukan indikasi peniru / entitas jahat.
+1. Tiap pelanggan datang dengan nama, peran, dan kalimat pembukanya.
+2. **Periksa** dia lewat beberapa cara. Setiap pemeriksaan memakan waktu dan menguras *kesabaran* pelanggan. Kalau habis, dia pergi sendiri.
+3. Cocokkan hasilnya dengan petunjuk di **Buku Anggota**. Makhluk akan meninggalkan satu atau beberapa kejanggalan.
+4. **Putuskan:** layani atau tolak.
 
-| Tombol Keyboard | Aksi |
-| :---: | :--- |
-| `1` – `7` | Melakukan analisis/pemeriksaan fisik & dokumen |
-| `8` | Telepon Pos Ronda (Konfirmasi Pak RT) |
-| `L` | Layani pelanggan & terima uang |
-| `T` | Tolak pelanggan & usir keluar |
-| `Enter` | Melanjutkan ke pelanggan berikutnya / Tutup Toko |
+| Keputusan | Hasil jika benar | Hasil jika salah |
+|---|---|---|
+| Layani warga asli | Dapat bayaran, plus bonus beruntun | — |
+| Tolak makhluk | Aman | — |
+| Layani makhluk | — | Kas berkurang, **nyawa** turun |
+| Tolak warga asli | — | **Nama baik** turun |
+
+### Cara memeriksa
+
+| Tombol | Aksi | Catatan |
+|:---:|---|---|
+| `1` | Amati dari balik meja | Cepat dan tanpa batas |
+| `2` | Minta KTP | Cocokkan nama, usia, RT |
+| `3` | Periksa belanjaan | |
+| `4` | Tanya soal dusun | |
+| `5` | Sorot senter | Jatah terbatas, lihat bayangan |
+| `6` | Tabur garam | Jatah terbatas |
+| `7` | Lihat cermin rak | Jatah terbatas |
+| `8` | Telepon pos ronda | Jatah terbatas, kadang ragu atau putus |
+
+### Syarat menang dan kalah
+
+Capai **target setoran kas** tiap malam sampai malam ke-5.
+
+- ❌ **Nyawa habis:** *Terjebak Dalam Gelap*
+- ❌ **Nama baik habis:** *Dibuang Warga Dusun*
+- ❌ **Kas di bawah target:** *Koperasi Bangkrut & Teror*
+- ❌ **3 Doppelganger lolos:** *Dusun Para Peniru*
+- ✅ **Selesai malam 5:** *Fajar Karangwuni*, atau ending terbaik *Pahlawan Karangwuni* jika kamu teliti (nyawa dan nama baik minimal 2, dan minimal 8 keputusan benar)
 
 ---
 
-## 🛠️ Teknologi yang Digunakan
+## 🎚️ Tingkat Kesulitan
 
-- **HTML5:** Struktur dokumen tunggal tanpa dependensi eksternal.
-- **CSS3:** Retro CRT Scanlines, Responsive Grid, Flexbox, Custom Variables, dan CSS Keyframe Animations.
-- **Vanilla JavaScript (ES6+):** Game loop, pembuat antrean prosedural, state management, dan evaluasi narasi.
-- **Web Audio API:** Synthesizer suara (BiquadFilter, OscillatorNode) untuk *ambience* dan *sound effects*.
+| | Easy | Normal | Hard |
+|---|:---:|:---:|:---:|
+| Kesabaran pelanggan | ×1,3 | ×1 | ×0,9 |
+| Target setoran | 75% | 90% | 100% |
+| Makhluk muncul | lebih jarang | standar | standar |
+| Jatah alat | +1 | standar | standar |
+| Kerugian saat makhluk lolos | ×0,5 | ×1 | ×1,25 |
+| Pemulihan nyawa & nama baik | +2 / malam | +1 / malam | +1 / malam |
+| Temuan janggal ditandai merah | ✅ | ✅ | ❌ (nilai sendiri) |
 
 ---
 
-## Game ini dapat dijalankan langsung di browser apa pun
-LINK NYA : midnight-kopdes.vercel.app
+## 🛠️ Teknologi
+
+Seluruh game ada di **satu file `index.html`**, tanpa framework, tanpa build, dan tanpa dependensi.
+
+- HTML, CSS, dan JavaScript murni
+- Grafis tokoh dan latar memakai **SVG** dan animasi **CSS**
+- Audio dihasilkan dan disematkan langsung di dalam file
+- Progres tersimpan di `localStorage` browser
+
+## ▶️ Menjalankan Secara Lokal
+
+```bash
+git clone https://github.com/ChristianNonti/midnight_kopdes.git
+cd midnight_kopdes
+# buka index.html langsung di browser, atau jalankan server lokal:
+python3 -m http.server 8000
+# lalu buka http://localhost:8000
+```
+
+Disarankan memakai browser modern (Chrome, Edge, Firefox, atau Safari). Pengaturan efek kejut, kecepatan teks, dan kualitas grafis ada di menu **Pengaturan** di dalam game.
+
+---
+
+## 📁 Struktur Repo
+
+```
+midnight_kopdes/
+├── index.html   # seluruh game
+├── README.md
+└── LICENSE      # MIT
+```
+
+## 📜 Lisensi
+
+Dirilis di bawah lisensi [MIT](LICENSE).
+
+## 🙌 Kredit
+
+Dibuat oleh **ChristianNonti** untuk Tugas Project Desain Game.
+Cerita, nama tokoh, dan tempat dalam game adalah fiksi.
