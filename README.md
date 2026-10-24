@@ -114,8 +114,3 @@ midnight_kopdes/
 ## 📜 Lisensi
 
 Dirilis di bawah lisensi [MIT](LICENSE).
-
-## 🙌 Kredit
-
-Dibuat oleh **ChristianNonti** untuk Tugas Project Desain Game.
-Cerita, nama tokoh, dan tempat dalam game adalah fiksi.
