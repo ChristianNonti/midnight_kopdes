@@ -1047,6 +1047,81 @@ body.q-rendah .lj-kunang,body.q-rendah .lj-kabut{display:none}
   background:rgba(8,20,16,.94);color:#cfe8dc;border:1px solid #2f6b50;padding:9px 14px;font-size:12.5px;line-height:1.4;text-align:center;
   opacity:0;pointer-events:none;transition:opacity .35s}
 #toast-gfx.tampil{opacity:1}
+
+/* ===================== SINEMATIK ENDING: adegan animasi + peta tujuan akhir ===================== */
+.sin{display:block}
+.sin h2{margin:0 0 6px}
+.sin-adegan{position:relative;height:clamp(190px,34vh,270px);margin:8px 0 10px;border:2px solid #000;overflow:hidden;background:#040a09;box-shadow:0 0 0 1px rgba(255,255,255,.06)}
+.sin-adegan svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.sin-narasi{min-height:96px;background:#0a1210;border:1px solid #2e4d43;border-left:4px solid var(--kuning);padding:12px 14px;font-size:13.5px;line-height:1.65;color:#d5e5dc;font-family:'Special Elite',monospace}
+.sin-narasi.mengetik::after{content:"▌";margin-left:2px;animation:sinKursor .7s steps(1) infinite}
+@keyframes sinKursor{50%{opacity:0}}
+.sin-titik{display:flex;gap:6px;justify-content:center;margin:8px 0 2px}
+.sin-titik i{width:7px;height:7px;border-radius:50%;background:#2e4d43;transition:background .3s}
+.sin-titik i.on{background:var(--kuning)}
+.sin-peta{margin-top:10px;animation:sinMasuk .7s ease both}
+@keyframes sinMasuk{from{opacity:0;transform:translateY(8px)}}
+.sin-peta-judul{font:11px 'Special Elite',monospace;letter-spacing:.2em;text-transform:uppercase;color:#9bb7ab;margin:0 0 6px;display:flex;gap:8px;align-items:center}
+.sin-peta-judul::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,rgba(210,50,50,.55),transparent)}
+.sin-peta svg{display:block;width:100%;height:auto;background:#07110e;border:1px solid #2e4d43}
+.sin-tujuan{margin-top:8px;padding:12px 14px;border:1px solid #2e4d43;background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.02));animation:sinMasuk .8s 3.4s ease both}
+.sin-tujuan small{display:block;font:10px 'Special Elite',monospace;letter-spacing:.18em;color:#8da99d;text-transform:uppercase}
+.sin-tujuan b{display:block;font-family:'Staatliches',sans-serif;font-size:22px;letter-spacing:.05em;margin:2px 0 4px;color:var(--wt,#eab93c)}
+.sin-tujuan p{margin:0;font-size:12.5px;line-height:1.55;color:#cbdad3}
+.sin-aksi{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.sin-aksi button{margin:0}
+.sin-aksi .tunggal{grid-column:1/-1}
+.sin-aksi[hidden],.sin-peta[hidden]{display:none}
+
+/* peta */
+.sp-garis{fill:none;stroke:var(--wt,#eab93c);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:0;animation:spGaris 3.6s linear .2s both}
+@keyframes spGaris{from{stroke-dashoffset:1}}
+.sp-bayang{fill:none;stroke:#1d332b;stroke-width:2.4;stroke-dasharray:2 5;stroke-linecap:round}
+.sp-node{animation:spMuncul .5s ease both;animation-delay:var(--dl,0s)}
+@keyframes spMuncul{from{opacity:0;transform:scale(.4)}}
+.sp-node{transform-box:fill-box;transform-origin:50% 50%}
+.sp-label{font:9px 'Special Elite',monospace;fill:#b9cfc5}
+.sp-akhir .sp-label{fill:#fff;font-size:10px;font-weight:bold}
+.sp-denyut{fill:none;stroke:var(--wt,#eab93c);stroke-width:1.5;transform-box:fill-box;transform-origin:50% 50%;animation:spDenyut 2s ease-out 3.8s infinite both}
+@keyframes spDenyut{from{opacity:.9;transform:scale(.5)}to{opacity:0;transform:scale(2.6)}}
+
+/* ---- elemen adegan (keadaan dasar = keadaan akhir, keyframe hanya 'from') ---- */
+.sn-fajar{animation:snFade 7s ease-in-out both}
+@keyframes snFade{from{opacity:0}}
+.sn-surya{animation:snSurya 7s ease-out both}
+@keyframes snSurya{from{transform:translateY(62px)}}
+.sn-gelap{animation:snGelap 6s ease-in both}
+@keyframes snGelap{from{opacity:0}}
+.sn-jalan{animation:snJalan var(--dur,6s) linear var(--dl,0s) both}
+@keyframes snJalan{from{transform:translateX(0)}to{transform:translateX(var(--jarak,100px))}}
+.sn-bob{animation:snBob .42s ease-in-out infinite alternate}
+@keyframes snBob{to{transform:translateY(-1.6px)}}
+.sn-muncul{animation:snMuncul 1.1s ease var(--dl,0s) both}
+@keyframes snMuncul{from{opacity:0}}
+.sn-hilang{animation:snHilang 1.4s ease var(--dl,0s) both}
+@keyframes snHilang{to{opacity:0}}
+.sn-konfeti{animation:snKonfeti var(--d,4s) linear var(--dl,5s) infinite both}
+@keyframes snKonfeti{from{transform:translateY(-30px) rotate(0)}to{transform:translateY(210px) rotate(540deg)}}
+.sn-api{transform-box:fill-box;transform-origin:50% 100%;animation:snApi .18s ease-in-out infinite alternate}
+@keyframes snApi{from{transform:scale(1,1)}to{transform:scale(.82,1.18)}}
+.sn-mati{animation:snMati .9s steps(1) var(--dl,1s) both}
+@keyframes snMati{from{opacity:var(--op,.9)}}
+.sn-mati{opacity:0}
+.sn-turun{animation:snTurun 2.4s cubic-bezier(.3,.1,.2,1) var(--dl,2s) both}
+@keyframes snTurun{from{transform:translateY(-90px);opacity:0}}
+.sn-roll{animation:snRoll 2.2s cubic-bezier(.5,0,.6,1) var(--dl,1s) both}
+@keyframes snRoll{from{transform:translateY(-58px)}}
+.sn-tilt{transform-box:fill-box;transform-origin:50% 100%;animation:snTilt 2.6s ease-in-out infinite alternate}
+@keyframes snTilt{from{transform:rotate(-9deg)}to{transform:rotate(9deg)}}
+.sn-burung{animation:snBurung 9s linear var(--dl,2s) both}
+@keyframes snBurung{from{transform:translateX(-60px)}to{transform:translateX(480px)}}
+.sn-kabut{animation:snKabut 14s linear infinite alternate}
+@keyframes snKabut{from{transform:translateX(-30px)}to{transform:translateX(30px)}}
+.sn-kedip{animation:snKedip 3.4s steps(1) infinite}
+@keyframes snKedip{0%,46%,50%,100%{opacity:1}48%{opacity:.35}}
+.sin-diam *{animation:none!important}
+.sin-diam .sin-tujuan,.sin-diam .sin-peta{animation:none!important}
+@media (prefers-reduced-motion:reduce){.sin *{animation:none!important}}
 </style>
 </head>
 <body>
@@ -4067,7 +4142,177 @@ function tutupToko(){
   }
 }
 
+/* ===================== SINEMATIK ENDING ===================== */
+/* Tujuan akhir tiap ending: lokasi terakhir + rute yang ditempuh (koordinat pada peta 400x120). */
+const TUJUAN_ENDING={
+  happy_true:{warna:"#eab93c",lokasi:"Balai Dusun Karangwuni",jam:"Hari ke-6 · 06.20",
+    ket:"Warga mengarak kamu dari KOPDES ke balai dusun. Di sana Pak RT Mardi menyerahkan piagam dan bonus, dan kamu tetap dipercaya menjaga KOPDES di malam hari.",
+    rute:[[28,92,"KOPDES"],[110,58,"Pertigaan"],[210,84,"Kebun bambu (dipagari)"],[300,44,"Jalan dusun"],[368,66,"Balai Dusun"]]},
+  happy_normal:{warna:"#4fc08a",lokasi:"Rumah, lalu kembali ke KOPDES",jam:"Hari ke-6 · 06.05",
+    ket:"Shift selesai dan gaji penuh diterima. Kamu pulang untuk tidur, lalu kembali ke meja kasir KOPDES begitu malam turun.",
+    rute:[[28,80,"KOPDES"],[130,50,"Pertigaan"],[240,78,"Jalan pulang"],[368,58,"Rumah"]]},
+  bad_hantu:{warna:"#ec5b4d",lokasi:"Di balik kegelapan KOPDES",jam:"Fajar · tak pernah keluar",
+    ket:"Kamu tidak pernah melewati pintu itu lagi. Tiruanmu berdiri di meja kasir, sementara kamu tertinggal di sisi lain kaca, di dalam gelap.",
+    rute:[[28,90,"Pintu depan"],[120,64,"Meja kasir"],[225,86,"Lorong rak"],[300,52,"Gudang"],[368,76,"Gelap"]]},
+  bad_dipecat:{warna:"#ec5b4d",lokasi:"Luar Dusun Karangwuni, entah ke mana",jam:"Menjelang fajar · diusir",
+    ket:"Dari KOPDES ke balai dusun, lalu digiring warga sampai gerbang desa. Kamu pergi dengan tas di tangan, tanpa tujuan, dan tidak boleh kembali.",
+    rute:[[28,76,"KOPDES"],[120,48,"Balai Dusun"],[225,82,"Gerbang Desa"],[368,40,"Jalan raya"]]},
+  bad_bangkrut:{warna:"#ec5b4d",lokasi:"Karangwuni yang gelap",jam:"Fajar tak kunjung datang",
+    ket:"Rolling door KOPDES dikunci untuk selamanya. Tanpa lampu pertigaan, kamu berjalan pulang melewati rumah-rumah yang kosong satu per satu.",
+    rute:[[28,88,"KOPDES (tutup)"],[115,60,"Pertigaan gelap"],[220,80,"Rumah warga"],[310,48,"Rumah kosong"],[368,70,"Gelap"]]},
+  bad_doppelganger:{warna:"#ec5b4d",lokasi:"Dusun Para Peniru",jam:"Hari ke-6 · tak ada yang asli",
+    ket:"Kamu berjalan pulang ke tengah desa. Setiap warga yang kamu sapa tersenyum dengan cara yang sama, dan tak satu pun lagi yang asli.",
+    rute:[[28,70,"KOPDES"],[115,92,"Rumah Pak RT"],[215,52,"Pertigaan"],[300,84,"Balai Dusun"],[368,56,"Dusun Peniru"]]}
+};
+
+/* orang siluet sederhana. o: warna, mata, senyum, obor, tas, piagam, kepala (kelas kepala) */
+function snOrang(x,y,s,o){
+  o=o||{}; const w=o.warna||"#050807";
+  let h='<g transform="translate('+x+' '+y+') scale('+s+')"><ellipse cx="0" cy="0" rx="8" ry="2" fill="#000" opacity=".4"/>'+
+    '<g'+(o.bob?' class="sn-bob"':'')+'><rect x="-3.4" y="-8" width="2.8" height="8" fill="'+w+'"/><rect x=".6" y="-8" width="2.8" height="8" fill="'+w+'"/>'+
+    '<rect x="-5.2" y="-21" width="10.4" height="14" rx="3" fill="'+w+'"/>';
+  if(o.tas) h+='<rect x="4" y="-16" width="7" height="9" rx="1" fill="#2a1d12" stroke="#000" stroke-width=".5"/>';
+  if(o.piagam) h+='<rect x="5" y="-22" width="9" height="6" fill="#f3e7c0" stroke="#7a5a1a" stroke-width=".6"/><path d="M6.5 -20h6M6.5 -18.4h4" stroke="#7a5a1a" stroke-width=".5"/>';
+  if(o.obor) h+='<rect x="5.5" y="-25" width="1.6" height="12" fill="#3a2410"/><g class="sn-api"><path d="M6.3 -25 q-3.6 -4 0 -9 q3.6 5 0 9z" fill="#ff9a2e"/><path d="M6.3 -25 q-1.6 -2.4 0 -5 q1.6 2.6 0 5z" fill="#ffe08a"/></g><circle cx="6.3" cy="-28" r="16" fill="#ff8a1e" opacity=".12"/>';
+  h+='<g class="'+(o.kepala||'')+'"><circle cx="0" cy="-26" r="4.6" fill="'+w+'"/>';
+  if(o.mata) h+='<ellipse cx="-1.8" cy="-26.6" rx="1.1" ry=".8" fill="#fff"/><ellipse cx="1.8" cy="-26.6" rx="1.1" ry=".8" fill="#fff"/>'+(o.senyum?'<path d="M-2.6 -23.2 q2.6 2.6 5.2 0" stroke="#fff" stroke-width=".6" fill="none"/>':'');
+  h+='</g></g></g>'; return h;
+}
+function snJalanKan(x,y,s,o,jarak,dur,dl){
+  return '<g class="sn-jalan" style="--jarak:'+jarak+'px;--dur:'+dur+'s;--dl:'+(dl||0)+'s">'+snOrang(x,y,s,Object.assign({bob:1},o))+'</g>';
+}
+function snPohon(x,y,s){
+  return '<g transform="translate('+x+' '+y+') scale('+s+')" fill="#050c09" stroke="#050c09"><path d="M0 0 Q3 -22 1 -44" stroke-width="2.2" fill="none"/><path d="M1 -44 q-14 -4 -24 6 q12 -3 24 -6zM1 -44 q14 -4 24 6 q-12 -3 -24 -6zM1 -44 q-9 -11 -19 -9 q10 1 19 9zM1 -44 q9 -11 19 -9 q-10 1 -19 9z" stroke="none"/></g>';
+}
+function snRumah(x,y,s,id){
+  return '<g transform="translate('+x+' '+y+') scale('+s+')"><polygon points="-4,-26 24,-44 52,-26" fill="#16271f"/><rect x="0" y="-26" width="48" height="26" fill="#0d1814"/><rect class="'+(id||'')+'" x="6" y="-19" width="14" height="10" fill="#d6b158" opacity=".7" style="--op:.7"/><rect x="30" y="-18" width="10" height="18" fill="#050a08"/></g>';
+}
+function snToko(k){
+  const neon=(k==="bad_hantu"||k==="bad_bangkrut"||k==="bad_doppelganger")?'sn-mati':(k==="happy_normal"?'sn-mati':'');
+  return '<g>'+
+    '<rect x="140" y="104" width="120" height="58" fill="#10271f" stroke="#020504" stroke-width="2"/>'+
+    '<rect x="132" y="94" width="136" height="12" fill="url(#sn-kanopi)"/>'+
+    '<rect x="166" y="76" width="68" height="15" fill="#2a0c08" stroke="#020504" stroke-width="1.5"/>'+
+    '<text x="200" y="88" text-anchor="middle" font-family="Staatliches,Impact,sans-serif" font-size="13" letter-spacing="1.6" fill="#7a2a22">KOPDES</text>'+
+    '<text class="'+neon+' sn-neon" x="200" y="88" text-anchor="middle" font-family="Staatliches,Impact,sans-serif" font-size="13" letter-spacing="1.6" fill="#ff7a68" style="--op:1;--dl:'+(k==="happy_normal"?3:2.5)+'s;filter:drop-shadow(0 0 3px #ff4a38)'+(neon?'':';opacity:1')+'">KOPDES</text>'+
+    '<rect x="150" y="113" width="52" height="32" fill="#d6b158" opacity=".16"/>'+
+    '<rect class="sn-lampu'+((k==="bad_hantu"||k==="bad_bangkrut")?' sn-mati':'')+'" x="150" y="113" width="52" height="32" fill="#e9c778" style="--op:.85;--dl:'+(k==="bad_bangkrut"?1:1.2)+'s;'+((k==="bad_hantu"||k==="bad_bangkrut")?'':'opacity:.85;')+'"/>'+
+    '<path d="M176 113v32M150 129h52" stroke="#08130f" stroke-width="2"/>'+
+    '<rect x="216" y="119" width="30" height="43" fill="#060c0a" stroke="#020504" stroke-width="1.5"/>'+
+    '</g>';
+}
+function sinSVG(k){
+  const bad=k.indexOf("bad_")===0, dawn=(k==="happy_true"||k==="happy_normal");
+  const r=(a,b)=>a+Math.random()*(b-a);
+  let st=''; for(let i=0;i<26;i++) st+='<circle cx="'+r(4,396).toFixed(0)+'" cy="'+r(3,86).toFixed(0)+'" r="'+r(.5,1.2).toFixed(1)+'" fill="#e6f3ee" opacity="'+r(.25,.8).toFixed(2)+'"/>';
+  const langit=(k==="bad_doppelganger")?['#150404','#3a0d0d']:['#040a09','#0b1b16'];
+  let s='<svg viewBox="0 0 400 200" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs>'+
+    '<linearGradient id="sn-mlm" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="'+langit[0]+'"/><stop offset="1" stop-color="'+langit[1]+'"/></linearGradient>'+
+    '<linearGradient id="sn-fjr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#27506a"/><stop offset=".55" stop-color="#e2955a"/><stop offset="1" stop-color="#f7dc92"/></linearGradient>'+
+    '<linearGradient id="sn-tnh" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0e1c17"/><stop offset="1" stop-color="#070f0c"/></linearGradient>'+
+    '<pattern id="sn-kanopi" width="26" height="12" patternUnits="userSpaceOnUse"><rect width="13" height="12" fill="#7f2a24"/><rect x="13" width="13" height="12" fill="#cbbf9c"/></pattern>'+
+    '<radialGradient id="sn-lamp" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffd27a" stop-opacity=".5"/><stop offset="1" stop-color="#ffd27a" stop-opacity="0"/></radialGradient></defs>'+
+    '<rect width="400" height="200" fill="url(#sn-mlm)"/>'+(dawn?'<rect class="sn-fajar" width="400" height="170" fill="url(#sn-fjr)"/>':st);
+  /* bulan / matahari */
+  if(dawn) s+='<g class="sn-surya"><circle cx="318" cy="62" r="19" fill="#fff0b8"/><circle cx="318" cy="62" r="34" fill="#ffd27a" opacity=".25"/></g>';
+  else s+='<circle cx="330" cy="34" r="13" fill="'+(k==="bad_doppelganger"?'#a52a22':'#d9d8bc')+'"/><circle cx="330" cy="34" r="24" fill="'+(k==="bad_doppelganger"?'#a52a22':'#d9d8bc')+'" opacity=".14"/>';
+  /* bukit, pohon, rumah */
+  s+='<path d="M0 150 L0 126 Q60 104 130 124 T270 118 T400 122 L400 150Z" fill="#0a1713"/>';
+  s+=snPohon(36,156,1.1)+snPohon(58,158,.8)+snPohon(366,156,1.15);
+  s+=snRumah(284,154,.85,(bad&&k!=="bad_dipecat")?'sn-mati':'')+snRumah(86,154,.75,(bad&&k!=="bad_dipecat")?'sn-mati':'');
+  /* tanah dan jalan */
+  s+='<rect y="150" width="400" height="50" fill="url(#sn-tnh)"/><rect y="170" width="400" height="30" fill="#141f1b"/><rect y="170" width="400" height="1.4" fill="#2f4d43"/>'+
+     '<path d="M0 186h24M54 186h24M108 186h24M162 186h24M216 186h24M270 186h24M324 186h24M378 186h24" stroke="#4a665b" stroke-width="1.2" opacity=".5"/>';
+  s+=snToko(k);
+  if(dawn) s+='<ellipse cx="200" cy="164" rx="130" ry="8" fill="#ffd27a" opacity=".12"/>';
+  /* ---------- adegan khusus tiap ending ---------- */
+  if(k==="happy_true"){
+    for(let i=0;i<5;i++) s+='<g class="sn-muncul" style="--dl:'+(2.5+i*.6).toFixed(1)+'s">'+snOrang(268+i*22,184,1.05,{bob:1,warna:i%2?"#0a0d0c":"#12100c"})+'</g>';
+    s+='<g class="sn-muncul" style="--dl:5.2s">'+snOrang(250,185,1.25,{bob:1,piagam:1,warna:"#1a120a"})+'</g>';
+    s+=snJalanKan(40,184,1.15,{warna:"#050807"},150,6,.5);
+    for(let i=0;i<16;i++) s+='<rect class="sn-konfeti" x="'+r(10,390).toFixed(0)+'" y="0" width="3" height="5" fill="'+["#eab93c","#ff7a68","#f3e7c0","#2f9468"][i%4]+'" style="--d:'+r(3,5.5).toFixed(1)+'s;--dl:'+r(4.6,8).toFixed(1)+'s"/>';
+  }else if(k==="happy_normal"){
+    s+=snRumah(320,168,1.1,'sn-hidup');
+    s+=snJalanKan(120,184,1.15,{warna:"#050807",tas:1},200,9,.5);
+    for(let i=0;i<3;i++) s+='<g class="sn-burung" style="--dl:'+(2+i*1.4)+'s"><path d="M'+(20+i*14)+' '+(46+i*8)+' q4 -5 8 0 q4 -5 8 0" stroke="#1b2a26" stroke-width="1.4" fill="none"/></g>';
+  }else if(k==="bad_hantu"){
+    s+='<g class="sn-gelap"><rect width="400" height="200" fill="#000" opacity=".55"/></g>';
+    s+='<g class="sn-hilang" style="--dl:4.2s">'+snJalanKan(70,184,1.15,{warna:"#050807"},40,3,.4)+'</g>';
+    s+='<g class="sn-turun" style="--dl:3s"><path d="M120 -10 Q150 40 168 96 Q200 70 232 96 Q250 40 282 -10Z" fill="#000" opacity=".82"/><path d="M168 96 q8 18 3 34 M200 80 q0 26 -4 46 M232 96 q-8 18 -3 34" stroke="#000" stroke-width="5" fill="none" stroke-linecap="round" opacity=".8"/></g>';
+    s+='<g class="sn-muncul" style="--dl:6s"><rect x="174" y="116" width="26" height="29" fill="#000" opacity=".9"/><circle cx="187" cy="124" r="6" fill="#050807"/><ellipse cx="184.6" cy="123.4" rx="1.6" ry="1.1" fill="#fff"/><ellipse cx="189.6" cy="123.4" rx="1.6" ry="1.1" fill="#fff"/></g>';
+  }else if(k==="bad_dipecat"){
+    s+='<ellipse cx="90" cy="150" rx="150" ry="70" fill="#ff8a1e" opacity=".07"/>';
+    for(let i=0;i<6;i++) s+=snJalanKan(-60+i*16,184+(i%2)*3,1.1,{warna:"#050706",obor:i%2===0||i===5,bob:1},190,8,0);
+    s+='<g><rect x="326" y="104" width="4" height="70" fill="#050c09"/><rect x="376" y="104" width="4" height="70" fill="#050c09"/><rect x="322" y="100" width="62" height="9" fill="#050c09"/><text x="353" y="107" text-anchor="middle" font-family="Special Elite,monospace" font-size="5.4" fill="#9bb7ab">DUSUN KARANGWUNI</text></g>';
+    s+=snJalanKan(240,186,1.2,{warna:"#050807",tas:1},190,8,.8);
+  }else if(k==="bad_bangkrut"){
+    s+='<g class="sn-gelap"><rect width="400" height="200" fill="#000" opacity=".5"/></g>';
+    s+='<g class="sn-roll" style="--dl:1.6s"><rect x="140" y="104" width="120" height="58" fill="#2b3834" stroke="#020504" stroke-width="2"/><path d="M140 112h120M140 120h120M140 128h120M140 136h120M140 144h120M140 152h120" stroke="#17211e" stroke-width="1.4"/><rect x="194" y="150" width="12" height="9" fill="#050807"/><path d="M197 150v-4q3-4 6 0v4" stroke="#8a8f88" stroke-width="1.4" fill="none"/></g>';
+    s+='<g class="sn-muncul" style="--dl:4s"><rect x="177" y="116" width="46" height="18" fill="#f3e7c0" stroke="#7a5a1a" stroke-width=".8" transform="rotate(-3 200 125)"/><text x="200" y="129" text-anchor="middle" font-family="Staatliches,Impact,sans-serif" font-size="11" fill="#7f1d14" transform="rotate(-3 200 125)">TUTUP</text></g>';
+    s+=snJalanKan(120,184,1.15,{warna:"#050807",tas:1},-95,9,3);
+    for(let i=0;i<3;i++) s+='<g class="sn-hilang" style="--dl:'+(5+i*1.2)+'s">'+snOrang(280+i*30,184,1,{warna:"#0a0d0c"})+'</g>';
+    s+='<g class="sn-kabut"><ellipse cx="200" cy="176" rx="190" ry="12" fill="#9bb7ab" opacity=".1"/></g>';
+  }else if(k==="bad_doppelganger"){
+    for(let i=0;i<6;i++) s+='<g class="sn-muncul" style="--dl:'+(1+i*.5).toFixed(1)+'s">'+snOrang(190+i*34,184,1.08,{warna:"#0b0505",mata:1,senyum:1,kepala:"sn-tilt"})+'</g>';
+    s+=snJalanKan(50,184,1.15,{warna:"#050807"},90,9,.4);
+    s+='<g class="sn-gelap"><rect width="400" height="200" fill="#3a0505" opacity=".18"/></g>';
+  }
+  s+='<rect width="400" height="200" fill="none" stroke="rgba(0,0,0,.0)"/><defs><radialGradient id="sn-vig" cx=".5" cy=".55" r=".75"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".65"/></radialGradient></defs><rect width="400" height="200" fill="url(#sn-vig)"/></svg>';
+  return s;
+}
+function sinPeta(T){
+  const R=T.rute; let d="M"+R[0][0]+" "+R[0][1]; for(let i=1;i<R.length;i++) d+=" L"+R[i][0]+" "+R[i][1];
+  let tot=0; const cum=[0]; for(let i=1;i<R.length;i++){ tot+=Math.hypot(R[i][0]-R[i-1][0],R[i][1]-R[i-1][1]); cum.push(tot); }
+  let grid=''; for(let x=20;x<400;x+=20) for(let y=15;y<120;y+=20) grid+='<circle cx="'+x+'" cy="'+y+'" r=".7" fill="#1d332b"/>';
+  let n=''; R.forEach((p,i)=>{
+    const akhir=i===R.length-1, dl=(.2+3.6*cum[i]/tot).toFixed(2), ke=p[1]>70?p[1]+14:p[1]-8, anchor=i===0?"start":(akhir?"end":"middle"), lx=i===0?p[0]-6:(akhir?p[0]+6:p[0]);
+    n+='<g class="sp-node'+(akhir?' sp-akhir':'')+'" style="--dl:'+dl+'s">'+
+      (akhir?'<circle class="sp-denyut" cx="'+p[0]+'" cy="'+p[1]+'" r="7"/><path d="M'+p[0]+' '+(p[1]+2)+' l-6 -12 a6.5 6.5 0 1 1 12 0z" fill="'+T.warna+'" stroke="#000" stroke-width="1"/><circle cx="'+p[0]+'" cy="'+(p[1]-9)+'" r="2.3" fill="#07110e"/>':
+             '<circle cx="'+p[0]+'" cy="'+p[1]+'" r="4" fill="#07110e" stroke="'+T.warna+'" stroke-width="1.8"/>')+
+      '<text class="sp-label" x="'+lx+'" y="'+(akhir?p[1]+21:ke)+'" text-anchor="'+anchor+'">'+p[2]+'</text></g>';
+  });
+  return '<svg viewBox="0 0 400 120" role="img" aria-label="Rute menuju '+T.lokasi+'" style="--wt:'+T.warna+'">'+grid+
+    '<path class="sp-bayang" d="'+d+'"/><path id="sp-rute" class="sp-garis" pathLength="1" d="'+d+'"/>'+n+
+    (pengaturan.efek==="1"?'<circle r="3.6" fill="#fff" opacity=".95"><animateMotion dur="3.6s" begin=".2s" fill="freeze" calcMode="linear" keyPoints="0;1" keyTimes="0;1"><mpath href="#sp-rute"/></animateMotion><set attributeName="opacity" to="0" begin="3.8s" fill="freeze"/></circle>':'')+'</svg>';
+}
+let sinId=0;
 function tampilkanEnding(kunci){
+  const end=ENDING_STORY[kunci], T=TUJUAN_ENDING[kunci]; if(!T) return tampilkanHasilEnding(kunci);
+  const kalah=end.badge==="ending-bad", id=++sinId, para=end.teks.split("<br><br>");
+  const S0=kalah?malamKalahSin():1; simpanMalam(kalah?S0:1);
+  bukaLayar('<div class="sin '+(pengaturan.efek==="1"?'':'sin-diam')+'">'+
+    '<h2>'+end.judul+'</h2><span class="ending-badge '+end.badge+'">'+(kalah?"BAD ENDING":"HAPPY ENDING")+'</span>'+
+    '<div class="sin-adegan">'+sinSVG(kunci)+'</div>'+
+    '<div class="sin-narasi" id="sin-narasi" aria-live="polite"></div>'+
+    '<div class="sin-titik" id="sin-titik">'+para.map(()=>'<i></i>').join("")+'</div>'+
+    '<div class="sin-peta" id="sin-peta" hidden><p class="sin-peta-judul">Tujuan akhir</p>'+sinPeta(T)+
+      '<div class="sin-tujuan" style="--wt:'+T.warna+'"><small>'+T.jam+'</small><b>'+T.lokasi+'</b><p>'+T.ket+'</p></div></div>'+
+    '<div class="sin-aksi" id="sin-aksi"><button class="tutup" id="sin-lewati">Lewati</button><button class="mulai" id="sin-lanjut">Lanjut ▸</button></div></div>');
+  bunyi(kalah?"buruk":"baik");
+  let i=-1, timer=0, fase="narasi";
+  const hidup=()=>id===sinId&&el("sin-narasi");
+  const peta=()=>{
+    if(!hidup()) return; fase="peta"; clearTimeout(timer);
+    const n=el("sin-narasi"); if(n.__ketik){cancelAnimationFrame(n.__ketik);n.__ketik=0;}
+    n.hidden=true; el("sin-titik").hidden=true; el("sin-peta").hidden=false;
+    const a=el("sin-aksi"); a.innerHTML='<button class="mulai tunggal" id="sin-hasil">Lihat Hasil Akhir</button>';
+    el("sin-hasil").onclick=()=>tampilkanHasilEnding(kunci);
+    bunyi("bel");
+  };
+  const maju=()=>{
+    if(!hidup()) return; clearTimeout(timer); i++;
+    if(i>=para.length){ peta(); return; }
+    const n=el("sin-narasi"), tt=el("sin-titik").children;
+    for(let j=0;j<tt.length;j++) tt[j].classList.toggle("on",j<=i);
+    ketik(n,para[i],18,()=>{ if(hidup()&&fase==="narasi") timer=setTimeout(maju,Math.max(1400,para[i].length*18)); });
+  };
+  el("sin-lanjut").onclick=maju;
+  el("sin-lewati").onclick=peta;
+  maju();
+}
+function malamKalahSin(){ return G?G.malam:muatMalam(); }
+
+function tampilkanHasilEnding(kunci){
   const end = ENDING_STORY[kunci];
   const kalah = end.badge==="ending-bad";
   const S=gabungStat(), PK=muatProgres();
@@ -4096,7 +4341,7 @@ function tampilkanEnding(kunci){
       : '<button class="mulai" id="tbl-ulang">Mainkan Lagi Dari Malam 1</button>'));
   if(kalah){
     el("tbl-ulang").onclick=()=>{ tutupLayar(); mulaiMalam(malamKalah); };
-    if(el("tbl-toko-k")) el("tbl-toko-k").onclick=()=>bukaToko(malamKalah,()=>tampilkanEnding(kunci));
+    if(el("tbl-toko-k")) el("tbl-toko-k").onclick=()=>bukaToko(malamKalah,()=>tampilkanHasilEnding(kunci));
     el("tbl-awal").onclick=()=>{ simpanMalam(1); tutupLayar(); tampilkanProlog(); };
   }else{
     el("tbl-ulang").onclick=()=>{ tutupLayar(); tampilkanProlog(); };
