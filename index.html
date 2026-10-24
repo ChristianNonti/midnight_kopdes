@@ -817,8 +817,8 @@ button:focus-visible{outline:2px solid #fff;outline-offset:2px}
 .layani:hover:not(:disabled){background:linear-gradient(180deg,#2a966b,#17604a)}
 .tolak{background:var(--merah);color:#fff;border-color:var(--merah-line)}
 .tolak:hover:not(:disabled){background:linear-gradient(180deg,#b52424,#701010)}
-.lanjut{background:linear-gradient(180deg,#dcd5d5,#9d9494);color:#1a1212;border-color:rgba(255,255,255,.3)}
-.lanjut:hover:not(:disabled){background:linear-gradient(180deg,#eee8e8,#b0a7a7)}
+.lanjut{background:linear-gradient(180deg,#3fae7c,#1f6a4c);color:#f2fff7;border-color:rgba(160,255,205,.35);text-shadow:0 1px 0 rgba(0,0,0,.35)}
+.lanjut:hover:not(:disabled){background:linear-gradient(180deg,#52c78f,#278058)}
 .telepon{background:linear-gradient(180deg,#2f4b66,#1b2e43);color:#dbe8ff;border-color:rgba(120,170,230,.3)}
 .telepon:hover:not(:disabled){background:linear-gradient(180deg,#3d5f80,#233b55)}
 .layar{background:radial-gradient(ellipse 70% 45% at 62% 6%,rgba(45,120,140,.28),transparent 70%),rgba(3,8,10,.90);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
@@ -911,8 +911,8 @@ tr.tandai td{background:rgba(255,255,255,.08)}
 .putusan .tolak.kep{background:linear-gradient(180deg,#bb2d27,#5a0d0b);border:1px solid rgba(255,120,100,.55);color:#fff2ee;--glow:220,50,40}
 @keyframes kepNafas{0%,100%{box-shadow:0 0 0 rgba(var(--glow,0,0,0),0),0 3px 10px rgba(0,0,0,.45)}50%{box-shadow:0 0 20px rgba(var(--glow,0,0,0),.4),0 3px 10px rgba(0,0,0,.45)}}
 /* tombol lanjut */
-.putusan .lanjut{display:flex;align-items:center;justify-content:center;gap:10px;min-height:56px;font-size:19px;letter-spacing:.06em;border-radius:14px;animation:kepNafas 2.6s ease-in-out infinite;--glow:255,255,255}
-.putusan .lanjut kbd{margin:0;color:#3a2c08;background:rgba(255,255,255,.55);border-color:rgba(0,0,0,.25)}
+.putusan .lanjut{display:flex;align-items:center;justify-content:center;gap:10px;min-height:56px;font-size:19px;letter-spacing:.06em;border-radius:14px;animation:kepNafas 2.6s ease-in-out infinite;--glow:80,220,150}
+.putusan .lanjut kbd{margin:0;color:#0d2a1d;background:rgba(235,255,244,.8);border-color:rgba(0,0,0,.25)}
 .putusan .lanjut::after{content:"→";font-size:1.15em;transition:transform .18s}
 .putusan .lanjut:hover:not(:disabled)::after{transform:translateX(5px)}
 @media(prefers-reduced-motion:reduce){.putusan .kep,.putusan .lanjut{animation:none}.putusan .kep::after{display:none}}
@@ -988,6 +988,33 @@ tr.tandai td{background:rgba(255,255,255,.08)}
   .lj-kunang,.lj-mata{opacity:.5!important}
   .lj-sosok{opacity:.9!important}
 }
+
+/* ===================== PERFORMA (kestabilan FPS) =====================
+   1) Dua lapisan layar penuh tidak lagi memakai mix-blend-mode. Scanline & vignet berwarna hitam murni, jadi
+      'multiply' dan alpha biasa menghasilkan piksel yang sama persis; tapi blend mode memaksa GPU mencampur ulang
+      seluruh layar setiap ada yang bergerak di bawahnya. Lapisan juga dipisah ke layer sendiri (statis, murah).
+   2) Adegan judul: kabut/awan bergeser pelan (3–6 px/detik) di dalam grup ber-filter blur. Blur dihitung ulang
+      tiap frame; dengan steps() geraknya diperbarui ~6x/detik (selisih <1 px per langkah, tak terlihat).
+   3) Saat modal/menu menutupi game atau tab disembunyikan, animasi di belakangnya dijeda (blur latar modal juga
+      berhenti dihitung ulang).
+   4) Kualitas Sedang/Rendah makin hemat: tanpa blur latar modal, tanpa filter SVG di adegan judul, tanpa denyut glow. */
+body::after{mix-blend-mode:normal;transform:translateZ(0)}
+body::before{mix-blend-mode:normal;opacity:.035;transform:translateZ(0)}
+.lj-awan,.lj-awan2{animation-timing-function:steps(420)}
+.lj-kabut{animation-timing-function:steps(240)}
+body.ada-layar .etalase,body.ada-layar .etalase *,body.ada-layar .etalase *::before,body.ada-layar .etalase *::after,
+body.ada-layar .papan *,body.ada-layar .status *,body.ada-layar .putusan *,body.ada-layar .aksi *{animation-play-state:paused!important}
+body.tab-sembunyi *,body.tab-sembunyi *::before,body.tab-sembunyi *::after{animation-play-state:paused!important}
+body.q-sedang .layar,body.q-rendah .layar,body.q-sedang .menu-overlay,body.q-rendah .menu-overlay{backdrop-filter:none;-webkit-backdrop-filter:none}
+body.q-sedang .layar{background:radial-gradient(ellipse 70% 45% at 62% 6%,rgba(45,120,140,.28),transparent 70%),rgba(3,8,10,.94)}
+body.q-sedang .menu-overlay{background:radial-gradient(ellipse 70% 45% at 62% 6%,rgba(45,120,140,.30),transparent 70%),rgba(3,8,10,.93)}
+body.q-sedang [filter="url(#ljBlur)"],body.q-rendah [filter="url(#ljBlur)"],body.q-rendah [filter="url(#ljGlow)"]{filter:none}
+body.q-sedang .putusan .kep,body.q-sedang .putusan .lanjut,body.q-rendah .putusan .kep,body.q-rendah .putusan .lanjut{animation:none}
+body.q-rendah .lj-kunang,body.q-rendah .lj-kabut{display:none}
+#toast-gfx{position:fixed;left:50%;bottom:calc(14px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:9600;max-width:min(92vw,460px);
+  background:rgba(8,20,16,.94);color:#cfe8dc;border:1px solid #2f6b50;padding:9px 14px;font-size:12.5px;line-height:1.4;text-align:center;
+  opacity:0;pointer-events:none;transition:opacity .35s}
+#toast-gfx.tampil{opacity:1}
 </style>
 </head>
 <body>
@@ -1057,6 +1084,7 @@ tr.tandai td{background:rgba(255,255,255,.08)}
           <div><span class="menu-label">Batas FPS</span><span class="menu-desc">Membatasi kehalusan animasi. 30 FPS lebih hemat baterai.</span></div>
           <select class="menu-select" id="menu-fps" aria-label="Batas FPS">
             <option value="0">Otomatis (layar)</option>
+            <option value="120">120 FPS (butuh layar 120 Hz)</option>
             <option value="60">60 FPS</option>
             <option value="30">30 FPS</option>
             <option value="15">15 FPS (sangat hemat)</option>
@@ -2139,6 +2167,193 @@ const BUKAN=[
      cermin:"Di cermin, sosoknya berjalan tertunduk dengan kepala di bawah, kaki di atas, dikelilingi kunang-kunang api kecil."}}
 ];
 
+/* ===================== VARIAN PETUNJUK MAKHLUK =====================
+   Tiap kanal petunjuk (x) makhluk punya 1 varian tambahan di sini; saat antrean dibuat, satu dari dua
+   teks dipilih acak. Isi tanda janggalnya sama (supaya tetap adil dan cocok dengan Buku Anggota), hanya
+   cara menggambarkannya yang beda, jadi pemain tidak bisa menghafal kalimat persisnya.
+   Sengaja TIDAK divariasikan: peniru_mardi, peniru, peniru_tarjo. Tanda mereka bergantung pada perbandingan
+   dengan warga aslinya yang sudah tercatat malam itu, jadi teksnya harus tetap. */
+const VARIAN_X={
+ tuyul:{
+  amati:"Kepalanya botak licin tanpa bekas cukur, dan dia tidak berkeringat meski terengah seperti habis lari. Tatapan matanya tua dan letih.",
+  ktp:"Bagas Nugroho, 8 th, anak Pak Kirno. Foto KK-nya anak berambut ikal lebat, sedangkan yang berdiri di depanmu botak licin.",
+  belanja:"Dia merogoh kantong dan menumpahkan segenggam koin dingin yang lengket tanah kuburan ke meja kasir.",
+  tanya:"Pak RT? Yang malam Jumat suka hitung duit di kamar itu, Om? Aku sering ngintip dari lubang dinding.",
+  senter:"Tidak ada bayangan anak kecil di lantai. Yang tampak cuma bayangan kardus permen yang bergeser sendiri.",
+  garam:"Telapak kakinya berasap tipis. Dia mengerang dengan suara berat orang tua, lalu meringkuk di kolong rak.",
+  cermin:"Di cermin tidak ada anak kecil, hanya sekarung goni yang bergoyang-goyang tepat di tempat dia berdiri."},
+ kuntilanak:{
+  amati:"Gamis putihnya kering dan bersih padahal gerimis belum reda. Dadanya tidak naik turun, tapi rambutnya melambai pelan tanpa angin.",
+  ktp:"Wajah di KTP itu perempuan paruh baya yang kamu kenal sebagai Bu Tin waktu muda, dengan nama dan tanggal lahir ditulis tinta pena.",
+  belanja:"Setangkai melati dan segenggam tanah merah basah. Uang yang dia taruh berbau kamboja layu.",
+  tanya:"Pak Mardi? Tahlilannya sudah lewat setahun, Mas. Saya hadir waktu itu, di barisan paling belakang.",
+  senter:"Cahaya senter lurus menembus dadanya dan menerangi kotak beras di rak belakangnya.",
+  garam:"Butir garam berhenti melayang di depan wajahnya, bergetar sebentar, lalu meluncur balik ke arahmu.",
+  cermin:"Di cermin dia berdiri membelakangimu. Gamisnya berlubang menganga di punggung, dan di baliknya tidak ada apa-apa."},
+ pocong:{
+  amati:"Dia tidak berkedip dan tidak menoleh. Begitu kamu melirik sebentar, posisinya sudah bergeser setengah langkah tanpa bunyi sandal.",
+  ktp:"Nama dan alamat cocok dengan buku, tapi di sudut kartu ada cap kecil pudar: wafat tujuh hari yang lalu.",
+  belanja:"Kapur barus berbungkus-bungkus ditumpuk rapi di meja. Tangannya berbau tanah kuburan dan kelopak kamboja.",
+  tanya:"Pak Mardi? Tadi berdiri di belakang Mas, dekat kulkas minuman. Dari tadi menatap Mas terus.",
+  senter:"Sorotan senter jatuh tepat di bawah ujung jaketnya. Tidak ada kaki, tidak ada bayangan, cuma kain yang melayang.",
+  garam:"Garam yang mengenai kain putihnya mendesis, dan tercium bau kain terbakar.",
+  cermin:"Di cermin, jaket putih itu berubah jadi kain kafan terikat di ubun-ubun, wajah di dalamnya tertutup rapat."},
+ genderuwo:{
+  amati:"Bulu hitam kasar tumbuh dari punggung tangan sampai leher. Matanya memantulkan lampu seperti mata hewan malam.",
+  ktp:"KTP-nya basah dan berbau tanah lembap. Kolom fotonya cuma noda hitam tanpa bentuk wajah.",
+  belanja:"Sepuluh bungkus rokok dibayar uang kertas bergambar lama yang sudah ditarik dari peredaran puluhan tahun.",
+  tanya:"Pak Mardi? Terakhir saya lihat di kebun bambu. Dia ikut masuk, dan belum keluar lagi sampai sekarang.",
+  senter:"Bayangannya menjulang sampai langit-langit, dan di kepalanya ada dua tanduk melengkung.",
+  garam:"Dia menggeram sampai botol di rak bergetar, lalu mundur ke sudut paling gelap toko.",
+  cermin:"Pantulannya sosok bungkuk setinggi pintu dengan mata merah menyala yang menatapmu tanpa berkedip."},
+ wewe:{
+  amati:"Kebayanya menggembung tidak wajar di bagian dada, seperti menyembunyikan sesuatu yang bergerak-gerak.",
+  ktp:"Tumirah, 71 th. Foto di KTP-nya perempuan muda, dan huruf namanya bergeser sendiri tiap kali kamu berkedip.",
+  belanja:"Dia tidak membeli apa pun. Berkali-kali dia bertanya apakah masih ada anak yang tertinggal di surau.",
+  tanya:"Pak Mardi kecil dulu sering saya sembunyikan kalau pulang mengaji kemalaman. Tiga hari baru saya pulangkan.",
+  senter:"Bayangannya sosok jangkung dengan lengan menjuntai sampai lantai, bukan nenek yang bungkuk.",
+  garam:"Dia melengking seperti tangis bayi, lalu merangkak mundur ke gelap dengan punggung terbungkuk.",
+  cermin:"Di pantulan ada anak kecil bergelayut di punggungnya, matanya terbuka lebar menatap lurus kepadamu."},
+ sundel:{
+  amati:"Bau melati bercampur bangkai menyengat. Dari balik selendang batik menetes cairan hitam yang tidak pernah sampai ke lantai.",
+  ktp:"Tin Marlina, 58 th. Alamat tertera RT 08, padahal Karangwuni cuma punya RT 01 sampai 05.",
+  belanja:"Kunyit basah dan pembalut berkardus-kardus. Jarinya dingin kaku waktu menyerahkan uang.",
+  tanya:"Pak Mardi? Hihihi... dia pernah lewat jalan sepi itu, Mas, dan tidak pernah pulang.",
+  senter:"Sorotan senter lewat begitu saja di punggungnya, memperlihatkan lubang menganga berulat di balik baju.",
+  garam:"Garam meletup seperti api kecil di roknya. Dia menjerit melengking dan melayang mundur ke arah pintu.",
+  cermin:"Cermin memantulkan wanita bergaun dengan punggung berlubang besar basah darah, matanya melotot menatapmu."},
+ kuyang:{
+  amati:"Ada garis merah tipis melingkari lehernya seperti bekas jahitan, dan tiap dia menoleh garis itu merekah.",
+  ktp:"Nur Hayati, 29 th. Kolom foto di KTP cuma menampilkan leher tanpa kepala.",
+  belanja:"Minyak kelapa dan sebungkus hati ayam mentah. Napasnya berbau amis seperti jeroan segar.",
+  tanya:"Anak-anak SD itu manis sekali malam ini. Organ mereka pasti segar, Mas... eh, maksud saya, semangat belajarnya.",
+  senter:"Saat disorot, kepalanya tampak mengambang beberapa senti di atas pundak, tidak benar-benar tersambung.",
+  garam:"Garam membuat lehernya berasap kehijauan, dan kepalanya melayang naik ketakutan.",
+  cermin:"Di cermin hanya ada kepala yang melayang, dengan usus dan organ menggantung berdarah di bawahnya."},
+ lampor:{
+  amati:"Dari luar terdengar denting besi dan derap banyak kaki, padahal jalan kosong. Matanya merah menyala.",
+  ktp:"KTP-nya lempeng besi berkarat yang penuh bercak darah kering.",
+  belanja:"Dia minta kain kafan dan kawat besi sebanyak-banyaknya. Jarinya kaku seperti ranting kering.",
+  tanya:"Sebelum pagi, seluruh dusun ini akan ikut keranda kami. Mas juga, tentu.",
+  senter:"Bayangan di lantai bukan manusia, melainkan keranda hitam yang melayang di atas banyak kaki.",
+  garam:"Garam yang kena bajunya memercikkan api, dan kainnya hangus jadi abu.",
+  cermin:"Cermin retak begitu memantulkannya, dan tampak keranda besi terbang melintas di lorong toko."},
+ mbahpalsu:{
+  amati:"Dia bicara lirih dan jernih, menjawab bisikanmu tanpa pernah minta diulang. Padahal Buku anggota mencatat Kakek Minto tuli di telinga kiri dan selalu bicara keras.",
+  ktp:"Minto, 82 th, RT 01. Tanggal terbit KTP-nya tahun 1893, dan tinta tanda tangannya masih lengket di jarimu.",
+  belanja:"Dia memesan kopi, tapi mencium gulanya dulu dengan jijik. Bayarannya segenggam tanah merah yang dia taruh di meja.",
+  tanya:"Pak Mardi? Yang menebang pohon besar itu? Umurnya sependek bubuk kopi di cangkir ini, Nak.",
+  senter:"Ada dua bayangan di lantai: satu bungkuk bertongkat, satu lagi tegak, muda, tanpa tongkat, menatap lurus kepadamu.",
+  garam:"Dia tersenyum tenang. Garam yang menyentuh kulitnya jatuh ke lantai dan menggumpal jadi tanah basah.",
+  cermin:"Pantulannya bukan kakek-kakek, melainkan pemuda berkain kafan yang bertumpu pada tongkat dengan dua tangan tulang."},
+ kucing:{
+  amati:"Dia menggendong kucing hitam kurus dan mengelusnya terus tanpa bersin sekali pun. Padahal Buku anggota mencatat Ningsih alergi bulu kucing.",
+  ktp:"Ningsih Rahayu, 29 th, RT 04. Foto KTP-nya cantik, tapi pupil matanya hanya garis vertikal tipis.",
+  belanja:"Ikan asin sepuluh bungkus. Satu bungkus langsung dia lahap mentah-mentah di depanmu.",
+  tanya:"Pak Mardi? Yang tiap Jumat taruh piring ikan di depan pintu itu? Semalam piringnya kosong, Mas.",
+  senter:"Matanya memantulkan cahaya hijau seperti kaca mobil, dan bayangannya punya ekor panjang.",
+  garam:"Tangan yang menepis garam mendadak berbulu. Dia mendesis, lalu menjilati telapak tangannya.",
+  cermin:"Di cermin yang berdiri di depanmu kucing hitam sebesar manusia, berkaki dua, dengan ekor melengkung."},
+ pramuka:{
+  amati:"Seragam Pramuka itu cokelat pudar seperti foto lama, dengan badge lengan model yang sudah tidak dipakai sejak 1990-an.",
+  ktp:"Kartu pelajar SMA Karangwuni atas nama Dhani Wibowo, 17 th, tapi tahun ajarannya 1994/1995.",
+  belanja:"Tiga botol air mineral dia minum sampai habis, tapi tenggorokannya tidak bergerak dan bajunya tetap kering.",
+  tanya:"Pak Mardi? Pembina kami Pak Kromo, Om. Katanya kami baru boleh pulang kalau regu sudah lengkap. Regu kami masih kurang.",
+  senter:"Ada tiga bayangan: satu miliknya, dua lainnya kecil berdiri di belakangnya sambil memegang tongkat Pramuka.",
+  garam:"Dia mundur dengan mata terbelalak. Jangan, Om, kami nggak nakal. Kami cuma lagi nyari jalan pulang.",
+  cermin:"Di cermin dia berdiri sendirian di kebun bambu, dan di belakangnya berbaris anak-anak berseragam sama yang tak ada satu pun bergerak."},
+ suster:{
+  amati:"Seragam putihnya bersih dan kering padahal hujan. Tidak terdengar bunyi langkah, dan dia berdiri terlalu rendah dari seharusnya.",
+  ktp:"Endang Purwati, 33 th, RT 01. Kartu pegawai puskesmas di dompetnya sudah kedaluwarsa sejak 1987.",
+  belanja:"Sepuluh gulung perban. Uang yang dia serahkan basah dan berbau formalin.",
+  tanya:"Pak Mardi? Yang dulu dirawat di kamar paling ujung itu? Belum keluar-keluar dari sana, Mas.",
+  senter:"Sorot senter memperlihatkan kakinya tidak menyentuh lantai. Dari lutut ke bawah cuma gelap.",
+  garam:"Garam di betisnya berdesis seperti air jatuh ke wajan panas. Dia cuma tersenyum tipis. Sudah lama perihnya, Mas.",
+  cermin:"Di cermin dia merangkak di lantai bertumpu dua siku, rambutnya menyapu keramik, matanya menengadah ke arahmu."},
+ jrangkong:{
+  amati:"Ada bunyi krek-krek pelan tiap dia bergerak, seperti ranting patah. Kukunya putih bersih tanpa setitik oli, padahal Buku anggota mencatat kuku Agus selalu hitam kena oli.",
+  ktp:"Agus Setiawan, 28 th, RT 04. Foto di KTP berdaging dan segar, tapi wajah di depanmu tinggal tulang berbalut kulit tipis.",
+  belanja:"Satu botol oli samping dia tenggak seperti minuman. Cairannya mengalir lewat tulang lehernya dan menetes ke lantai.",
+  tanya:"Pak Mardi? Dagingnya tebal sekali. Kalau musim paceklik nanti, dia yang pertama.",
+  senter:"Bayangan di lantai bukan siluet orang, tapi rangka: iga, tengkorak, dan sendi-sendi jari.",
+  garam:"Rahangnya membuka terlalu lebar dengan bunyi kletak. Dia tertawa tanpa suara.",
+  cermin:"Di cermin hanya ada rangka berwearpack, rahangnya naik turun seolah sedang bicara."},
+ noni:{
+  amati:"Kalau kamu menoleh sedikit, jaket almamater itu tampak seperti gaun putih berenda yang sangat tua di sudut matamu.",
+  ktp:"Sarah Adriani, 21 th. Tahun lahir yang tercetak jelas: 1921. Kartunya berbau lemari kayu.",
+  belanja:"Dia tidak membeli apa pun. Dia menyodorkan sepuluh keping uang gulden sambil tersenyum polos.",
+  tanya:"Pak Mardi? Saya cuma kenal Tuan Asisten Residen di loji ujung jalan, Mas.",
+  senter:"Ada dua bayangan di lantai. Satu ikut bergerak, satu lagi diam dan menatapmu.",
+  garam:"Dia berbisik dalam bahasa Belanda yang terbata-bata, lalu mundur menembus rak roti.",
+  cermin:"Di cermin, minimarket berganti lampu minyak dan lantai tegel kuno. Dia berdiri di tengahnya dengan gaun putih, matanya basah."},
+ kurirhelm:{
+  amati:"Helmnya tidak pernah dibuka, dan kaca gelapnya tidak memantulkan lampu minimarket. Kerah jaketnya menggantung kosong.",
+  ktp:"Wahyu Setiawan, 28 th. Kolom foto KTP hanya potret kerah jaket dari leher ke bawah.",
+  belanja:"Dia menaruh uang tanpa menoleh ke barang. Motor di luar menderu keras tapi tanpa lampu dan tanpa pelat.",
+  tanya:"Pak Mardi? Saya mencari alamat itu sampai pagi, lalu ada kabel melintang setinggi leher. Sesudahnya saya lupa, Mas.",
+  senter:"Kaca helmnya terbuka sendiri. Di dalamnya kosong, dan helm itu berdiri di atas leher yang tidak ada.",
+  garam:"Garam jatuh lewat rongga di bawah helm dan sampai ke lantai tanpa menyentuh apa pun.",
+  cermin:"Di cermin, helm itu ada di tangan kirinya, dan lehernya berakhir rata dengan kerah."},
+ penagih:{
+  amati:"Batiknya kering kerontang di tengah gerimis. Tas hitam di tangannya sesekali bergerak, seperti ada yang bernapas di dalamnya.",
+  ktp:"Bambang Kusnadi, 46 th. Kop. Sumber Rejeki tak terdaftar di kabupaten mana pun, dan di baliknya tertulis kecil: angsuran dibayar dengan umur.",
+  belanja:"Dia tidak membeli apa-apa. Dia membuka tas dan menyodorkan buku besar berisi nama warga dusun, lengkap dengan kolom sisa umur.",
+  tanya:"Pak Mardi? Sisa tiga tahun. Bu Tin sebelas. Mas mau lihat sisa Mas sendiri?",
+  senter:"Bayangannya punya empat tangan, dan semuanya sedang menghitung uang.",
+  garam:"Dia menepis garam dengan sopan, tapi di bagian kemejanya yang terkena, batik itu bolong berasap seperti kertas kena rokok.",
+  cermin:"Di cermin dia memegang buku besar terbuka, dan di salah satu halamannya tertulis namamu."},
+ blorong:{
+  amati:"Kain jariknya tidak bergeser walau dia melangkah, ujungnya menyapu lantai seperti ekor. Gelang emasnya ternyata dua lingkar sisik hijau.",
+  ktp:"Larasati Wulandari, 30 th. Di kolom tanda khusus tertulis tangan: kulit mengelupas tiap tujuh bulan.",
+  belanja:"Sepuluh butir telur. Dua dia telan mentah-mentah di depanmu, lengkap dengan cangkangnya.",
+  tanya:"Pak Mardi? Yang menebang pohon asam itu? Saudara-saudara saya tinggal di akarnya, Mas. Sekarang kami tak beratap.",
+  senter:"Bayangannya tidak berhenti di tumit. Ia menjulur panjang dan berkelok ke arah pintu seperti ular besar.",
+  garam:"Dia mendesis panjang sekali. Kainnya bergolak seperti ada yang berputar di dalamnya, lalu dia mundur.",
+  cermin:"Di cermin, dari pinggang ke bawah bukan kaki, melainkan ekor bersisik hijau yang melingkar tiga kali di lantai."},
+ pengamen:{
+  amati:"Gitarnya tidak punya senar. Bunyi petikan datang dari dalam kotak gitar itu sendiri, tanpa ada jari yang bergerak.",
+  ktp:"Jagad Wicaksono, 32 th, KTP Yogyakarta. Fotonya menghadap ke samping, seolah tidak mau ditatap.",
+  belanja:"Dia tidak membeli apa-apa. Dia menawar satu lagu dengan bayaran sepotong ingatan masa kecilmu, dan tahu nama panggilanmu waktu kecil.",
+  tanya:"Pak Mardi? Yang tiap malam kutemani sejak pohon itu ditebang? Kasihan, dia tidak bisa tidur.",
+  senter:"Bayangannya menari sendiri, tidak ikut gerakan badannya. Badannya diam menatapmu.",
+  garam:"Petikan gitar berhenti, tapi nadanya tetap terdengar, kini dari arah rak di belakangmu.",
+  cermin:"Di cermin dia memainkan gitar bersenar sembilan warna merah, dan penontonnya orang-orang yang kamu kenal dengan mata kosong."},
+ wongalus:{
+  amati:"Sepatunya bersih mengilap padahal jalan setapak tadi penuh lumpur. Wajahnya terlalu rupawan seperti lukisan. Kamu lupa berkedip.",
+  ktp:"Bima Aryasatya, 25 th. Izin pendakiannya berlaku sampai tanggal yang belum ada di kalender, ditulis dengan aksara Jawa kuno.",
+  belanja:"Uang seratus ribunya terasa hangat dan halus, berbau daun jati basah.",
+  tanya:"Basecamp? Yang di gunung itu kampung kami, Mas. Kami sudah di sana dua ratus tahun sebelum dusun ini ada.",
+  senter:"Senter menembus badannya. Bayangannya tidak jatuh di lantai melainkan di dinding sebelah, berupa sosok bermahkota.",
+  garam:"Garam yang jatuh di lantai berubah jadi embun dan menguap. Dia menatapmu penasaran seperti anak kecil.",
+  cermin:"Di cermin bukan minimarket yang terpantul, melainkan taman berkabut. Dia melambai dari sana."},
+ petugas:{
+  amati:"Rompinya bersih dan kering. Dia mencatat sesuatu di map, tapi tak ada bunyi pulpen menggores dan kertasnya kosong.",
+  ktp:"Suparman Aji. Surat tugasnya berstempel kecamatan yang tidak ada di peta, bertanggal Jumat Kliwon tahun depan.",
+  belanja:"Dia tidak membeli apa-apa. Dia menaruh formulir pendataan berisi nama-nama warga dusun ini, sebagian sudah dicoret merah.",
+  tanya:"Penduduk dusun ini tercatat dua ratus empat belas jiwa. Sudah tiga hari kurang satu. Mas belum kami hitung.",
+  senter:"Di bawah sorotan senter wajahnya polos seperti telur, tanpa mata dan mulut. Begitu sorotan bergeser, wajah itu kembali biasa.",
+  garam:"Dia mencatat dengan tenang. Garam yang jatuh di kertasnya membuat tulisan di situ terbakar jadi lubang.",
+  cermin:"Di cermin dia memegang buku besar seperti milikmu, dan sedang mencoret satu nama dengan tinta merah."},
+ ngepet:{
+  amati:"Bau minyak kelapa dan tanah basah menguar kuat. Kukunya hitam keras seperti kuku babi yang dicat.",
+  ktp:"Fotonya buram seperti tercetak di kaca berembun, dan tanggal lahirnya berubah tiap kali disorot lampu.",
+  belanja:"Uang yang dia bayarkan basah berbau tanah sawah, dan lembarannya mengkerut jadi daun kering begitu masuk laci.",
+  tanya:"Pak Mardi? Hehehe, sawahnya luas sekali sekarang, sejak dia mulai 'memelihara' saya tiap malam Jumat.",
+  senter:"Bayangannya bukan bayangan orang gemuk, melainkan babi berkalung tali dengan moncong menyodok ke rak.",
+  garam:"Dia mendengus keras seperti babi terkejut dan mundur sambil menjatuhkan cincin emas yang berubah jadi kerikil.",
+  cermin:"Di cermin yang berdiri bukan manusia, tapi babi hitam gemuk berkalung tasbih yang menatap lurus ke arahmu."},
+ banaspati:{
+  amati:"Kulitnya memerah seperti bara arang, dan uap panas mengepul dari rompi yang anehnya tidak ikut terbakar.",
+  ktp:"Tepi kartu itu hangus, dan tulisan namanya berubah jadi abu tiap kali disorot lampu senter.",
+  belanja:"Tangannya menggenggam bara kecil, bukan baterai. Begitu diletakkan di meja, baunya seperti kayu terbakar.",
+  tanya:"Pak Mardi? Gardu listrik itu sudah saya bakar sejak tiga malam lalu, Mas. Belum ada yang sadar.",
+  senter:"Di bawah sorotan senter, kepalanya menggantung terbalik dari leher, rambutnya menyala kecil seperti sumbu.",
+  garam:"Garam yang jatuh ke tubuhnya mendesis dan menguap jadi asap tipis berbau hangus.",
+  cermin:"Di cermin, sosoknya berjalan tertunduk dengan kepala di bawah dan kaki di atas, dikelilingi kunang-kunang api."}
+};
+/* pilih satu teks x: teks asli atau varian tambahan, acak */
+function pilihX(t,s){ const v=VARIAN_X[t.id]&&VARIAN_X[t.id][s]; return v?ambilAcak([t.x[s],v]):t.x[s]; }
+
 const BIAYA={amati:4,ktp:6,belanja:5,tanya:7,senter:5,garam:5,cermin:4,telepon:12};
 const LABEL={amati:"Amati dari balik meja",ktp:"Minta KTP",belanja:"Periksa belanjaan",
   tanya:"Tanya soal dusun",senter:"Sorot senter",garam:"Tabur garam",cermin:"Lihat cermin rak",
@@ -2256,16 +2471,17 @@ try{
    petunjuk: tambahan/pengurangan jumlah petunjuk (kanal) yang bocor dari tiap makhluk · alat: tambahan jatah senter/garam/cermin
    rugi: pengali kerugian kas saat makhluk lolos · pulih: pemulihan keselamatan & nama baik antar malam */
 const KESULITAN={
-  easy:{id:"easy",nama:"Easy",sabar:1.3,target:.85,jahat:-.06,petunjuk:1,alat:1,rugi:.5,pulih:2,
+  easy:{id:"easy",nama:"Easy",tanda:true,telRagu:.5,sabar:1.3,target:.85,jahat:-.06,petunjuk:1,alat:1,rugi:.5,pulih:2,
     ket:"Pelanggan lebih sabar, target setoran lebih ringan, makhluk lebih jarang dan lebih banyak meninggalkan petunjuk, jatah alat +1, kerugian setengahnya, nyawa dan nama baik pulih +2 tiap malam."},
-  normal:{id:"normal",nama:"Normal",sabar:1,target:1,jahat:0,petunjuk:0,alat:0,rugi:1,pulih:1,
+  normal:{id:"normal",nama:"Normal",tanda:true,telRagu:1,sabar:1,target:1,jahat:0,petunjuk:0,alat:0,rugi:1,pulih:1,
     ket:"Pengalaman asli game ini."},
-  hard:{id:"hard",nama:"Hard",sabar:.8,target:1.1,jahat:.06,petunjuk:-1,alat:-1,rugi:1.5,pulih:0,
-    ket:"Pelanggan cepat bosan, target setoran +10%, makhluk lebih sering datang dan petunjuknya lebih sedikit, jatah alat -1, kerugian 1,5x, nyawa dan nama baik tidak pulih antar malam."}
+  hard:{id:"hard",nama:"Hard",tanda:false,telRagu:1.4,sabar:.8,target:1.1,jahat:.06,petunjuk:-1,alat:-1,rugi:1.5,pulih:0,
+    ket:"Pelanggan cepat bosan, target setoran +10%, makhluk lebih sering datang dan petunjuknya lebih sedikit, jatah alat -1, kerugian 1,5x, nyawa dan nama baik tidak pulih antar malam. Temuan janggal tidak lagi ditandai merah dan tanpa bunyi peringatan, jadi kamu menilai sendiri. Telepon pos ronda lebih sering ragu atau putus."}
 };
 let kesulitan="normal";
 try{ let k=localStorage.getItem("kopdes_kesulitan"); k=({pemula:"easy",mimpi:"hard"})[k]||k; if(k&&(k in KESULITAN)) kesulitan=k; }catch(e){}
 const kes=()=>KESULITAN[kesulitan]||KESULITAN.normal;
+const tanda=()=>kes().tanda!==false; /* true: temuan janggal ditandai merah + bunyi peringatan (Easy/Normal) */
 function setKesulitan(k){
   if(!(k in KESULITAN)) return;
   kesulitan=k; try{localStorage.setItem("kopdes_kesulitan",k)}catch(e){}
@@ -2489,7 +2705,7 @@ const GFX={kualitas:"tinggi",fps:0,tampil:false};
 function muatGfx(){
   try{
     const q=localStorage.getItem("kopdes_kualitas"); if(["tinggi","sedang","rendah"].includes(q)) GFX.kualitas=q;
-    const f=parseInt(localStorage.getItem("kopdes_fps"),10); if([0,15,30,60].includes(f)) GFX.fps=f;
+    const f=parseInt(localStorage.getItem("kopdes_fps"),10); if([0,15,30,60,120].includes(f)) GFX.fps=f;
     GFX.tampil=localStorage.getItem("kopdes_fpstampil")==="1";
   }catch(e){}
 }
@@ -2504,7 +2720,7 @@ const Fps={raf:0,last:0,cnt:0,t0:0,tampil:0};
 function fpsLoop(now){
   Fps.raf=requestAnimationFrame(fpsLoop);
   /* penghitung: hitung frame yang benar-benar diperbarui (bukan sekadar rAF) */
-  const batas=GFX.fps&&document.getAnimations;
+  const batas=GFX.fps&&GFX.fps<120&&document.getAnimations;
   if(!batas||now-Fps.last>=1000/GFX.fps-1) Fps.cnt++;
   if(!Fps.t0) Fps.t0=now;
   if(now-Fps.t0>=1000){
@@ -2512,7 +2728,7 @@ function fpsLoop(now){
     Fps.cnt=0; Fps.t0=now;
   }
   /* pembatas */
-  if(!GFX.fps||!document.getAnimations) { Fps.last=now; return; }
+  if(!GFX.fps||GFX.fps>=120||!document.getAnimations) { Fps.last=now; return; }
   const iv=1000/GFX.fps;
   if(now-Fps.last<iv-1) { /* di antara tick: pastikan animasi baru ikut dijeda */
     document.getAnimations().forEach(a=>{ if(a instanceof CSSAnimation&&a.playState==="running"){ a.pause(); a.__fpsPaused=true; } });
@@ -2530,9 +2746,9 @@ function lepasBatasFps(){
   document.getAnimations().forEach(a=>{ if(a.__fpsPaused){ a.__fpsPaused=false; try{a.play();}catch(e){} } });
 }
 function terapkanFps(v){
-  GFX.fps=[0,15,30,60].includes(Number(v))?Number(v):0;
+  GFX.fps=[0,15,30,60,120].includes(Number(v))?Number(v):0;
   try{localStorage.setItem("kopdes_fps",String(GFX.fps))}catch(e){}
-  if(!GFX.fps) lepasBatasFps();
+  if(!GFX.fps||GFX.fps>=120) lepasBatasFps();
   Fps.last=0; mulaiFpsLoop();
 }
 function terapkanFpsTampil(on){
@@ -2541,12 +2757,12 @@ function terapkanFpsTampil(on){
   mulaiFpsLoop();
 }
 function mulaiFpsLoop(){
-  const perlu=GFX.tampil||GFX.fps>0;
+  const perlu=GFX.tampil||(GFX.fps>0&&GFX.fps<120);
   if(perlu&&!Fps.raf){ Fps.cnt=0; Fps.t0=0; Fps.raf=requestAnimationFrame(fpsLoop); }
   else if(!perlu&&Fps.raf){ cancelAnimationFrame(Fps.raf); Fps.raf=0; }
 }
 muatGfx(); terapkanKualitas(GFX.kualitas); document.body.classList.toggle("fps-on",GFX.tampil); mulaiFpsLoop();
-el("menu-kualitas").onchange=e=>terapkanKualitas(e.target.value);
+el("menu-kualitas").onchange=e=>{ try{localStorage.setItem("kopdes_kualitas_manual","1")}catch(_){} terapkanKualitas(e.target.value); };
 el("menu-fps").onchange=e=>terapkanFps(e.target.value);
 el("menu-fpstampil").onchange=e=>terapkanFpsTampil(e.target.value==="1");
 
@@ -2587,7 +2803,7 @@ function buatAntrean(malam,opt){
       let p=Math.max(1,dasar-(i>jml*.6?1:0));
       const kunci=Object.keys(t.x);
       const kanal=kocok(kunci).slice(0,Math.min(p,kunci.length));
-      const data={}; SALURAN.forEach(s=>data[s]=kanal.includes(s)?t.x[s]:t.c[s]);
+      const data={}; SALURAN.forEach(s=>data[s]=kanal.includes(s)?pilihX(t,s):t.c[s]);
       antre.push({...t,jahat:true,data,kanal});
     }else{
       const t=wargaPool[iw++%wargaPool.length];
@@ -2625,7 +2841,9 @@ function buatAntrean(malam,opt){
     if(idx.length){ const j=ambilAcak(idx); antre[j]={...pilih,jahat:false,data:{...pilih.c},kanal:[]}; }
   }
   antre.forEach(o=>{
-    o.sabar=Math.max(10,Math.round(o.sabar*(ev.sabarMul||1)*(kk.sabar||1))+(opt.sabarBonus||0));
+    /* makhluk memakai kesabaran dasar acak milik warga, supaya laju bar tidak membocorkan siapa dia */
+    const sabarDasar=o.jahat?ambilAcak(WARGA).sabar:o.sabar;
+    o.sabar=Math.max(10,Math.round(sabarDasar*(ev.sabarMul||1)*(kk.sabar||1))+(opt.sabarBonus||0));
     if(!o.jahat) o.bayar=Math.round(o.bayar*(ev.bayarMul||1)/1000)*1000;
   });
   return antre;
@@ -3349,6 +3567,29 @@ function lanjut(){
   gambarAksi();
 }
 
+/* ===== TELEPON POS RONDA: Pak Mardi kuat sebagai petunjuk, tapi tidak mutlak =====
+   putus: sambungan gagal (jatah kembali, waktu tetap terpakai) · ragu: dia lupa (netral untuk warga maupun makhluk)
+   silang: jawabannya ragu-ragu dan condong ke arah yang salah (makhluk terdengar aman, warga terdengar asing)
+   peluang dikali pengali telRagu tingkat kesulitan; sisanya jawaban jujur seperti semula. */
+const TELEPON_PELUANG={putus:.12,ragu:.12,silang:.06};
+function teleponHasil(c){
+  const m=kes().telRagu||1, r=Math.random(), n=c.nama;
+  const pPutus=TELEPON_PELUANG.putus*m, pRagu=pPutus+TELEPON_PELUANG.ragu*m, pSilang=pRagu+TELEPON_PELUANG.silang*m;
+  if(r<pPutus) return {kelas:"samar",j:false,putus:true,t:ambilAcak([
+    'Telepon berdering lama, lalu sambungan terputus sendiri. Sinyal di pos ronda memang sering hilang kalau gerimis. Pulsamu tidak terpakai, kamu bisa mencoba lagi.',
+    'Suara Pak Mardi timbul tenggelam di antara desis statis: "Halo...? Mas...? Putus-putus ini..." Lalu hening. Pulsamu tidak terpakai, kamu bisa mencoba lagi.'])};
+  if(r<pRagu) return {kelas:"samar",j:false,t:ambilAcak([
+    'Pak Mardi menjawab pelan: "Wah, '+n+'... saya lupa, Mas. Malam ini banyak yang lewat pos ronda, saya tidak ingat satu-satu."',
+    '"'+n+'? Namanya kayak pernah dengar, tapi wajahnya saya tidak ingat jelas. Mas putuskan sendiri saja ya."',
+    'Di belakang suara Pak Mardi ramai orang main gaple. "Hah? Nama siapa tadi, Mas? Nanti saya tanya yang lain dulu." Sambungan terputus.'])};
+  if(r<pSilang) return c.jahat
+    ? {kelas:"samar",j:false,t:'"'+n+'? Kayaknya... iya, saya pernah lihat orangnya di warung. Tapi jangan pegang kata saya, Mas, saya kurang yakin."'}
+    : {kelas:"samar",j:false,t:'"'+n+'? Hm, saya tidak ingat dia tinggal di dusun ini. Tapi saya sudah tua, bisa jadi saya yang lupa. Kurang yakin, Mas."'};
+  return c.jahat
+    ? {kelas:"bahaya",j:true,t:'Telepon diangkat. Suara Pak Mardi terdengar curiga: "'+n+'? Orang itu ada di pos ronda sama saya dari tadi, Mas. Siapa yang di minimarketmu?!" Sambungan terputus.'}
+    : {kelas:"aman",j:false,t:'Pak Mardi menjawab gembira. "Iya benar, itu '+n+'. Tolong layani ya, orangnya memang lagi cari kebutuhan."'};
+}
+
 function periksa(s){
   if(G.fase!=="layani"||G.dipakai.includes(s)) return;
   const stok=(ALAT[s]||s==="telepon")?G.alat[s]:null;
@@ -3363,28 +3604,27 @@ function periksa(s){
 
   const c=G.kini;
   if(s==="telepon"){
-    const jwb=c.jahat
-      ? 'Telepon diangkat. Suara Pak Mardi terdengar curiga: "'+c.nama+'? Orang itu ada di pos ronda sama saya dari tadi, Mas. Siapa yang di minimarketmu?!" Sambungan terputus.'
-      : 'Pak Mardi menjawab gembira. "Iya benar, itu '+c.nama+'. Tolong layani ya, orangnya memang lagi cari kebutuhan."';
-    (c.cat=c.cat||[]).push({s:LABEL.telepon,w:jamStr(G.waktu),t:jwb,j:!!c.jahat});
-    tambahNota('<p class="baris"><b>'+LABEL.telepon+' · '+jamStr(G.waktu)+'</b><span class="'+(c.jahat?"bahaya":"aman")+'">'+jwb+'</span></p>');
-    if(c.jahat) bunyi("buruk");
+    const r=teleponHasil(c);
+    (c.cat=c.cat||[]).push({s:LABEL.telepon,w:jamStr(G.waktu),t:r.t,j:!!(r.j&&tanda())});
+    tambahNota('<p class="baris"><b>'+LABEL.telepon+' · '+jamStr(G.waktu)+'</b><span class="'+(tanda()?r.kelas:"")+'">'+r.t+'</span></p>');
+    if(r.j&&tanda()) bunyi("buruk");
+    if(r.putus){ G.alat.telepon++; G.dipakai=G.dipakai.filter(x=>x!=="telepon"); }  /* tersambung gagal: jatah kembali, boleh coba lagi */
   }else{
     const janggal=c.jahat&&c.kanal.includes(s);
     if(s==="senter"){
       gambarScene({terang:true});
-      if(janggal){ el("etalase").classList.add("padam"); setTimeout(()=>el("etalase").classList.remove("padam"),1000); }
+      if(janggal&&tanda()){ el("etalase").classList.add("padam"); setTimeout(()=>el("etalase").classList.remove("padam"),1000); }
       setTimeout(()=>{ if(G.fase==="layani") gambarScene({terang:false}); },2800);
     }
-    if(s==="cermin"&&janggal){ el("etalase").classList.add("getar"); setTimeout(()=>el("etalase").classList.remove("getar"),400); }
-    if(janggal) bunyi("buruk");
-    (c.cat=c.cat||[]).push({s:LABEL[s],w:jamStr(G.waktu),t:c.data[s],j:!!janggal});
-    tambahNota('<p class="baris"><b>'+LABEL[s]+' · '+jamStr(G.waktu)+'</b><span class="'+(janggal?"bahaya":"")+'">'+c.data[s]+'</span></p>');
+    if(s==="cermin"&&janggal&&tanda()){ el("etalase").classList.add("getar"); setTimeout(()=>el("etalase").classList.remove("getar"),400); }
+    if(janggal&&tanda()) bunyi("buruk");
+    (c.cat=c.cat||[]).push({s:LABEL[s],w:jamStr(G.waktu),t:c.data[s],j:!!(janggal&&tanda())});
+    tambahNota('<p class="baris"><b>'+LABEL[s]+' · '+jamStr(G.waktu)+'</b><span class="'+(janggal&&tanda()?"bahaya":"")+'">'+c.data[s]+'</span></p>');
   }
 
   gambarSabar(); gambarAksi();
 
-  if(G.terpakaiSabar>=c.sabar&&!c.jahat){ kaburKarenaBosan(); return; }
+  if(G.terpakaiSabar>=c.sabar){ kaburKarenaBosan(); return; }
   if(G.waktu>=AKHIR){
     tambahNota('<p class="baris bahaya">Jam menunjukkan '+jamStr(AKHIR)+'. Waktu habis—ambil keputusan sekarang!</p>');
     el("aksi").innerHTML="";
@@ -3392,11 +3632,19 @@ function periksa(s){
 }
 
 function kaburKarenaBosan(){
-  G.fase="hasil"; G.kabur++; G.runtun=0;
-  G.catatan.push({nama:G.kini.nama,peran:G.kini.peran,jam:jamStr(G.waktu),hasil:"pergi sendiri",cat:G.kini.cat||[]});
+  const c=G.kini, jahat=!!c.jahat;
+  G.fase="hasil"; if(!jahat) G.kabur++; G.runtun=0;
+  G.catatan.push({nama:c.nama,peran:c.peran,jam:jamStr(G.waktu),hasil:jahat?"pergi sendiri (ternyata bukan warga)":"pergi sendiri",cat:c.cat||[]});
   gambarScene({terang:false}); npcPergi(true); gambarSabar();
+  /* teks keluarnya sengaja sama untuk warga dan makhluk; bedanya baru ketahuan setelah dia pergi */
   tambahNota('<p class="baris" style="border-top:2px dashed #9c8f6d;padding-top:8px"><b>Pelanggan Pergi · '+jamStr(G.waktu)+'</b>'+
-    '<span class="samar">'+G.kini.nama+' menggerutu kesal: "Kelamaan ditanyai seperti penjahat saja!" Dia keluar tanpa belanja.</span></p>');
+    '<span class="samar">'+c.nama+' menggerutu kesal: "Kelamaan ditanyai seperti penjahat saja!" Dia keluar tanpa belanja.</span></p>');
+  if(jahat){
+    const rugi=Math.min(G.kas,Math.round((8000+acak(14000))*((G.kes&&G.kes.rugi)||1))); G.kas-=rugi;
+    tambahNota('<p class="baris bahaya">Begitu pintu menutup, bel tidak berbunyi dan tidak ada langkah di teras. Laci kas terasa lebih ringan'+(rugi?' '+rupiah(rugi):'')+'. Dia bukan warga. Nyawamu selamat, tapi kamu membiarkannya pergi membawa sesuatu.</p>');
+    bunyi("buruk"); el("etalase").classList.add("getar"); setTimeout(()=>el("etalase").classList.remove("getar"),400);
+    gambarStatus();
+  }
   const habis=(G.waktu>=AKHIR||G.idx+1>=G.antre.length);
   tombolLanjut(habis?"Tutup toko":"Pelanggan berikutnya",habis?tutupToko:lanjut);
 }
@@ -3631,7 +3879,7 @@ el("b-catatan").onclick=()=>{
     c.slice().reverse().map(x=>kartu(x.nama,x.peran,x.jam,x.hasil,x.cat)).join("");
   bukaLayar('<h2>Catatan Petunjuk</h2>'+
     '<p class="kecil">Malam ke-'+(G?G.malam:1)+' · semua temuan pemeriksaan tercatat otomatis.</p>'+
-    '<p>Jika ada nama yang muncul 2 kali dalam satu malam, salah satunya pasti Peniru! Temuan yang janggal ditandai merah.</p>'+
+    '<p>Jika ada nama yang muncul 2 kali dalam satu malam, salah satunya pasti Peniru! '+(tanda()?'Temuan yang janggal ditandai merah.':'Di tingkat ini tidak ada tanda merah. Kamu sendiri yang menilai mana yang janggal.')+'</p>'+
     (isi||'<p class="kecil">Belum ada pelanggan malam ini.</p>')+
     '<button class="tutup" id="x">Tutup Catatan</button>');
   el("x").onclick=tutupLayar;
@@ -3640,16 +3888,24 @@ el("b-catatan").onclick=()=>{
 function ketik(elm,teks,speed,cb){
   if(!elm) return;
   const f=kecTeks[pengaturan.teks];
+  if(elm.__ketik){ cancelAnimationFrame(elm.__ketik); elm.__ketik=0; }
   if(f===0){ elm.classList.remove("mengetik"); elm.innerHTML=teks; if(cb) cb(); return; }
   speed=Math.max(2,Math.round(speed*f));
   elm.textContent=""; elm.classList.add("mengetik");
-  let i=0;
-  const iv=setInterval(()=>{
-    if(teks[i]==="<"){ const j=teks.indexOf(">",i); i=(j<0)?i+1:j+1; }
-    else i++;
-    elm.innerHTML=teks.slice(0,i);
-    if(i>=teks.length){ clearInterval(iv); elm.classList.remove("mengetik"); if(cb) cb(); }
-  },speed);
+  /* satu pembaruan DOM per frame (bukan per karakter), jumlah karakter mengikuti waktu */
+  let i=0, t0=null, jalan=0;
+  const tik=now=>{
+    if(t0===null) t0=now;
+    const target=Math.floor((now-t0)/speed); let ganti=false;
+    while(jalan<target&&i<teks.length){
+      if(teks[i]==="<"){ const j=teks.indexOf(">",i); i=(j<0)?i+1:j+1; } else i++;
+      jalan++; ganti=true;
+    }
+    if(ganti) elm.innerHTML=teks.slice(0,i);
+    if(i>=teks.length){ elm.__ketik=0; elm.classList.remove("mengetik"); if(cb) cb(); return; }
+    elm.__ketik=requestAnimationFrame(tik);
+  };
+  elm.__ketik=requestAnimationFrame(tik);
 }
 
 const PROLOG_MALAM = [
@@ -3820,11 +4076,50 @@ document.addEventListener("keydown",e=>{
   if(k==="enter"&&G&&G.lanjutFn){ e.preventDefault(); const f=G.lanjutFn; G.lanjutFn=null; f(); }
 });
 
+/* ===================== PERFORMA: jeda saat tertutup + KUALITAS OTOMATIS ===================== */
+(function(){
+  const b=document.body;
+  const sinkron=()=>{
+    const L=el("layar"), M=el("menu-overlay");
+    b.classList.toggle("ada-layar",!!((L&&!L.classList.contains("sembunyi"))||(M&&M.classList.contains("open"))));
+  };
+  const mo=new MutationObserver(sinkron);
+  ["layar","menu-overlay"].forEach(id=>{ const n=el(id); if(n) mo.observe(n,{attributes:true,attributeFilter:["class"]}); });
+  sinkron();
+  document.addEventListener("visibilitychange",()=>b.classList.toggle("tab-sembunyi",document.hidden));
+})();
+const AutoQ={raf:0,t0:0,n:0,buruk:0,turun:0};
+const kualitasManual=()=>{ try{ return localStorage.getItem("kopdes_kualitas_manual")==="1"; }catch(e){ return false; } };
+function toastGfx(teks){
+  let t=el("toast-gfx"); if(!t){ t=document.createElement("div"); t.id="toast-gfx"; document.body.appendChild(t); }
+  t.textContent=teks; t.classList.add("tampil"); clearTimeout(t.__h); t.__h=setTimeout(()=>t.classList.remove("tampil"),6000);
+}
+/* Mengukur FPS tiap 3 detik. Kalau dua jendela berturut-turut di bawah batas, kualitas diturunkan satu tingkat.
+   Penurunan kedua (ke Rendah) hanya bila FPS masih di bawah 24. Dimatikan kalau pemain memilih kualitas sendiri
+   atau memakai batas FPS. */
+function autoKualitasLoop(now){
+  AutoQ.raf=requestAnimationFrame(autoKualitasLoop);
+  if(document.hidden||(GFX.fps>0&&GFX.fps<120)||kualitasManual()||GFX.kualitas==="rendah"){ AutoQ.t0=0; return; }
+  if(!AutoQ.t0){ AutoQ.t0=now; AutoQ.n=0; return; }
+  AutoQ.n++;
+  const dt=now-AutoQ.t0; if(dt<3000) return;
+  const fps=AutoQ.n*1000/dt; AutoQ.t0=now; AutoQ.n=0;
+  AutoQ.buruk=(fps<(AutoQ.turun===0?45:24))?AutoQ.buruk+1:0;
+  if(AutoQ.buruk<2) return;
+  const urut=["tinggi","sedang","rendah"], baru=urut[Math.min(2,urut.indexOf(GFX.kualitas)+1)];
+  AutoQ.buruk=0; AutoQ.turun++; AutoQ.t0=0;
+  terapkanKualitas(baru);
+  try{ el("menu-kualitas").value=baru; }catch(e){}
+  toastGfx("FPS terdeteksi rendah, kualitas grafis diturunkan otomatis ke "+baru.charAt(0).toUpperCase()+baru.slice(1)+". Bisa diubah di Pengaturan › Tampilan.");
+}
+function mulaiAutoKualitas(){ if(!AutoQ.raf) setTimeout(()=>{ if(!AutoQ.raf) AutoQ.raf=requestAnimationFrame(autoKualitasLoop); },4000); }
+
 /* ===================== INIT ===================== */
 G={malam:muatMalam(),waktu:AWAL,kas:0,target:150000,nyawa:3,rep:3,antre:[],idx:-1,kini:null,catatan:[],fase:"idle"};
 gambarStatus();
 el("scene").innerHTML=svgTokoh({kosong:true},{});
 layarJudul();
+mulaiAutoKualitas();
 </script>
 </body>
 </html>
