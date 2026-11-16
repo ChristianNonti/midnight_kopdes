@@ -400,20 +400,6 @@ button{touch-action:manipulation}
   @media (max-width:700px){ .wrap{height:100dvh} }
 }
 
-.putar-hp{display:none}
-@media (max-width:900px) and (orientation:landscape) and (pointer:coarse){
-  .wrap{display:none}
-  .putar-hp{
-    display:flex;position:fixed;inset:0;z-index:200;background:var(--malam);
-    flex-direction:column;align-items:center;justify-content:center;text-align:center;
-    padding:24px;gap:14px
-  }
-  .putar-hp .ikon{font-size:44px;animation:putar-anim 1.8s ease-in-out infinite}
-  .putar-hp h2{font-family:'Staatliches',sans-serif;font-weight:400;letter-spacing:.03em;
-    font-size:19px;color:var(--kuning);margin:0}
-  .putar-hp p{font-family:'Special Elite',monospace;color:var(--redup);font-size:13px;max-width:320px;margin:0}
-  @keyframes putar-anim{0%,100%{transform:rotate(0deg)}50%{transform:rotate(-90deg)}}
-}
 
 .getar{animation:getar .35s}
 @keyframes getar{0%,100%{transform:none}20%{transform:translate(-5px,3px)}45%{transform:translate(4px,-3px)}70%{transform:translate(-3px,-2px)}}
@@ -1122,14 +1108,157 @@ body.q-rendah .lj-kunang,body.q-rendah .lj-kabut{display:none}
 .sin-diam *{animation:none!important}
 .sin-diam .sin-tujuan,.sin-diam .sin-peta{animation:none!important}
 @media (prefers-reduced-motion:reduce){.sin *{animation:none!important}}
+
+/* =====================================================================
+   MODE LANDSCAPE (HP diputar mendatar)
+   Dulu game memblokir landscape dengan layar "Putar HP ke mode potret".
+   Sekarang HP bisa dimainkan mendatar. Untuk layar pendek (tinggi <= 500px)
+   tampilan dibagi dua kolom:
+     KIRI  : papan nama + status + etalase pintu kaca
+     KANAN : nota, tombol aksi, tombol keputusan
+   Blok ini sengaja diletakkan PALING AKHIR supaya menimpa aturan mobile
+   (max-width:700px) dan desktop (min-width:701px) di atas.
+   ===================================================================== */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%} /* cegah iOS membesarkan teks saat landscape */
+
+@media (orientation:landscape) and (max-height:500px){
+  html,body{height:100%;overflow:hidden}
+  .wrap{
+    max-width:none;width:100%;margin:0;
+    height:100vh;height:100dvh;min-height:0;overflow:hidden;
+    padding:max(4px,env(safe-area-inset-top)) max(8px,env(safe-area-inset-right)) max(4px,env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left));
+    display:grid;
+    grid-template-columns:minmax(0,5fr) minmax(0,8fr);
+    grid-template-rows:auto auto minmax(0,1fr);
+    gap:4px 8px;
+  }
+  /* .panggung dibongkar supaya etalase & meja ikut grid .wrap */
+  .panggung{display:contents}
+
+  /* ---------- KOLOM KIRI ---------- */
+  .papan{grid-column:1;grid-row:1;min-width:0;padding:4px 8px;gap:3px}
+  .judul{display:flex;align-items:center;justify-content:space-between;gap:6px;width:100%}
+  .papan h1{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:none}
+  .papan .sub{display:none}
+  .jam{font-size:13px;padding:1px 6px 0;flex:0 0 auto}
+  .kanan{width:100%;display:flex;flex-wrap:nowrap;gap:3px}
+  .mini{flex:1 1 0;min-width:0;min-height:24px;padding:2px;font-size:9px;text-align:center;box-shadow:0 2px 0 #000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .mini::before{margin-right:2px;font-size:9px}
+
+  .status{grid-column:1;grid-row:2;min-width:0;grid-template-columns:repeat(3,1fr)}
+  .status div{padding:1px 2px;text-align:center}
+  .status .lbl{font-size:6.5px;letter-spacing:.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .status .val{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+  .etalase{grid-column:1;grid-row:3;align-self:stretch;width:auto;height:auto;min-height:0;max-height:none;aspect-ratio:auto;border-width:1px}
+  .scene{min-height:0}
+  .scene svg{max-height:100%;filter:brightness(1.55) contrast(1.08) saturate(1.1)}
+  .stiker{font-size:8px;padding:2px 6px;left:8px}
+  .kusen{inset:4px}
+  .sabar{left:8px;right:8px;bottom:5px}
+  .sabar .cap{font-size:7.5px;margin-bottom:2px}
+  .bar{height:6px}
+
+  /* ---------- KOLOM KANAN ---------- */
+  .meja{grid-column:2;grid-row:1 / 4;min-width:0;min-height:0;display:flex;flex-direction:column;gap:4px}
+  .nota{flex:1 1 auto;min-height:0;height:auto;padding:6px 10px 6px 24px;overflow-y:auto}
+  .nota::after{display:none}
+  .nota::before{left:15px}
+  .nota h2{font-size:14px;padding-bottom:3px;margin-bottom:1px}
+  .nota .waktu{font-size:9.5px;margin-bottom:4px}
+  .baris{font-size:12px;margin-bottom:5px;line-height:1.35}
+  .baris b{font-size:10px}
+  .ucap{padding-left:7px;margin:1px 0 6px}
+
+  .judul-aksi{display:none}
+  .aksi{flex:0 0 auto;grid-template-columns:repeat(4,1fr);gap:4px}
+  .aksi .alat{flex-direction:row;align-items:center;justify-content:flex-start;text-align:left;min-height:36px;padding:3px 4px 3px 7px;gap:5px;border-radius:9px;box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 2px 5px rgba(0,0,0,.4)}
+  .aksi .alat::after{top:5px;bottom:5px;width:2px}
+  .aksi .alat .ik{width:22px;height:22px;border-radius:7px;font-size:12px}
+  .aksi .alat .tx{gap:1px}
+  .aksi .alat .nm{font-size:10.5px;line-height:1.05;letter-spacing:.01em}
+  .aksi .alat .sub{gap:4px}
+  .aksi .alat .biaya{font-size:8px;gap:3px}
+  .aksi .alat .biaya::before{width:6px;height:6px;border-width:1px}
+  .stok{gap:2px}.stok i{width:5px;height:5px}
+  .aksi .alat kbd,.putusan .kep kbd,.putusan .lanjut kbd{display:none}
+  .aksi .alat.habis .nm::after,.aksi .alat.telat .nm::after{content:""}
+
+  .putusan{flex:0 0 auto;gap:4px}
+  .putusan .kep{flex-direction:row;align-items:center;justify-content:flex-start;min-height:40px;padding:4px 8px;gap:7px;border-radius:11px}
+  .putusan .kep .ik{width:26px;height:26px;font-size:14px}
+  .putusan .kep .nm{font-size:13px;line-height:1.05}
+  .putusan .kep .biaya{display:none}
+  .putusan .lanjut{min-height:40px;font-size:15px}
+
+  /* ---------- LAYAR MODAL (buku, catatan, prolog, hasil, ending) ---------- */
+  .layar{padding:6px max(10px,env(safe-area-inset-right)) 6px max(10px,env(safe-area-inset-left))}
+  .kartu{padding:12px 16px;max-width:min(720px,100%);max-height:96vh;max-height:calc(100dvh - 12px)}
+  #layar.judul-mode .kartu{margin-top:clamp(4px,2vh,16px)}
+  .layar h2{font-size:clamp(18px,6vh,26px)}
+  .layar h3{font-size:14px;margin:10px 0 4px}
+  .layar p{margin:0 0 6px}
+  .cerita-box{padding:9px 12px;margin:6px 0;font-size:12.5px}
+  .mulai{padding:9px;font-size:16px}
+  .tutup{margin-top:6px;padding:7px 10px}
+
+  /* layar judul / jeda */
+  .home-screen{padding:2px 0 0}
+  .home-logo{font-size:clamp(28px,12vh,46px);line-height:.95;margin:0 0 4px}
+  .home-sub{font-size:10px;margin-bottom:8px}
+  .home-rule{margin-bottom:10px}
+  .home-buttons{grid-template-columns:1fr 1fr;gap:6px;max-width:520px}
+  .home-btn{padding:8px 10px;font-size:16px}
+  .home-btn.primary{grid-column:1 / -1}
+  .home-btn:last-child:nth-child(even){grid-column:1 / -1}
+  .home-note{margin-top:8px}
+  .kes-box{margin-bottom:8px}
+  .kes-ket{min-height:0}
+
+  /* adegan prolog */
+  .prolog-adegan{height:190px;margin:6px 0 8px}
+
+  /* ending */
+  .sin-adegan{height:clamp(130px,40vh,200px);margin:6px 0 8px}
+  .sin-narasi{min-height:64px;padding:8px 10px;font-size:12.5px;line-height:1.5}
+  .sin-tujuan{padding:8px 10px}
+  .sin-tujuan b{font-size:18px}
+  .sin-aksi{gap:6px;margin-top:6px}
+
+  /* menu pengaturan */
+  .menu-overlay{padding:6px}
+  .menu-panel{width:min(760px,96vw);max-height:calc(100vh - 12px);max-height:calc(100dvh - 12px);padding:10px 16px 12px}
+  .menu-tabs{gap:6px}
+  .menu-tab{font-size:15px;padding:7px 4px;border-radius:9px}
+  .menu-body{margin-top:8px;padding:2px 14px;min-height:0}
+  .menu-row{padding:7px 0;gap:12px}
+  .menu-row.slider{min-height:40px;padding:4px 0}
+  .menu-label{font-size:16px}
+  .menu-desc{font-size:10px;margin-top:2px}
+  .menu-select{padding:7px 10px;font-size:13px}
+  .menu-home-link{margin-top:8px;padding:7px 22px;font-size:16px}
+
+  /* jumpscare: ukuran mengikuti TINGGI layar, bukan lebar */
+  #jumpscare-overlay .js-face{width:min(82vh,520px);height:min(82vh,520px)}
+  #jumpscare-overlay .js-art{width:min(88vw,560px);height:min(74vh,560px);margin-bottom:6vh}
+  #jumpscare-overlay .js-text{font-size:clamp(20px,9vh,40px);bottom:9%}
+}
+
+/* HP landscape yang sempit (mis. 568 x 320): aksi 3 kolom, judul lebih kecil */
+@media (orientation:landscape) and (max-height:500px) and (max-width:640px){
+  .aksi{grid-template-columns:repeat(3,1fr)}
+  .papan h1{font-size:12.5px}
+}
+/* tinggi sangat pendek (<= 340px): rapatkan sedikit lagi */
+@media (orientation:landscape) and (max-height:340px){
+  .mini{min-height:22px}
+  .aksi .alat{min-height:32px}
+  .putusan .kep,.putusan .lanjut{min-height:34px}
+  .baris{font-size:11.5px}
+}
 </style>
 </head>
 <body>
-<div class="putar-hp">
-  <div class="ikon">📱</div>
-  <h2>Putar HP ke mode potret</h2>
-  <p>Midnight KOPDES dirancang untuk layar tegak (potret). Putar HP kamu kembali ke posisi normal untuk melanjutkan shift.</p>
-</div>
 <div class="wrap" id="wrap">
 <div id="fps-meter" aria-hidden="true">-- FPS</div>
 <div class="menu-overlay" id="menu-overlay" aria-hidden="true">
